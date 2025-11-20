@@ -1,0 +1,30 @@
+services:
+  postgres_db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: fast_food
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+
+  redis_db:
+    image: redis:7.2.4
+    ports:
+      - "6379:6379"
+
+
+#  app:
+#    build:
+#     context: .
+ #     dockerfile: Dockerfile
+ #   image: app:0.0.1
+ #   environment:
+ #     SPRING_DATASOURCE_USERNAME: postgres
+ #     SPRING_DATASOURCE_PASSWORD: postgres
+ #     SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/fast_food
+  #  depends_on:
+  #    - postgres_db
+  #    - redis_db
+  #  ports:
+   #   - "8080:8080"

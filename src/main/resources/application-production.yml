@@ -1,0 +1,18 @@
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  otp:
+   retry-wait-time: 60 # in seconds
+   retry-count: 3
+   time-to-live: 300 # in seconds
+
+notification:
+  eskiz:
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTY5OTQ1NzMsImlhdCI6MTcxNDQwMjU3Mywicm9sZSI6InRlc3QiLCJzaWduIjoiMmYxMDliOTRmOWE3MWM1NjNhMGRmYWQ3NTUwYmZkOTY1ZmFkMGI4ZWQzNDQxMDFjMzE0NGJhNWQ2MzQ5YmEzOCIsInN1YiI6IjU1OTEifQ.LkOpwTRtapPhtczF4cfFtnG6c--113dKrEyIDTEuxkU
+
+security:
+  token:
+    expiration: 86400
+    secretKey: FMrOwoLPY38lu29ODuC4wIHvUX0yFmM3p8qNla9r

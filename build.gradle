@@ -1,0 +1,100 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.7'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.vaadin' version '24.9.5'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "2025.0.0")
+}
+
+dependencies {
+	// spring boot actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// spring jpa
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	
+	//spring mail
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	
+	//security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	
+	// validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	
+	//spring web
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	//open feign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	
+	//prometheus
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+	
+	// postgres
+	runtimeOnly 'org.postgresql:postgresql'
+	
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// tests	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	testImplementation 'org.springframework.security:spring-security-test'
+	
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// swagger
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14")
+
+	// redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'redis.clients:jedis:5.1.0'
+
+	//model mapper
+    implementation 'org.modelmapper:modelmapper:3.2.0'
+
+	 // jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+	// mapstruct
+    implementation "org.mapstruct:mapstruct:1.6.3"
+    annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
