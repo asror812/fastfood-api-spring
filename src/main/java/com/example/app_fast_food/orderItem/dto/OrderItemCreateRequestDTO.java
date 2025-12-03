@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.UUID;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 @AllArgsConstructor
@@ -16,4 +17,7 @@ import jakarta.validation.constraints.NotNull;
 public class OrderItemCreateRequestDTO {
     @NotNull
     private UUID productId;
+
+    @Min(1)
+    private int quantity;
 }

@@ -1,35 +1,20 @@
 package com.example.app_fast_food.filial;
 
-import com.example.app_fast_food.common.mapper.BaseMapper;
-import com.example.app_fast_food.common.service.GenericService;
-import com.example.app_fast_food.filial.dto.FilialResponseDTO;
 import com.example.app_fast_food.filial.entity.Filial;
 import com.example.app_fast_food.filial.entity.NearestFilial;
 
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@Getter
-public class FilialService
-        extends GenericService<Filial, FilialResponseDTO> {
+@RequiredArgsConstructor
+public class FilialService {
 
     private final FilialRepository repository;
-    private final FilialMapper mapper;
-    private final Class<Filial> entityClass = Filial.class;
 
     private static final double EARTH_RADIUS = 6378.1370;
-
-    public FilialService(BaseMapper<Filial, FilialResponseDTO> baseMapper,
-            FilialRepository repository,
-            FilialMapper mapper) {
-        super(baseMapper);
-
-        this.repository = repository;
-        this.mapper = mapper;
-    }
 
     public NearestFilial findTheNearestOne(Double longitude, Double latitude) {
 

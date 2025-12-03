@@ -3,9 +3,7 @@ package com.example.app_fast_food.product.entity;
 import com.example.app_fast_food.attachment.entity.Attachment;
 import com.example.app_fast_food.bonus.entity.BonusProductLink;
 import com.example.app_fast_food.category.entity.Category;
-
-import com.example.app_fast_food.product_discounts.ProductDiscount;
-import com.example.app_fast_food.review.entity.Review;
+import com.example.app_fast_food.product_discounts.entity.ProductDiscount;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -40,16 +38,15 @@ public class Product {
     private int weight;
 
     @OneToMany(mappedBy = "product")
-    private List<ProductDiscount> discounts = new ArrayList<>();
+    private List<ProductDiscount> productDiscounts = new ArrayList<>();
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private Attachment main;
+    @JoinColumn(name = "main_image")
+    private Attachment mainImage;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private Attachment other;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Review> reviews = new ArrayList<>();
+    @JoinColumn(name = "secondary_image")
+    private Attachment secondaryImage;
 
     @OneToMany(mappedBy = "product")
     private List<BonusProductLink> bonusProductLinks = new ArrayList<>();
@@ -62,10 +59,8 @@ public class Product {
 
         this.category = category;
         this.weight = weight;
-        this.main = main;
-        this.other = other;
+        this.mainImage = main;
+        this.secondaryImage = other;
     }
 
-    // TODO: Get Campaign Products
-    // TODO: Get Popular Products
 }

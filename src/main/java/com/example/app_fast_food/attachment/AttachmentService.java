@@ -1,6 +1,6 @@
 package com.example.app_fast_food.attachment;
 
-import com.example.app_fast_food.attachment.dto.AttachmentResponseDTO;
+import com.example.app_fast_food.attachment.dto.AttachmentResponseDto;
 import com.example.app_fast_food.attachment.entity.Attachment;
 import com.example.app_fast_food.exceptions.FileNotFoundException;
 import com.example.app_fast_food.exceptions.FileSizeLimitExceedException;
@@ -18,6 +18,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,7 +31,7 @@ public class AttachmentService {
     private final AttachmentMapper mapper;
     final Long limitSize = 1L;
 
-    public AttachmentResponseDTO uploadImageToFileSystem(HttpServletRequest request)
+    public AttachmentResponseDto uploadImageToFileSystem(HttpServletRequest request)
             throws IOException, ServletException {
 
         Part file = request.getPart("file");
@@ -100,5 +101,9 @@ public class AttachmentService {
                 .orElseThrow(() -> new EntityNotFoundException("Attachment with id : %s not found"));
 
         repository.delete(entity);
+    }
+
+    public List<AttachmentResponseDto> getAll() {
+        return repository.findAll().stream().map(a -> mapper.toResponseDTO(a)).toList();
     }
 }

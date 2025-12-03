@@ -1,13 +1,11 @@
 package com.example.app_fast_food.category;
 
 import com.example.app_fast_food.category.dto.CategoryCreateDto;
-import com.example.app_fast_food.category.dto.CategoryListResponseDto;
-import com.example.app_fast_food.category.dto.CategoryResponse;
-import com.example.app_fast_food.category.dto.CategoryResponseDTO;
 import com.example.app_fast_food.category.dto.CategoryResponseDto;
 import com.example.app_fast_food.product.ProductService;
-import com.example.app_fast_food.product.dto.ProductResponseDTO;
+import com.example.app_fast_food.product.dto.ProductResponseDto;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -23,14 +21,15 @@ import java.util.UUID;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<CategoryResponseDto> create(@RequestBody CategoryCreateDto createDTO) {
+    public ResponseEntity<CategoryResponseDto> create(@Valid @RequestBody CategoryCreateDto createDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(createDTO));
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryListResponseDto>> getAll() {
+    public ResponseEntity<List<CategoryResponseDto>> getAll() {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
@@ -39,9 +38,9 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getById(id));
     }
 
-    @GetMapping("/menu/{categoryName}")
-    public ResponseEntity<List<ProductResponseDTO>> getAllByCategory(@PathVariable String categoryName) {
-        return ResponseEntity.ok(categoryService.getByCategory(categoryName));
+    @GetMapping("/menu/{id}")
+    public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryName(@PathVariable UUID id) {
+        return ResponseEntity.ok(productService.getAllByCategory(id));
     }
 
 }

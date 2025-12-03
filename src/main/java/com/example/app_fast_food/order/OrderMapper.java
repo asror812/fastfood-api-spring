@@ -1,12 +1,12 @@
 package com.example.app_fast_food.order;
 
 import com.example.app_fast_food.bonus.BonusMapper;
-import com.example.app_fast_food.common.mapper.BaseMapper;
 import com.example.app_fast_food.discount.DiscountMapper;
-import com.example.app_fast_food.order.dto.OrderCreateRequestDTO;
-import com.example.app_fast_food.order.dto.OrderResponseDTO;
-import com.example.app_fast_food.order.dto.OrderUpdateRequestDTO;
+import com.example.app_fast_food.order.dto.OrderCreateDto;
+import com.example.app_fast_food.order.dto.OrderResponseDto;
+import com.example.app_fast_food.order.dto.OrderUpdateDto;
 import com.example.app_fast_food.order.entity.Order;
+import com.example.app_fast_food.orderItem.OrderItemMapper;
 
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -15,9 +15,9 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring", uses = { DiscountMapper.class, BonusMapper.class })
+@Mapper(componentModel = "spring", uses = { DiscountMapper.class, BonusMapper.class, OrderItemMapper.class })
 @Component
-public interface OrderMapper extends BaseMapper<Order, OrderResponseDTO> {
+public interface OrderMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
@@ -28,7 +28,7 @@ public interface OrderMapper extends BaseMapper<Order, OrderResponseDTO> {
     @Mapping(target = "finalPrice", ignore = true)
     @Mapping(target = "orderItems", ignore = true)
     @Mapping(target = "appliedBonus", ignore = true)
-    Order toEntity(OrderCreateRequestDTO dto);
+    Order toEntity(OrderCreateDto dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
@@ -38,5 +38,8 @@ public interface OrderMapper extends BaseMapper<Order, OrderResponseDTO> {
     @Mapping(target = "totalPrice", ignore = true)
     @Mapping(target = "discountAmount", ignore = true)
     @Mapping(target = "finalPrice", ignore = true)
-    void toEntity(OrderUpdateRequestDTO dto, @MappingTarget Order order);
+    void toEntity(OrderUpdateDto dto, @MappingTarget Order order);
+
+    OrderResponseDto toResponseDto(Order order);
+
 }

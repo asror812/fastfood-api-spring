@@ -3,7 +3,6 @@ package com.example.app_fast_food.user.entity;
 import com.example.app_fast_food.bonus.entity.UserBonus;
 import com.example.app_fast_food.check.entity.Check;
 import com.example.app_fast_food.product.entity.Product;
-import com.example.app_fast_food.review.entity.Review;
 import com.example.app_fast_food.user.permission.entity.Permission;
 import com.example.app_fast_food.user.role.Role;
 import jakarta.persistence.*;
@@ -24,7 +23,7 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = { "comments", "roles", "checks" })
+@ToString(exclude = { "roles", "checks" })
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -40,9 +39,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "user")
-    private List<Review> comments = new ArrayList<>();
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
@@ -51,11 +47,11 @@ public class User implements UserDetails {
     private List<Check> checks = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<UserBonus> userBonuses;
+    private List<UserBonus> userBonuses = new ArrayList<>();
 
     @ManyToMany
-    @JoinTable(name = "user_favorites", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
-    public List<Product> favoriteProducts = new ArrayList<>();
+    @JoinTable(name = "user_favourite_products", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
+    private Set<Product> favouriteProducts = new HashSet<>();
 
     private LocalDate birthDate;
 

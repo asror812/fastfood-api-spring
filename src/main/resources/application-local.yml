@@ -19,3 +19,7 @@ security:
   token:
     expiration: 86400
     secretKey: my-fast-food-application-secret-key
+
+logging:
+  level:
+    root: WARN

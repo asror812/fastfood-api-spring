@@ -1,11 +1,10 @@
 package com.example.app_fast_food.order;
 
-import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDTO;
-import com.example.app_fast_food.check.dto.CheckCreateRequestDTO;
+import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDto;
 import com.example.app_fast_food.common.response.ApiMessageResponse;
-import com.example.app_fast_food.order.dto.OrderResponseDTO;
+import com.example.app_fast_food.order.dto.OrderResponseDto;
 import com.example.app_fast_food.orderItem.dto.OrderItemCreateRequestDTO;
-import com.example.app_fast_food.product.dto.ProductResponseDTO;
+import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,22 +27,22 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<List<OrderResponseDTO>> getAll() {
+    public ResponseEntity<List<OrderResponseDto>> getAll() {
         return ResponseEntity.ok(orderService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<OrderResponseDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(orderService.getById(id));
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<OrderResponseDTO>> getAllByOrderStatus(@PathVariable String status) {
+    public ResponseEntity<List<OrderResponseDto>> getAllByOrderStatus(@PathVariable String status) {
         return ResponseEntity.ok(orderService.getByOrderStatus(status));
     }
 
     @PostMapping("/basket/items")
-    public ResponseEntity<OrderResponseDTO> addItem(@AuthenticationPrincipal User user,
+    public ResponseEntity<OrderResponseDto> addItem(@AuthenticationPrincipal User user,
             @Valid @RequestBody OrderItemCreateRequestDTO dto) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -51,12 +50,12 @@ public class OrderController {
     }
 
     @GetMapping("/basket")
-    public ResponseEntity<OrderResponseDTO> getBasket(@AuthenticationPrincipal User user) {
+    public ResponseEntity<OrderResponseDto> getBasket(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(orderService.getBasket(user));
     }
 
     @PatchMapping("/basket/items/{productId}")
-    public ResponseEntity<OrderResponseDTO> updateQuantity(
+    public ResponseEntity<OrderResponseDto> updateQuantity(
             @AuthenticationPrincipal User user,
             @PathVariable UUID productId,
             @RequestParam(required = true) int quantity) {
@@ -69,7 +68,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/basket/items/{productId}")
-    public ResponseEntity<OrderResponseDTO> removeItem(
+    public ResponseEntity<OrderResponseDto> removeItem(
             @AuthenticationPrincipal User user,
             @PathVariable UUID productId) {
 
@@ -77,12 +76,12 @@ public class OrderController {
     }
 
     @GetMapping("/basket/bonus")
-    public ResponseEntity<List<BonusResponseDTO>> getAvailableBonuses(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<BonusResponseDto>> getAvailableBonuses(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(orderService.getAvailableBonuses(user));
     }
 
     @PostMapping("/basket/bonus/{productId}")
-    public ResponseEntity<ProductResponseDTO> chooseBonus(
+    public ResponseEntity<ProductResponseDto> chooseBonus(
             @AuthenticationPrincipal User user,
             @PathVariable UUID productId) {
         return ResponseEntity.ok(orderService.selectBonus(user, productId));
@@ -90,9 +89,8 @@ public class OrderController {
 
     @PostMapping("/confirm")
     public ResponseEntity<ApiMessageResponse> confirmOrder(
-            @AuthenticationPrincipal User user,
-            @Valid @RequestBody CheckCreateRequestDTO createDTO) {
-        orderService.confirmOrder(createDTO, user);
+            @AuthenticationPrincipal User user) {
+        orderService.confirmOrder(user);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

@@ -1,5 +1,6 @@
 package com.example.app_fast_food.bonus.entity;
 
+import java.time.LocalDate;
 import java.util.UUID;
 import com.example.app_fast_food.user.entity.User;
 
@@ -34,4 +35,12 @@ public class UserBonus {
     @ManyToOne
     @JoinColumn(name = "bonus_id")
     private Bonus bonus;
+
+    private LocalDate receivedDate;
+
+    private boolean used;
+
+    private LocalDate usedDate;
+
+    private int remainingUses;
 }

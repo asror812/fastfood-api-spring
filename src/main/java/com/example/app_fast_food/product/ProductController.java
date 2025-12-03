@@ -1,6 +1,6 @@
 package com.example.app_fast_food.product;
 
-import com.example.app_fast_food.product.dto.ProductResponseDTO;
+import com.example.app_fast_food.product.dto.ProductResponseDto;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,22 +16,22 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getAll() {
+    public ResponseEntity<List<ProductResponseDto>> getAll() {
         return ResponseEntity.ok(productService.getAll());
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<List<ProductResponseDTO>> get4PopularProducts() {
-        return ResponseEntity.ok(productService.getDefaultProducts());
+    public ResponseEntity<List<ProductResponseDto>> getPopularProducts() {
+        return ResponseEntity.ok(productService.getPopularProducts());
     }
 
     @GetMapping("/campaign")
-    public ResponseEntity<List<ProductResponseDTO>> getCampaignProducts() {
+    public ResponseEntity<List<ProductResponseDto>> getCampaignProducts() {
         return ResponseEntity.ok(productService.getCampaignProducts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> getProductIndividual(@PathVariable UUID id) {
+    public ResponseEntity<ProductResponseDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(productService.getSpecificProduct(id));
     }
 

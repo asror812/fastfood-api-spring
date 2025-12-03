@@ -9,6 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BonusProductLinkResponseDTO extends BonusProductLinkDTO {
+public class BonusProductLinkResponseDTO extends BonusProductLinkDto {
     private UUID id;
+    private String bonusName;
+
+    public BonusProductLinkResponseDTO(UUID id, String bonusName, UUID bonusId, UUID productId, int quantity) {
+        super(bonusId, productId, quantity);
+        this.id = id;
+        this.bonusName = bonusName;
+    }
 }

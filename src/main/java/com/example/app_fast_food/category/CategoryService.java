@@ -1,43 +1,56 @@
 package com.example.app_fast_food.category;
 
 import com.example.app_fast_food.category.dto.CategoryCreateDto;
-import com.example.app_fast_food.category.dto.CategoryResponseDTO;
 import com.example.app_fast_food.category.dto.CategoryResponseDto;
 import com.example.app_fast_food.category.entity.Category;
-import com.example.app_fast_food.common.mapper.BaseMapper;
-import com.example.app_fast_food.common.service.GenericService;
-import com.example.app_fast_food.product.dto.ProductResponseDTO;
+import com.example.app_fast_food.exceptions.AlreadyExistsException;
+import com.example.app_fast_food.exceptions.EntityNotFoundException;
 
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 @Service
-@Getter
-public class CategoryService
-        extends GenericService<Category, CategoryResponseDTO> {
-
+@RequiredArgsConstructor
+public class CategoryService {
     private final CategoryRepository repository;
-    private final Class<Category> entityClass = Category.class;
-    private CategoryMapper mapper;
+    private final CategoryMapper mapper;
 
-    public CategoryService(BaseMapper<Category, CategoryResponseDTO> mapper, CategoryRepository repository,
-            CategoryMapper mapper2) {
-        super(mapper);
-        this.repository = repository;
-        mapper = mapper2;
+    public CategoryResponseDto create(CategoryCreateDto createDto) {
+        UUID parentId = createDto.getParentId();
+        String name = createDto.getName();
+
+        Category parent = null;
+        if (parentId != null) {
+            parent = repository.findById(parentId)
+                    .orElseThrow(() -> new EntityNotFoundException("Category", parentId.toString()));
+        }
+
+        repository.findByName(name)
+                .ifPresent(c -> {
+                    throw new AlreadyExistsException(
+                            "Category", "name", name);
+                });
+
+        Category category = new Category();
+        category.setParent(parent);
+        category.setName(name);
+
+        repository.save(category);
+
+        return mapper.toResponseDto(category);
     }
 
-    public CategoryResponseDto create(CategoryCreateDto createDTO) {
-        mapper.toEntity(createDTO);
-        return null;
+    public List<CategoryResponseDto> getAll() {
+        return repository.findAll().stream().map(c -> mapper.toResponseDto(c)).toList();
     }
 
-    public List<ProductResponseDTO> getByCategory(String categoryName) {
-        return Collections.emptyList();
+    public CategoryResponseDto getById(UUID id) {
+        return repository.findById(id).map(c -> mapper.toResponseDto(c))
+                .orElseThrow(() -> new EntityNotFoundException("Category", id.toString()));
     }
 
 }

@@ -1,21 +1,20 @@
 package com.example.app_fast_food.category;
 
 import com.example.app_fast_food.category.dto.CategoryCreateDto;
-import com.example.app_fast_food.category.dto.CategoryResponseDTO;
+import com.example.app_fast_food.category.dto.CategoryResponseDto;
 import com.example.app_fast_food.category.dto.CategoryUpdateDto;
+import com.example.app_fast_food.category.dto.SubCategory;
 import com.example.app_fast_food.category.entity.Category;
-import com.example.app_fast_food.common.mapper.BaseMapper;
 
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface CategoryMapper
-        extends BaseMapper<Category, CategoryResponseDTO> {
+public interface CategoryMapper {
 
-    @Override
-    public CategoryResponseDTO toResponseDTO(Category category);
+    public CategoryResponseDto toResponseDto(Category category);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "products", ignore = true)
@@ -24,4 +23,8 @@ public interface CategoryMapper
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "products", ignore = true)
     public Category toEntity(CategoryCreateDto createDTO);
+
+    default List<SubCategory> mapCategories(List<Category> subCategories) {
+        return subCategories.stream().map(c -> new SubCategory(c.getId(), c.getName())).toList();
+    }
 }

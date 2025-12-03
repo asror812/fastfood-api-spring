@@ -33,12 +33,12 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<UserResponseDTO> signUp(@Valid @RequestBody SignUpDTO signUpDTO) {
+    public ResponseEntity<UserResponseDto> signUp(@Valid @RequestBody SignUpDto signUpDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.create(signUpDTO));
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<TokenResponseDTO> signIn(@Valid @RequestBody SignInDTO signInDTO) {
+    public ResponseEntity<TokenResponseDto> signIn(@Valid @RequestBody SignInDto signInDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.signIn(signInDTO));
     }
 }

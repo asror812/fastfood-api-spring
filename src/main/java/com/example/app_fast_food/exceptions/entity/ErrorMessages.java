@@ -18,7 +18,8 @@ public class ErrorMessages {
     public static final String AUTH_FAILED = "Authentication failed.";
     public static final String USER_NOT_FOUND = "User not found.";
 
-    public static final String PHONE_NUMBER_ALREADY_REGISTERED = "This phone number is already registered";
+    public static final String PHONE_ALREADY_REGISTERED = "This phone number is already registered";
+    public static final String ALREADY_EXIST = "Resource already exists";
 
     private ErrorMessages() {
     }

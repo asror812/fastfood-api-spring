@@ -1,11 +1,15 @@
 package com.example.app_fast_food.category;
 
 import com.example.app_fast_food.category.entity.Category;
-import com.example.app_fast_food.common.repository.GenericRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface CategoryRepository extends GenericRepository<Category, UUID> {
+public interface CategoryRepository extends JpaRepository<Category, UUID> {
+
+    Optional<Category> findByName(String name);
+
 }

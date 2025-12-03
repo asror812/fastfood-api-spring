@@ -1,20 +1,16 @@
 package com.example.app_fast_food.user;
 
-import com.example.app_fast_food.common.mapper.BaseMapper;
-import com.example.app_fast_food.common.service.GenericService;
-import com.example.app_fast_food.exceptions.AlreadyRegisteredException;
+import com.example.app_fast_food.exceptions.AlreadyExistsException;
 import com.example.app_fast_food.exceptions.InvalidCredentialsException;
 import com.example.app_fast_food.exceptions.PhoneNumberNotVerifiedException;
 import com.example.app_fast_food.otp.OtpRepository;
 import com.example.app_fast_food.otp.entity.Otp;
 import com.example.app_fast_food.security.JwtService;
 
-import com.example.app_fast_food.user.dto.UserResponseDTO;
-import com.example.app_fast_food.user.dto.UserUpdateRequestDTO;
 import com.example.app_fast_food.user.entity.User;
 
 import jakarta.transaction.Transactional;
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,48 +19,35 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.example.app_fast_food.user.dto.SignInDTO;
-import com.example.app_fast_food.user.dto.SignUpDTO;
-import com.example.app_fast_food.user.dto.TokenResponseDTO;
+
+import com.example.app_fast_food.user.dto.SignInDto;
+import com.example.app_fast_food.user.dto.SignUpDto;
+import com.example.app_fast_food.user.dto.TokenResponseDto;
+import com.example.app_fast_food.user.dto.UserResponseDto;
+import com.example.app_fast_food.user.dto.UserUpdateDto;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Getter
 @Slf4j
-public class AuthService extends GenericService<User, UserResponseDTO>
-        implements UserDetailsService {
+@RequiredArgsConstructor
+public class AuthService implements UserDetailsService {
 
-    private final Class<User> entityClass = User.class;
     private final UserMapper mapper;
-
     private final UserRepository repository;
     private final OtpRepository otpRepository;
 
     private final PasswordEncoder passwordEncoder;
-
     private final JwtService jwtService;
 
-    public AuthService(BaseMapper<User, UserResponseDTO> baseMapper, UserRepository repository,
-            OtpRepository otpRepository, UserRepository userRepository, PasswordEncoder passwordEncoder,
-            JwtService jwtService, UserMapper mapper) {
-        super(baseMapper);
-
-        this.repository = repository;
-        this.otpRepository = otpRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
-        this.mapper = mapper;
-    }
-
-    protected UserResponseDTO create(SignUpDTO signUpDTO) {
+    protected UserResponseDto create(SignUpDto signUpDTO) {
         String phoneNumber = signUpDTO.getPhoneNumber();
 
         isPhoneNumberVerified(phoneNumber);
 
         if (repository.findByPhoneNumber(phoneNumber).isPresent()) {
-            throw new AlreadyRegisteredException(phoneNumber);
+            throw new AlreadyExistsException("User", "phone number", phoneNumber);
         }
 
         String password = passwordEncoder.encode(signUpDTO.getPassword());
@@ -73,7 +56,7 @@ public class AuthService extends GenericService<User, UserResponseDTO>
                 signUpDTO.getBirthDate());
 
         repository.save(user);
-        return mapper.toResponseDTO(user);
+        return mapper.toResponseDto(user);
     }
 
     private void isPhoneNumberVerified(String phoneNumber) {
@@ -86,12 +69,12 @@ public class AuthService extends GenericService<User, UserResponseDTO>
         }
     }
 
-    protected UserResponseDTO update(UUID id, UserUpdateRequestDTO userUpdateDTO) {
-        return mapper.toResponseDTO(repository.findById(id).orElseThrow());
+    protected UserResponseDto update(UUID id, UserUpdateDto userUpdateDTO) {
+        return mapper.toResponseDto(repository.findById(id).orElseThrow());
     }
 
     @Transactional
-    public TokenResponseDTO signIn(SignInDTO signInDTO) {
+    public TokenResponseDto signIn(SignInDto signInDTO) {
         User user = repository.findByPhoneNumber(signInDTO.getPhoneNumber())
                 .orElseThrow(
                         () -> new InvalidCredentialsException(signInDTO.getPhoneNumber(), signInDTO.getPassword()));
@@ -100,7 +83,7 @@ public class AuthService extends GenericService<User, UserResponseDTO>
             throw new BadCredentialsException("Username or password is not correct");
         }
 
-        return new TokenResponseDTO(jwtService.generateToken(signInDTO.getPhoneNumber()));
+        return new TokenResponseDto(jwtService.generateToken(signInDTO.getPhoneNumber()));
     }
 
     @Override

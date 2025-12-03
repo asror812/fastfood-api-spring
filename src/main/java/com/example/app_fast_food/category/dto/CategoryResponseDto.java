@@ -3,21 +3,21 @@ package com.example.app_fast_food.category.dto;
 import java.util.List;
 import java.util.UUID;
 
-public record CategoryResponseDto(
-        UUID id,
-        String name,
-        UUID parentId,
-        List<SubCategoryDTO> subCategories,
-        List<ProductDTO> products) {
-}
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-record SubCategoryDTO(
-        UUID id,
-        String name) {
-}
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+public class CategoryResponseDto {
+    private UUID id;
 
-record ProductDTO(
-        UUID id,
-        String name,
-        Double price) {
+    private String name;
+
+    private ParentCategoryDto parent; // safe parent
+
+    private List<SubCategory> subCategories; // safe children
 }

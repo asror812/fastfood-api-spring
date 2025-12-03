@@ -1,12 +1,12 @@
 package com.example.app_fast_food.bonus.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +15,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Bonus {
 
     @Id
@@ -26,7 +25,7 @@ public class Bonus {
     private String name;
 
     @OneToMany(mappedBy = "bonus", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BonusProductLink> bonusProductLinks;
+    private List<BonusProductLink> bonusProductLinks = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "condition_id", nullable = false)
@@ -49,4 +48,16 @@ public class Bonus {
 
     @Column(name = "is_active")
     private boolean isActive = true;
+
+    public Bonus(UUID id, String name, BonusCondition condition, int usageLimit, LocalDate startDate, LocalDate endDate,
+            boolean isActive) {
+        this.id = id;
+        this.name = name;
+        this.condition = condition;
+        this.usageLimit = usageLimit;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.isActive = isActive;
+    }
+    
 }

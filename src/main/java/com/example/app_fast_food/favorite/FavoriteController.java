@@ -1,7 +1,7 @@
 package com.example.app_fast_food.favorite;
 
 import com.example.app_fast_food.common.response.ApiMessageResponse;
-import com.example.app_fast_food.product.dto.ProductResponseDTO;
+import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
@@ -20,14 +20,14 @@ public class FavoriteController {
     private final FavoriteService favoriteService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getFavoriteProducts(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<ProductResponseDto>> getFavoriteProducts(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(favoriteService.getFavorites(user.getId()));
     }
 
-    @PostMapping("/{product_id}")
+    @PostMapping("/{productId}")
     public ResponseEntity<ApiMessageResponse> addFavorite(@AuthenticationPrincipal User user,
-            @PathVariable UUID product_id) {
-        return ResponseEntity.ok(favoriteService.addFavorite(user.getId(), product_id));
+            @PathVariable UUID productId) {
+        return ResponseEntity.ok(favoriteService.addFavorite(user.getId(), productId));
     }
 
 }

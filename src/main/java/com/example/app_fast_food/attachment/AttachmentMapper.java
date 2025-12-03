@@ -1,12 +1,13 @@
 package com.example.app_fast_food.attachment;
 
-import com.example.app_fast_food.attachment.dto.AttachmentResponseDTO;
-import com.example.app_fast_food.attachment.entity.Attachment;
-import com.example.app_fast_food.common.mapper.BaseMapper;
-
 import org.mapstruct.Mapper;
 
+import com.example.app_fast_food.attachment.dto.AttachmentResponseDto;
+import com.example.app_fast_food.attachment.entity.Attachment;
+
 @Mapper(componentModel = "spring")
-public interface AttachmentMapper extends BaseMapper<Attachment, AttachmentResponseDTO> {
+public interface AttachmentMapper {
+
+    AttachmentResponseDto toResponseDTO(Attachment attachment);
 
 }

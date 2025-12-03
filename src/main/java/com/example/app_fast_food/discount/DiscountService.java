@@ -1,8 +1,5 @@
 package com.example.app_fast_food.discount;
 
-import com.example.app_fast_food.common.mapper.BaseMapper;
-import com.example.app_fast_food.common.service.GenericService;
-import com.example.app_fast_food.discount.dto.DiscountResponseDTO;
 import com.example.app_fast_food.discount.entity.Discount;
 import com.example.app_fast_food.order.entity.Order;
 import com.example.app_fast_food.orderItem.entity.OrderItem;
@@ -17,16 +14,13 @@ import java.util.Set;
 
 @Service
 @Getter
-public class DiscountService
-        extends GenericService<Discount, DiscountResponseDTO> {
+public class DiscountService {
 
     private final DiscountRepository repository;
     private final Class<Discount> entityClass = Discount.class;
     private final DiscountMapper mapper;
 
-    public DiscountService(BaseMapper<Discount, DiscountResponseDTO> baseMapper, DiscountRepository repository,
-            DiscountMapper mapper) {
-        super(baseMapper);
+    public DiscountService(DiscountRepository repository, DiscountMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }

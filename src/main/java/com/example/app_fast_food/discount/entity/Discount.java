@@ -9,7 +9,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.example.app_fast_food.product_discounts.ProductDiscount;
+
+import com.example.app_fast_food.product_discounts.entity.ProductDiscount;
 
 @Entity
 @Table(name = "discounts")
@@ -27,10 +28,10 @@ public class Discount {
 
     private int percentage;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "start_date")
     private LocalDate startDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "end_date")
     private LocalDate endDate;
 
     @Column(name = "required_quantity")

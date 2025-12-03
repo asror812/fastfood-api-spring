@@ -1,27 +1,25 @@
 package com.example.app_fast_food.bonus;
 
-import com.example.app_fast_food.bonus.dto.bonus.BonusCreateRequestDTO;
-import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDTO;
-import com.example.app_fast_food.bonus.dto.bonus.BonusUpdateRequestDTO;
+import com.example.app_fast_food.bonus.dto.bonus.BonusCreateDto;
+import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDto;
+import com.example.app_fast_food.bonus.dto.bonus.BonusUpdateRequestDto;
 import com.example.app_fast_food.bonus.entity.Bonus;
-import com.example.app_fast_food.common.mapper.BaseMapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring", uses = { BonusProductLinkMapper.class, BonusConditionMapper.class })
-public interface BonusMapper extends BaseMapper<Bonus, BonusResponseDTO> {
+public interface BonusMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "condition", ignore = true)
     @Mapping(target = "bonusProductLinks", ignore = true)
-    Bonus toEntity(BonusCreateRequestDTO dto);
+    Bonus toEntity(BonusCreateDto dto);
 
-    @Override
-    BonusResponseDTO toResponseDTO(Bonus bonus);
+    BonusResponseDto toResponseDto(Bonus bonus);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "bonusProductLinks", ignore = true)
-    void toEntity(BonusUpdateRequestDTO dto, @MappingTarget Bonus bonus);
+    void toEntity(BonusUpdateRequestDto dto, @MappingTarget Bonus bonus);
 }

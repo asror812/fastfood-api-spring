@@ -1,8 +1,8 @@
 package com.example.app_fast_food.product;
 
-import com.example.app_fast_food.common.repository.GenericRepository;
 import com.example.app_fast_food.product.entity.Product;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -11,13 +11,38 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ProductRepository extends GenericRepository<Product, UUID> {
+public interface ProductRepository extends JpaRepository<Product, UUID> {
 
+    @Query(value = """
+            SELECT p.*
+            FROM products p
+            INNER JOIN categories c ON c.id = p.category_id
+            WHERE c.name = :name
+            """, nativeQuery = true)
     List<Product> findProductsByCategoryName(String name);
+
+    @Query(value = """
+            SELECT p.*
+            FROM products p
+            WHERE p.category_id = :id
+            OR p.category_id IN (
+                SELECT c.id FROM categories c WHERE c.parent_id = :id
+            )
+            """, nativeQuery = true)
+    List<Product> findProductsByCategoryId(UUID id);
 
     Optional<Product> findProductById(UUID id);
 
-    @Query("SELECT p FROM Product p")
+    Optional<Product> findByName(String name);
+
+    @Query(value = """
+            SELECT DISTINCT p.*
+            FROM products p
+            JOIN product_discounts pd ON pd.product_id = p.id
+            JOIN discounts d ON d.id = pd.discount_id
+            WHERE d.is_active = true
+              AND CURRENT_DATE BETWEEN d.start_date AND d.end_date
+            """, nativeQuery = true)
     List<Product> getCampaignProducts();
 
     @Query(value = """

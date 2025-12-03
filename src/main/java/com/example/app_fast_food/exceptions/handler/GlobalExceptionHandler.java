@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.example.app_fast_food.exceptions.AlreadyRegisteredException;
+import com.example.app_fast_food.exceptions.AlreadyExistsException;
 import com.example.app_fast_food.exceptions.EntityNotFoundException;
 import com.example.app_fast_food.exceptions.FileSizeLimitExceedException;
 import com.example.app_fast_food.exceptions.InvalidOperationException;
@@ -92,20 +92,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    @ExceptionHandler(AlreadyRegisteredException.class)
-    public ResponseEntity<?> handleUserAlreadyRegistered(AlreadyRegisteredException e) {
-        log.error("Unhandled Exception: {}", e.getMessage(), e);
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<?> handleAlreadyExist(AlreadyExistsException e) {
+        log.error("AlreadyExistException: {}", e.getMessage());
 
         ErrorResponse response = new ErrorResponse(
-                ErrorMessages.PHONE_NUMBER_ALREADY_REGISTERED,
-                "PHONE_ALREADY_USED");
+                ErrorMessages.ALREADY_EXIST,
+                "ALREADY_EXIST");
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleUnexpected(Exception e) {
-        log.error("Unhandled Exception: {}", e.getMessage(), e);
+        log.error("Unhandled Exception: {}", e.getMessage());
 
         ErrorResponse response = new ErrorResponse(
                 "Internal server error",

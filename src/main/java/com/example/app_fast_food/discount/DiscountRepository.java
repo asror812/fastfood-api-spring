@@ -1,9 +1,9 @@
 package com.example.app_fast_food.discount;
 
-import com.example.app_fast_food.common.repository.GenericRepository;
 import com.example.app_fast_food.discount.entity.Discount;
 import com.example.app_fast_food.product.entity.Product;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface DiscountRepository extends GenericRepository<Discount, UUID> {
+public interface DiscountRepository extends JpaRepository<Discount, UUID> {
 
   Optional<Discount> findDiscountByName(String name);
 
