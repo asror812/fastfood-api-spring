@@ -1,65 +1,66 @@
-🍔 FastFood API (Spring Boot)
+# 🍔 FastFood API (Spring Boot)
 
 A modern REST API backend for a food delivery application.
 Provides authentication, product catalog, categories, discounts, cart, favorites, file storage, and ordering.
 
-📌 Overview
+## 📌 Overview
 
 FastFood API is a Spring Boot 3 application built with a layered architecture (Controller → Service → Repository).
+
 It uses:
 
-PostgreSQL for database
-Redis for caching + token blacklist
-JWT Authentication for secure access
-Docker Compose to run required services
-Spring Security for route protection
-REST API consumed by an Android mobile application
+- PostgreSQL for database
+- Redis for caching + token blacklist
+- JWT Authentication for secure access
+- Docker Compose to run required services
+- Spring Security for route protection
+- REST API consumed by an Android mobile application
 
-🔐 Authentication
+## 🔐 Authentication
 
-Login by phone number
-JWT token generation
-Role-based permissions (Admin, User, Staff)
-Token blacklist using Redis
+- Login by phone number
+- JWT token generation
+- Role-based permissions (Admin, User, Staff)
+- Token blacklist using Redis
 
-🍽 Product Catalog
+## 🍽 Product Catalog
 
-Categories & Subcategories
-Products with images (attachments)
-Product discounts
-Bonus conditions (holiday, birthday, first purchase)
+- Categories & Subcategories
+- Products with images (attachments)
+- Product discounts
+- Bonus conditions (holiday, birthday, first purchase)
 
-❤️ Favorites
+## ❤️ Favorites
 
-Add product to favorites
-Remove product from favorites
-View user favorites
+- Add product to favorites
+- Remove product from favorites
+- View user favorites
 
-🧺 Shopping Cart (planned or optional)
+## 🧺 Shopping Cart (planned or optional)
 
-Add items
-Remove items
-Price calculation
+- Add items
+- Remove items
+- Price calculation
 
-🏬 Filials (Branches)
+## 🏬 Filials (Branches)
 
-Filial list
-Working hours
-Region support
+- Filial list
+- Working hours
+- Region support
 
-🧾 Orders
+## 🧾 Orders
 
-Create order
-Track order status
-Order items inside order
+- Create order
+- Track order status
+- Order items inside order
 
-🖼 Attachments
+## 🖼 Attachments
 
-Upload images
-Download images using:
-GET /attachments/download/{id}
+- Upload images
+- Download images using:
+- GET /attachments/download/{id}
 
-🛠 Tech Stack
+## 🛠 Tech Stack
 | Component           | Technology            |
 | ------------------- | --------------------- |
 | Backend Framework   | Spring Boot 3         |
@@ -71,21 +72,27 @@ GET /attachments/download/{id}
 | API Docs            | SpringDoc / Swagger   |
 | Deployment          | Docker Compose        |
 
-🧪 How to Run the Backend
+## 🧪 How to Run the Backend
 
-This project requires Docker and Java 17+.
+- This project requires Docker and Java 17+.
 
 1️⃣ Clone the repository
+```bash
 git clone https://github.com/asror812/fastfood-api-spring.git
 cd fastfood-api-spring
+```
 
 2️⃣ Start PostgreSQL + Redis using Docker Compose
+```bash
 docker compose up -d
+```
 
-Check running containers:
+3. Check running containers:
+```bash
 docker ps
-
-
+```
 You should see:
+
 postgres
+
 redis
