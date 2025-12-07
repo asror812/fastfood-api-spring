@@ -16,12 +16,12 @@ import java.time.LocalDate;
 @Setter
 public class UserDto {
     @NotBlank
-    private String name;
+    protected String name;
 
     @NotBlank
     @Pattern(regexp = "^\\+\\d{2} \\d{3}-\\d{2}-\\d{2}$")
-    private String phoneNumber;
+    protected String phoneNumber;
 
     @NotNull
-    private LocalDate birthDate;
+    protected LocalDate birthDate;
 }

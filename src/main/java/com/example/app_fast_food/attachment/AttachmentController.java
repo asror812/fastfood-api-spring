@@ -51,8 +51,8 @@ public class AttachmentController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
-        attachmentService.delete(UUID.fromString(id));
+    public void delete(@PathVariable UUID id) {
+        attachmentService.delete(id);
     }
 
 }

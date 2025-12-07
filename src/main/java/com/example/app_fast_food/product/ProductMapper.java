@@ -27,6 +27,9 @@ public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "bonusProductLinks", ignore = true)
     @Mapping(target = "productDiscounts", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "mainImage", ignore = true)
+    @Mapping(target = "secondaryImage", ignore = true)
     public Product toEntity(ProductCreateDto productCreateDto);
 
     public ProductResponseDto toResponseDTO(Product product);

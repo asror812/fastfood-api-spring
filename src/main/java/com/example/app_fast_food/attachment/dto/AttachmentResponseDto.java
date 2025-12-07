@@ -19,4 +19,11 @@ public class AttachmentResponseDto {
     private Long size;
 
     private String downloadUrl;
+
+    @Override
+    public String toString() {
+        return "AttachmentResponseDto [originalName=" + originalName +
+                ", storedName=" + storedName +
+                ", downloadUrl=" + downloadUrl + "]";
+    }
 }

@@ -19,7 +19,7 @@ public class Attachment {
     private UUID id;
 
     @Column(nullable = false)
-    private String originalName; // user-uploaded name (e.g. image.png)
+    private String originalName; // user-uploaded name 
 
     @Column(nullable = false)
     private String storedName; // actual saved filename (e.g. 1f9d...-img.png)

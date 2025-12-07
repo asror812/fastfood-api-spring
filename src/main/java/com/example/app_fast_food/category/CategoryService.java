@@ -53,4 +53,10 @@ public class CategoryService {
                 .orElseThrow(() -> new EntityNotFoundException("Category", id.toString()));
     }
 
+    public List<CategoryResponseDto> getParentCategories() {
+        List<Category> parentCategories = repository.getParentCategories();
+
+        return parentCategories.stream().map(pc -> mapper.toResponseDto(pc)).toList();
+    }
+
 }

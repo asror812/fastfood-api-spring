@@ -13,6 +13,7 @@ import jakarta.servlet.http.Part;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.file.Files;
@@ -27,7 +28,7 @@ import java.util.UUID;
 public class AttachmentService {
 
     private final AttachmentRepository repository;
-    final String IMAGES_FOLDER_PATH = "/static/images";
+    final String IMAGES_FOLDER_PATH = "/home/ruby/Desktop/app_fast_food/app_fast_food/images/burger_1.jpgм";
     private final AttachmentMapper mapper;
     final Long limitSize = 1L;
 
@@ -76,26 +77,50 @@ public class AttachmentService {
         return (dot >= 0) ? originalName.substring(dot) : "";
     }
 
-    public void loadImageFromImageFolder(UUID id, HttpServletResponse response) throws IOException {
+    public void loadImageFromImageFolder(@NonNull UUID id, HttpServletResponse response) throws IOException {
         Attachment image = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Image with name: %s not found"));
 
-        Path path = Path.of(image.getDownloadUrl());
-        try (InputStream inputStream = new FileInputStream(path.toFile())) {
-            String contentType = Files.probeContentType(path);
+        String filePath = image.getDownloadUrl();
 
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + image.getId() + "\"");
-            response.setContentType(contentType);
+        File file = new File(filePath);
 
-            response.getOutputStream().write(inputStream.readAllBytes());
-
-        } catch (IOException e) {
-            throw new FileNotFoundException(image.getOriginalName(), image.getDownloadUrl());
+        if (!file.exists()) {
+            throw new FileNotFoundException(image.getStoredName(), filePath);
         }
+
+        /*
+         * InputStream in = getClass().getResourceAsStream(filePath);
+         * 
+         * if (in == null) {
+         * throw new FileNotFoundException(image.getOriginalName(), filePath);
+         * }
+         */
+        response.setHeader("Content-Disposition", "inline; filename=\"" + image.getOriginalName() + "\"");
+        try (InputStream inputStream = new FileInputStream(file)) {
+            inputStream.transferTo(response.getOutputStream());
+        }
+
+        /*
+         * Path path = Path.of(image.getDownloadUrl());
+         * try (InputStream inputStream = new FileInputStream(path.toFile())) {
+         * String contentType = Files.probeContentType(path);
+         * 
+         * response.setHeader("Content-Disposition", "attachment; filename=\"" +
+         * image.getId() + "\"");
+         * response.setContentType(contentType);
+         * 
+         * response.getOutputStream().write(inputStream.readAllBytes());
+         * 
+         * } catch (IOException e) {
+         * throw new FileNotFoundException(image.getOriginalName(),
+         * image.getDownloadUrl());
+         * }
+         */
 
     }
 
-    public void delete(UUID id) {
+    public void delete(@NonNull UUID id) {
         Attachment entity = repository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Attachment with id : %s not found"));

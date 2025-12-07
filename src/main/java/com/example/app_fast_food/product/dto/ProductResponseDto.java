@@ -1,6 +1,5 @@
 package com.example.app_fast_food.product.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,6 @@ import com.example.app_fast_food.bonus.dto.bonus_product_link.BonusProductLinkRe
 import com.example.app_fast_food.product_discounts.dto.ProductDiscountResponseDto;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 public class ProductResponseDto {
@@ -35,4 +33,14 @@ public class ProductResponseDto {
     private List<ProductDiscountResponseDto> productDiscounts;
 
     private List<BonusProductLinkResponseDTO> bonusProductLinks;
+
+    @Override
+    public String toString() {
+        return "\nProduct [" +
+                "\n    name=" + name +
+                ",\n    price=" + price +
+                ",\n    category=" + category.getName() +
+                ",\n    mainImage=" + mainImage.getDownloadUrl() +
+                ",\n    secondaryImage=" + secondaryImage.getDownloadUrl() + "]";
+    }
 }

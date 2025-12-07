@@ -5,10 +5,12 @@ import com.example.app_fast_food.order.entity.OrderStatus;
 import com.example.app_fast_food.order.entity.PaymentType;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class OrderUpdateDto {
     private OrderStatus orderStatus;
 

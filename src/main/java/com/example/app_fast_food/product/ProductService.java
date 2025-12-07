@@ -21,16 +21,24 @@ public class ProductService {
 
     private final ProductRepository repository;
 
-    protected ProductResponseDto create(ProductCreateDto productCreateDTO) {
-        Product product = mapper.toEntity(productCreateDTO);
+    protected ProductResponseDto create(ProductCreateDto createDto) {
+        Product product = mapper.toEntity(createDto);
+
         repository.save(product);
 
         return mapper.toResponseDTO(product);
     }
 
     public List<ProductResponseDto> getAllByCategory(UUID categoryId) {
-        log.error("Category id: " + categoryId);
-        return getProductResponseDTOS(repository.findProductsByCategoryId(categoryId));
+        log.info("Parent category: " + categoryId);
+        List<ProductResponseDto> productResponseDtos = getProductResponseDTOS(
+                repository.findProductsByCategoryTree(categoryId));
+
+        for (ProductResponseDto p : productResponseDtos) {
+            System.out.println(p);
+        }
+
+        return productResponseDtos;
     }
 
     public List<ProductResponseDto> getCampaignProducts() {

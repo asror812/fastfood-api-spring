@@ -3,6 +3,7 @@ package com.example.app_fast_food.initialize;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -56,7 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class DatabaseInitialDataAdd implements CommandLineRunner {
-        private static final String IMAGES_FOLDER_PATH = "/images/";
+        private static final String IMAGES_FOLDER_PATH = "/home/ruby/Desktop/app_fast_food/images/";
 
         private final PasswordEncoder passwordEncoder;
 
@@ -112,23 +113,23 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 // ------------------------------------------------------------------------
                 // ORDERS
                 // ------------------------------------------------------------------------
+                Product beefLavashWithCheese = productRepository.findByName("Beef Lavash with Cheese")
+                                .orElseThrow(() -> new RuntimeException("Beef Lavash with Cheese product not found"));
 
-                Product cola = productRepository.findByName("Coca Cola")
-                                .orElseThrow(() -> new RuntimeException("Coca Cola product not found"));
-                Product lavash = productRepository.findByName("Lavash")
-                                .orElseThrow(() -> new RuntimeException("Lavash producy not found"));
-                Product pizza = productRepository.findByName("Pizza")
-                                .orElseThrow(() -> new RuntimeException("Pizza product not found"));
+                Product classicBeefBurger = productRepository.findByName("Classic Beef Burger")
+                                .orElseThrow(() -> new RuntimeException("Classic Beef Burger product not found"));
+
+                Product pepperoniLarge = productRepository.findByName("Pepperoni Large")
+                                .orElseThrow(() -> new RuntimeException("Pepperoni Large product not found"));
 
                 Order order = new Order(null, OrderStatus.TAKEN, PaymentType.CASH, admin);
-                OrderItem orderItem1 = new OrderItem(null, 4, cola, order);
-                OrderItem orderItem2 = new OrderItem(null, 1, pizza, order);
-                OrderItem orderItem3 = new OrderItem(null, 10, lavash, order);
+                OrderItem orderItem1 = new OrderItem(null, 4, beefLavashWithCheese, order);
+                OrderItem orderItem2 = new OrderItem(null, 1, classicBeefBurger, order);
+                OrderItem orderItem3 = new OrderItem(null, 10, pepperoniLarge, order);
 
                 order.getOrderItems().addAll(List.of(orderItem1, orderItem2, orderItem3));
 
                 orderRepository.save(order);
-
         }
 
         private void createBonuses() {
@@ -151,12 +152,14 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
                 BonusCondition orderTotalCondition = new BonusCondition(null, ConditionType.TOTAL_PRICE, "150000");
 
-                bonusConditionRepository.saveAll(List.of(
+                List<BonusCondition> bonusConditions = new ArrayList<>(Arrays.asList(
                                 holidayCondition,
                                 birthdayCondition,
                                 productBonusCondition,
                                 firstPurchaseCondition,
                                 orderTotalCondition));
+
+                bonusConditionRepository.saveAll(bonusConditions);
 
                 // --------------------------------------------------------------------
                 // 2) CREATE BONUSES
@@ -180,37 +183,41 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 LocalDate.now().plusWeeks(3),
                                 true);
 
-                bonusRepository.saveAll(List.of(birthday2025, navruzBonus));
+                bonusRepository.save(birthday2025);
+                bonusRepository.save(navruzBonus);
 
                 // --------------------------------------------------------------------
                 // 3) LINK BONUSES TO PRODUCTS
                 // --------------------------------------------------------------------
 
-                Product lavash = productRepository.findByName("Lavash")
+                Product classicBeefBurger = productRepository.findByName("Classic Beef Burger")
                                 .orElseThrow();
 
-                Product hamburger = productRepository.findByName("Hamburger")
+                Product beefLavashWithCheese = productRepository.findByName("Beef Lavash with Cheese")
                                 .orElseThrow();
 
                 BonusProductLink link1 = new BonusProductLink(
                                 null,
                                 birthday2025,
-                                lavash,
+                                classicBeefBurger,
                                 1);
 
                 BonusProductLink link2 = new BonusProductLink(
                                 null,
                                 navruzBonus,
-                                hamburger,
+                                beefLavashWithCheese,
                                 2);
 
-                bonusProductLinkRepository.saveAll(List.of(link1, link2));
+                bonusProductLinkRepository.save(link1);
+                bonusProductLinkRepository.save(link2);
 
                 // Attach links to bonuses
                 birthday2025.getBonusProductLinks().add(link1);
                 navruzBonus.getBonusProductLinks().add(link2);
 
-                bonusRepository.saveAll(List.of(birthday2025, navruzBonus));
+                bonusRepository.save(navruzBonus);
+                bonusRepository.save(birthday2025);
+
         }
 
         // ------------------------------------------------------------------------
@@ -262,7 +269,9 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 41.3385,
                                 Region.TASHKENT);
 
-                filialRepository.saveAll(Arrays.asList(filial1, filial2, filial3, filial4));
+                List<Filial> filials = new ArrayList<>(Arrays.asList(filial1, filial2, filial3, filial4));
+                filialRepository.saveAll(filials);
+
         }
 
         // ------------------------------------------------------------------------
@@ -280,7 +289,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 // -----------------------
                 Category burgers = new Category(null, "Burgers & Sandwiches", null);
                 Category lavash = new Category(null, "Rolls & Lavash", null);
-                Category doner = new Category(null, "Doners / Shawarma", null);
+                Category doner = new Category(null, "Doners", null);
                 Category pizza = new Category(null, "Pizza", null);
                 Category drinks = new Category(null, "Drinks", null);
                 Category desserts = new Category(null, "Desserts", null);
@@ -308,10 +317,12 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 Category iceCream = new Category(null, "Ice Cream", desserts);
                 Category donuts = new Category(null, "Donuts", desserts);
 
-                categoryRepository.saveAll(Arrays.asList(
+                List<Category> categories = new ArrayList<>(Arrays.asList(
                                 burgers, lavash, doner, pizza, drinks, desserts,
                                 beefBurger, beefLavash, cheeseLavash, beefDoner,
                                 pepperoniPizza, coldDrinks, iceCream, donuts));
+
+                categoryRepository.saveAll(categories);
 
                 // -----------------------
                 // DISCOUNTS
@@ -334,8 +345,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 new BigDecimal(23000),
                                 beefBurger,
                                 280,
-                                createAttachment("classic_beef_burger"),
-                                createAttachment("classic_beef_burger"));
+                                createAttachment("burger_1", "jpg"),
+                                createAttachment("burger_2", "jpg"));
 
                 Product cheeseBurger = new Product(
                                 null,
@@ -343,8 +354,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 new BigDecimal(30000),
                                 beefBurger,
                                 380,
-                                createAttachment("cheese_burger"),
-                                createAttachment("cheese_burger"));
+                                createAttachment("cheese_burger_1", "jpg"),
+                                createAttachment("cheese_burger_2", "jpg"));
 
                 // Beef Lavash
                 Product classicBeefLavash = new Product(
@@ -353,8 +364,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 new BigDecimal(23000),
                                 beefLavash,
                                 280,
-                                createAttachment("classic_beef_lavash"),
-                                createAttachment("classic_beef_lavash"));
+                                createAttachment("beef_lavash_1", "webp"),
+                                createAttachment("beef_lavash_2", "webp"));
 
                 Product beefLavashWithCheese = new Product(
                                 null,
@@ -362,27 +373,27 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 new BigDecimal(30000),
                                 beefLavash,
                                 380,
-                                createAttachment("beef_lavash_with_cheese"),
-                                createAttachment("beefe_lavash_with_cheese"));
+                                createAttachment("beef_lavash_with_cheese_1", "jpg"),
+                                createAttachment("beefe_lavash_with_cheese_2", "jpg"));
 
                 // Pepperoni Pizza
                 Product pepperoniMedium = new Product(
                                 null,
                                 "Pepperoni Medium",
                                 new BigDecimal(23000),
-                                beefBurger,
+                                pepperoniPizza,
                                 280,
-                                createAttachment("pepperoni_medium"),
-                                createAttachment("pepperoni_medium"));
+                                createAttachment("pepperoni_pizza_1", "jpeg"),
+                                createAttachment("pepperoni_pizza_2", "jpeg"));
 
                 Product pepperoniLarge = new Product(
                                 null,
                                 "Pepperoni Large",
                                 new BigDecimal(30000),
-                                beefBurger,
+                                pepperoniPizza,
                                 380,
-                                createAttachment("pepperoni_large"),
-                                createAttachment("pepperoni_large"));
+                                createAttachment("large_pepperoni_pizza_1", "webp"),
+                                createAttachment("large_pepperoni_pizza_2", "jpg"));
 
                 // Ice Cream
                 Product vanillaIceCream = new Product(
@@ -391,8 +402,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 new BigDecimal(20_000),
                                 iceCream,
                                 250,
-                                createAttachment("vanilla_ice_cream"),
-                                createAttachment("vanilla_ice_cream"));
+                                createAttachment("vanilla_ice_cream_1", "jpg"),
+                                createAttachment("vanilla_ice_cream_2", "jpeg"));
 
                 Product chocolateIceCream = new Product(
                                 null,
@@ -400,8 +411,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 new BigDecimal(20_000),
                                 iceCream,
                                 250,
-                                createAttachment("chocolate_ice_cream"),
-                                createAttachment("chocolate_ice_cream"));
+                                createAttachment("chocolate_ice_cream_1"),
+                                createAttachment("chocolate_ice_cream_2"));
                 // Cold drinks
                 Product sprite = new Product(
                                 null,
@@ -409,34 +420,40 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 new BigDecimal(25_000),
                                 coldDrinks,
                                 300,
-                                createAttachment("sprite"),
-                                createAttachment("sprite"));
+                                createAttachment("sprite_0.5_1", "png"),
+                                createAttachment("sprite_0.5_1", "png"));
 
                 Product cocaCola = new Product(
                                 null,
-                                "Coca Cola",
+                                "Coca Cola 0.5L",
                                 new BigDecimal(10_000),
                                 coldDrinks,
                                 500,
-                                createAttachment("cocacola"),
-                                createAttachment("cocacola"));
+                                createAttachment("cocacola_0.5_1", "avif"),
+                                createAttachment("cocacola_0.5_2", "avif"));
 
-                productRepository.saveAll(List.of(classicBeefBurger, cheeseBurger, vanillaIceCream, chocolateIceCream,
-                                cocaCola, sprite, pepperoniLarge, pepperoniMedium, classicBeefLavash,
-                                beefLavashWithCheese));
+                List<Product> products = new ArrayList<>(
+                                List.of(classicBeefBurger, cheeseBurger, vanillaIceCream, chocolateIceCream,
+                                                cocaCola, sprite, pepperoniLarge, pepperoniMedium, classicBeefLavash,
+                                                beefLavashWithCheese));
+
+                productRepository.saveAll(products);
 
                 // -----------------------
                 // PRODUCT DISCOUNTS
                 // -----------------------
+
                 ProductDiscount pd1 = new ProductDiscount(null, cocaCola, navruz);
 
                 ProductDiscount pd2 = new ProductDiscount(null, pepperoniLarge, extra);
-                ProductDiscount pd3 = new ProductDiscount(null, pepperoniLarge, extra);
+                ProductDiscount pd3 = new ProductDiscount(null, pepperoniMedium, extra);
 
                 ProductDiscount pd4 = new ProductDiscount(null, vanillaIceCream, extra2);
                 ProductDiscount pd5 = new ProductDiscount(null, chocolateIceCream, extra2);
 
-                productDiscountReposity.saveAll(List.of(pd1, pd2, pd3, pd4, pd5));
+                List<ProductDiscount> productDiscounts = new ArrayList<>(List.of(pd1, pd2, pd3, pd4, pd5));
+                productDiscountReposity.saveAll(productDiscounts);
+
         }
 
         // ------------------------------------------------------------------------
@@ -475,7 +492,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 2,
                                 true);
 
-                discountRepository.saveAll(List.of(discount1, discount2, discount3));
+                List<Discount> discounts = new ArrayList<>(List.of(discount1, discount2, discount3));
+                discountRepository.saveAll(discounts);
         }
 
         // ------------------------------------------------------------------------
@@ -572,12 +590,12 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
         // ATTACHMENTS
         // ------------------------------------------------------------------------
 
-        private Attachment createAttachment(String originalBaseName) {
-                String storedName = UUID.randomUUID() + ".jpg";
+        private Attachment createAttachment(String originalBaseName, String type) {
+                String storedName = originalBaseName + "." + type;
 
                 return new Attachment(
                                 null,
-                                originalBaseName + ".jpg",
+                                originalBaseName + "." + type,
                                 storedName,
                                 "image/jpeg",
                                 10L,

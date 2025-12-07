@@ -33,6 +33,11 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
+    @GetMapping("/parent")
+    public ResponseEntity<List<CategoryResponseDto>> getAllParentCategories() {
+        return ResponseEntity.ok(categoryService.getParentCategories());
+    }
+
     @GetMapping("{id}")
     public ResponseEntity<CategoryResponseDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(categoryService.getById(id));
