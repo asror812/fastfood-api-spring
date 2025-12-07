@@ -411,8 +411,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 new BigDecimal(20_000),
                                 iceCream,
                                 250,
-                                createAttachment("chocolate_ice_cream_1"),
-                                createAttachment("chocolate_ice_cream_2"));
+                                createAttachment("chocolate_ice_cream_1", "jpg"),
+                                createAttachment("chocolate_ice_cream_2", "jpg"));
                 // Cold drinks
                 Product sprite = new Product(
                                 null,
@@ -421,7 +421,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 coldDrinks,
                                 300,
                                 createAttachment("sprite_0.5_1", "png"),
-                                createAttachment("sprite_0.5_1", "png"));
+                                createAttachment("sprite_0.5_2", "png"));
 
                 Product cocaCola = new Product(
                                 null,

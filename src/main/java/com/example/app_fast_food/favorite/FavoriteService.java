@@ -33,7 +33,7 @@ public class FavoriteService {
         return productService.getProductResponseDTOS(favoriteProducts.stream().toList());
     }
 
-    public ApiMessageResponse addFavorite(UUID userId, UUID productId) {
+    public ApiMessageResponse add(UUID userId, UUID productId) {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -47,6 +47,21 @@ public class FavoriteService {
         userRepository.save(user);
 
         return new ApiMessageResponse("Product added to favorites successfully");
+    }
+
+    public ApiMessageResponse remove(UUID userId, UUID productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Product", productId.toString()));
+
+        User user = userRepository.findUserByIdWithFavouriteProducts(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User", userId.toString()));
+
+        user.getFavouriteProducts().remove(product);
+
+        userRepository.save(user);
+
+        return new ApiMessageResponse("Product removed from favorites successfully");
     }
 
 }
