@@ -4,19 +4,15 @@ import com.example.app_fast_food.bonus.entity.ConditionType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 public class BonusConditionDto {
     @NotNull
-    private ConditionType conditionType;
+    protected ConditionType conditionType;
 
     @NotBlank
-    private String value;
+    protected String value;
 }

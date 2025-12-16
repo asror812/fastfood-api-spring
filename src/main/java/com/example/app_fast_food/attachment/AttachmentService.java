@@ -2,8 +2,10 @@ package com.example.app_fast_food.attachment;
 
 import com.example.app_fast_food.attachment.dto.AttachmentResponseDto;
 import com.example.app_fast_food.attachment.entity.Attachment;
-import com.example.app_fast_food.exceptions.FileNotFoundException;
-import com.example.app_fast_food.exceptions.FileSizeLimitExceedException;
+import com.example.app_fast_food.exception.FileNotFoundException;
+import com.example.app_fast_food.exception.FileReadException;
+import com.example.app_fast_food.exception.FileSaveException;
+import com.example.app_fast_food.exception.FileSizeLimitExceedException;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
@@ -28,30 +30,32 @@ import java.util.UUID;
 public class AttachmentService {
 
     private final AttachmentRepository repository;
-    final String IMAGES_FOLDER_PATH = "/home/ruby/Desktop/app_fast_food/app_fast_food/images/burger_1.jpgм";
+    private static final String IMAGES_FOLDER_PATH = "/home/ruby/Desktop/app_fast_food/app_fast_food/images/burger_1.jpg";
     private final AttachmentMapper mapper;
-    final Long limitSize = 1L;
+    private static final Long LIMIT_SIZE = 1L;
 
-    public AttachmentResponseDto uploadImageToFileSystem(HttpServletRequest request)
-            throws IOException, ServletException {
+    public AttachmentResponseDto uploadImageToFileSystem(HttpServletRequest request) {
+        Part file;
 
-        Part file = request.getPart("file");
+        try {
+            file = request.getPart("file");
+        } catch (IOException | ServletException e) {
+            throw new FileNotFoundException("file part not found in request");
+        }
 
         String originalName = file.getSubmittedFileName();
         String contentType = file.getContentType();
         long size = file.getSize();
 
-        if (size > 1024 * 1024) { // 1 MB
-            throw new FileSizeLimitExceedException("Image exceeded limit size: 1 MB", limitSize);
+        if (size > 1024 * 1024) {
+            throw new FileSizeLimitExceedException("Image exceeded limit size: 1 MB", LIMIT_SIZE);
         }
 
         // Generate unique stored file name
         String storedName = UUID.randomUUID().toString() + getExtension(originalName);
 
-        // Build download URL
         String downloadUrl = "http://localhost:8080/attachments/download/" + storedName;
 
-        // Create and save attachment entity
         Attachment attachment = new Attachment(
                 null,
                 originalName,
@@ -63,12 +67,17 @@ public class AttachmentService {
         log.info("Entity -> {}", attachment);
         repository.save(attachment);
 
-        InputStream inputStream = file.getInputStream();
         Path targetPath = Paths.get(IMAGES_FOLDER_PATH, storedName);
 
-        Files.copy(inputStream, targetPath);
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.createDirectories(targetPath.getParent());
+            Files.copy(inputStream, targetPath);
+        } catch (IOException e) {
+            repository.delete(attachment);
+            throw new FileSaveException("Failed to save file to disk: " + targetPath, e.getCause());
+        }
 
-        log.info("Response -> {}", mapper.toResponseDTO(attachment));
+        log.info("{}", mapper.toResponseDTO(attachment));
         return mapper.toResponseDTO(attachment);
     }
 
@@ -77,7 +86,7 @@ public class AttachmentService {
         return (dot >= 0) ? originalName.substring(dot) : "";
     }
 
-    public void loadImageFromImageFolder(@NonNull UUID id, HttpServletResponse response) throws IOException {
+    public void loadImageFromImageFolder(@NonNull UUID id, HttpServletResponse response) {
         Attachment image = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Image with name: %s not found"));
 
@@ -89,35 +98,15 @@ public class AttachmentService {
             throw new FileNotFoundException(image.getStoredName(), filePath);
         }
 
-        /*
-         * InputStream in = getClass().getResourceAsStream(filePath);
-         * 
-         * if (in == null) {
-         * throw new FileNotFoundException(image.getOriginalName(), filePath);
-         * }
-         */
         response.setHeader("Content-Disposition", "inline; filename=\"" + image.getOriginalName() + "\"");
         try (InputStream inputStream = new FileInputStream(file)) {
             inputStream.transferTo(response.getOutputStream());
+        } catch (java.io.FileNotFoundException e) {
+            throw new FileNotFoundException(file.getName(), file.getPath());
+        } catch (IOException e) {
+            throw new FileReadException(
+                    "Failed to read image from disk: " + image.getStoredName(), e);
         }
-
-        /*
-         * Path path = Path.of(image.getDownloadUrl());
-         * try (InputStream inputStream = new FileInputStream(path.toFile())) {
-         * String contentType = Files.probeContentType(path);
-         * 
-         * response.setHeader("Content-Disposition", "attachment; filename=\"" +
-         * image.getId() + "\"");
-         * response.setContentType(contentType);
-         * 
-         * response.getOutputStream().write(inputStream.readAllBytes());
-         * 
-         * } catch (IOException e) {
-         * throw new FileNotFoundException(image.getOriginalName(),
-         * image.getDownloadUrl());
-         * }
-         */
-
     }
 
     public void delete(@NonNull UUID id) {
@@ -129,6 +118,6 @@ public class AttachmentService {
     }
 
     public List<AttachmentResponseDto> getAll() {
-        return repository.findAll().stream().map(a -> mapper.toResponseDTO(a)).toList();
+        return repository.findAll().stream().map(mapper::toResponseDTO).toList();
     }
 }

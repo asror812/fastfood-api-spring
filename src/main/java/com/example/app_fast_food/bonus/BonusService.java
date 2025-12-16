@@ -1,10 +1,12 @@
 package com.example.app_fast_food.bonus;
 
+import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDto;
 import com.example.app_fast_food.bonus.entity.Bonus;
 import com.example.app_fast_food.bonus.entity.BonusProductLink;
 import com.example.app_fast_food.check.CheckRepository;
+import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.order.entity.Order;
-import com.example.app_fast_food.orderItem.entity.OrderItem;
+import com.example.app_fast_food.orderitem.entity.OrderItem;
 import com.example.app_fast_food.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +20,7 @@ import java.util.*;
 public class BonusService {
 
     private final BonusRepository repository;
+    private final BonusMapper mapper;
 
     private final CheckRepository checkRepository;
 
@@ -68,6 +71,15 @@ public class BonusService {
             }
         }
         return false;
+    }
+
+    public BonusResponseDto findById(UUID id) {
+        return repository.findById(id).map(mapper::toResponseDto)
+                .orElseThrow(() -> new EntityNotFoundException("Bonus", id.toString()));
+    }
+
+    public List<BonusResponseDto> findAll() {
+        return repository.findAll().stream().map(mapper::toResponseDto).toList();
     }
 
 }

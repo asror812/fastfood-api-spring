@@ -11,7 +11,6 @@ import org.mapstruct.Mapping;
 public interface CheckMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "filial", ignore = true)
     @Mapping(target = "courier", ignore = true)
     @Mapping(target = "order.id", source = "orderId")
     @Mapping(target = "user.id", source = "userId")
@@ -19,9 +18,6 @@ public interface CheckMapper {
 
     @Mapping(target = "orderId", source = "order.id")
     @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "userName", source = "user.name")
-    @Mapping(target = "filialId", source = "filial.id")
-    @Mapping(target = "filialName", source = "filial.name")
     public CheckResponseDto toResponseDto(Check check);
 
 }

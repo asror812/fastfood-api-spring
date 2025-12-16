@@ -1,8 +1,8 @@
 package com.example.app_fast_food.user;
 
-import com.example.app_fast_food.exceptions.AlreadyExistsException;
-import com.example.app_fast_food.exceptions.InvalidCredentialsException;
-import com.example.app_fast_food.exceptions.PhoneNumberNotVerifiedException;
+import com.example.app_fast_food.exception.AlreadyExistsException;
+import com.example.app_fast_food.exception.InvalidCredentialsException;
+import com.example.app_fast_food.exception.PhoneNumberNotVerifiedException;
 import com.example.app_fast_food.otp.OtpRepository;
 import com.example.app_fast_food.otp.entity.Otp;
 import com.example.app_fast_food.security.JwtService;

@@ -11,5 +11,6 @@ public interface BonusProductLinkMapper {
 
     @Mapping(target = "productId", source = "product.id")
     @Mapping(target = "bonusId", source = "bonus.id")
+    @Mapping(target = "bonusName", source = "bonus.name")
     BonusProductLinkResponseDTO toResponseDto(BonusProductLink bonusProductLink);
 }

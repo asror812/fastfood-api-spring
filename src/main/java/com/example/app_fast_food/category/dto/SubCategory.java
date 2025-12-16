@@ -9,9 +9,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
 @ToString
 public class SubCategory {
     private UUID id;

@@ -27,21 +27,14 @@ public class SecurityConfig {
                                 .cors(AbstractHttpConfigurer::disable)
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                .authorizeHttpRequests(registry -> registry
-                                                // .requestMatchers(
-                                                // "/auth/**",
-                                                // "/swagger-ui/**",
-                                                // "/v3/**")
-                                                // .permitAll()
-                                                .requestMatchers("/**")
-                                                .permitAll())
-                                // .anyRequest().authenticated())
+                                .authorizeHttpRequests(registry -> registry.requestMatchers(
+                                                "/auth/**",
+                                                "/swagger-ui/**",
+                                                "/v3/**")
+                                                .permitAll()
+                                                .anyRequest().authenticated())
                                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                                 .addFilterBefore(transactionLoggerFilter, JwtAuthorizationFilter.class)
-                                .exceptionHandling(ex -> ex
-                                                .authenticationEntryPoint(
-                                                                (req, res, e) -> res.sendError(401, "Unauthorized"))
-                                                .accessDeniedHandler((req, res, e) -> res.sendError(403, "Forbidden")))
                                 .build();
         }
 

@@ -1,7 +1,6 @@
 package com.example.app_fast_food.discount.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -9,7 +8,6 @@ import java.util.UUID;
 
 @Setter
 @Getter
-@NoArgsConstructor
 public class DiscountResponseDto {
     private UUID id;
 

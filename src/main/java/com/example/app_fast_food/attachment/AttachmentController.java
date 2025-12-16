@@ -2,14 +2,12 @@ package com.example.app_fast_food.attachment;
 
 import com.example.app_fast_food.attachment.dto.AttachmentResponseDto;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,12 +20,7 @@ public class AttachmentController {
 
     @PostMapping("/upload")
     public AttachmentResponseDto upload(MultipartHttpServletRequest request) {
-        try {
-            return attachmentService.uploadImageToFileSystem(request);
-
-        } catch (IOException | ServletException e) {
-            throw new RuntimeException();
-        }
+        return attachmentService.uploadImageToFileSystem(request);
     }
 
     @GetMapping
@@ -43,11 +36,7 @@ public class AttachmentController {
     @GetMapping("/download/{id}")
     public void load(@PathVariable UUID id,
             HttpServletResponse response) {
-        try {
-            attachmentService.loadImageFromImageFolder(id, response);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        attachmentService.loadImageFromImageFolder(id, response);
     }
 
     @DeleteMapping("/{id}")

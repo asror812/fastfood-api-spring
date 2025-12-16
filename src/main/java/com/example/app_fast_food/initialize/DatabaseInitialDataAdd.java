@@ -2,7 +2,6 @@ package com.example.app_fast_food.initialize;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,21 +26,17 @@ import com.example.app_fast_food.category.CategoryRepository;
 import com.example.app_fast_food.category.entity.Category;
 import com.example.app_fast_food.discount.DiscountRepository;
 import com.example.app_fast_food.discount.entity.Discount;
-import com.example.app_fast_food.filial.FilialRepository;
-import com.example.app_fast_food.filial.entity.Filial;
-import com.example.app_fast_food.filial.entity.Region;
 import com.example.app_fast_food.order.OrderRepository;
 import com.example.app_fast_food.order.entity.Order;
 import com.example.app_fast_food.order.entity.OrderStatus;
 import com.example.app_fast_food.order.entity.PaymentType;
-import com.example.app_fast_food.orderItem.entity.OrderItem;
+import com.example.app_fast_food.orderitem.entity.OrderItem;
 import com.example.app_fast_food.product.ProductRepository;
 import com.example.app_fast_food.product.entity.Product;
-import com.example.app_fast_food.product_discounts.ProductDiscountReposity;
-import com.example.app_fast_food.product_discounts.entity.ProductDiscount;
+import com.example.app_fast_food.productdiscount.ProductDiscountReposity;
+import com.example.app_fast_food.productdiscount.entity.ProductDiscount;
 import com.example.app_fast_food.security.JwtService;
 import com.example.app_fast_food.user.UserRepository;
-import com.example.app_fast_food.user.entity.Address;
 import com.example.app_fast_food.user.entity.User;
 import com.example.app_fast_food.user.permission.PermissionRepository;
 import com.example.app_fast_food.user.permission.entity.Permission;
@@ -64,22 +58,24 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
         private final UserRepository userRepository;
         private final RoleRepository roleRepository;
         private final PermissionRepository permissionRepository;
-
         private final ProductRepository productRepository;
         private final DiscountRepository discountRepository;
         private final ProductDiscountReposity productDiscountReposity;
         private final CategoryRepository categoryRepository;
-
-        private final FilialRepository filialRepository;
-
         private final BonusRepository bonusRepository;
         private final BonusConditionRepository bonusConditionRepository;
         private final BonusProductLinkRepository bonusProductLinkRepository;
-
         private final OrderRepository orderRepository;
 
         private final JwtService jwtService;
-        private User admin;
+
+        private static final String BEEF_LAVASH_WITH_CHEESE = "Beef Lavash with Cheese";
+        private static final String CLASSIC_BEEF_BURGER_NAME = "Classic Beef Burger";
+        private static final String ADMIN_PASSWORD = "123";
+
+        private static final String ADMIN = "Admin";
+
+        private User adminUser;
 
         @Override
         public void run(String... args) {
@@ -91,38 +87,27 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 createDiscounts();
                 createCategoriesAndProducts();
 
-                createFilials();
-
                 createBonuses();
-
                 createOrders();
-                // TODO:
-                // - create sample checks
-                // - create real attachments
+
         }
 
-        // ------------------------------------------------------------------------
         // BONUSES
-        // ------------------------------------------------------------------------
-
         private void createOrders() {
                 if (orderRepository.count() > 0) {
                         return;
                 }
 
-                // ------------------------------------------------------------------------
-                // ORDERS
-                // ------------------------------------------------------------------------
-                Product beefLavashWithCheese = productRepository.findByName("Beef Lavash with Cheese")
+                Product beefLavashWithCheese = productRepository.findByName(BEEF_LAVASH_WITH_CHEESE)
                                 .orElseThrow(() -> new RuntimeException("Beef Lavash with Cheese product not found"));
 
-                Product classicBeefBurger = productRepository.findByName("Classic Beef Burger")
+                Product classicBeefBurger = productRepository.findByName(CLASSIC_BEEF_BURGER_NAME)
                                 .orElseThrow(() -> new RuntimeException("Classic Beef Burger product not found"));
 
                 Product pepperoniLarge = productRepository.findByName("Pepperoni Large")
                                 .orElseThrow(() -> new RuntimeException("Pepperoni Large product not found"));
 
-                Order order = new Order(null, OrderStatus.TAKEN, PaymentType.CASH, admin);
+                Order order = new Order(null, OrderStatus.TAKEN, PaymentType.CASH, adminUser);
                 OrderItem orderItem1 = new OrderItem(null, 4, beefLavashWithCheese, order);
                 OrderItem orderItem2 = new OrderItem(null, 1, classicBeefBurger, order);
                 OrderItem orderItem3 = new OrderItem(null, 10, pepperoniLarge, order);
@@ -133,23 +118,14 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
         }
 
         private void createBonuses() {
-
                 if (bonusRepository.count() > 0) {
                         return;
                 }
 
-                // --------------------------------------------------------------------
-                // 1) CREATE BONUS CONDITIONS
-                // --------------------------------------------------------------------
-
                 BonusCondition holidayCondition = new BonusCondition(null, ConditionType.HOLIDAY_BONUS, "ANY");
-
                 BonusCondition birthdayCondition = new BonusCondition(null, ConditionType.USER_BIRTHDAY, "ANY");
-
                 BonusCondition productBonusCondition = new BonusCondition(null, ConditionType.QUANTITY, "2");
-
                 BonusCondition firstPurchaseCondition = new BonusCondition(null, ConditionType.FIRST_PURCHASE, "1");
-
                 BonusCondition orderTotalCondition = new BonusCondition(null, ConditionType.TOTAL_PRICE, "150000");
 
                 List<BonusCondition> bonusConditions = new ArrayList<>(Arrays.asList(
@@ -161,15 +137,11 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
                 bonusConditionRepository.saveAll(bonusConditions);
 
-                // --------------------------------------------------------------------
-                // 2) CREATE BONUSES
-                // --------------------------------------------------------------------
-
                 Bonus birthday2025 = new Bonus(
                                 null,
                                 "Birthday-2025",
                                 birthdayCondition,
-                                1, // usage limit for birthday
+                                1,
                                 LocalDate.now(),
                                 LocalDate.now().plusMonths(12),
                                 true);
@@ -186,14 +158,10 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 bonusRepository.save(birthday2025);
                 bonusRepository.save(navruzBonus);
 
-                // --------------------------------------------------------------------
-                // 3) LINK BONUSES TO PRODUCTS
-                // --------------------------------------------------------------------
-
-                Product classicBeefBurger = productRepository.findByName("Classic Beef Burger")
+                Product classicBeefBurger = productRepository.findByName(CLASSIC_BEEF_BURGER_NAME)
                                 .orElseThrow();
 
-                Product beefLavashWithCheese = productRepository.findByName("Beef Lavash with Cheese")
+                Product beefLavashWithCheese = productRepository.findByName(BEEF_LAVASH_WITH_CHEESE)
                                 .orElseThrow();
 
                 BonusProductLink link1 = new BonusProductLink(
@@ -211,7 +179,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 bonusProductLinkRepository.save(link1);
                 bonusProductLinkRepository.save(link2);
 
-                // Attach links to bonuses
                 birthday2025.getBonusProductLinks().add(link1);
                 navruzBonus.getBonusProductLinks().add(link2);
 
@@ -220,73 +187,13 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
         }
 
-        // ------------------------------------------------------------------------
-        // FILIALS
-        // ------------------------------------------------------------------------
-
-        private void createFilials() {
-                if (filialRepository.count() > 0) {
-                        return;
-                }
-
-                Filial filial1 = new Filial(
-                                null,
-                                "Babur park filial",
-                                "babur park",
-                                LocalTime.of(9, 0),
-                                LocalTime.of(0, 0),
-                                72.3422,
-                                40.7828,
-                                Region.ANDIJON);
-
-                Filial filial2 = new Filial(
-                                null,
-                                "Registan Square filial",
-                                "registan square",
-                                LocalTime.of(9, 0),
-                                LocalTime.of(0, 0),
-                                66.9749,
-                                39.6542,
-                                Region.SAMARQAND);
-
-                Filial filial3 = new Filial(
-                                null,
-                                "Chorsu Bazaar filial",
-                                "chorsu bazaar",
-                                LocalTime.of(9, 0),
-                                LocalTime.of(0, 0),
-                                69.2435,
-                                41.3270,
-                                Region.TASHKENT);
-
-                Filial filial4 = new Filial(
-                                null,
-                                "Tashkent Tower filial",
-                                "tashkent tower",
-                                LocalTime.of(9, 0),
-                                LocalTime.of(0, 0),
-                                69.3341,
-                                41.3385,
-                                Region.TASHKENT);
-
-                List<Filial> filials = new ArrayList<>(Arrays.asList(filial1, filial2, filial3, filial4));
-                filialRepository.saveAll(filials);
-
-        }
-
-        // ------------------------------------------------------------------------
-        // CATEGORIES + PRODUCTS + PRODUCT DISCOUNTS
-        // ------------------------------------------------------------------------
-
         @Transactional
         public void createCategoriesAndProducts() {
                 if (categoryRepository.count() > 0 || productRepository.count() > 0) {
                         return;
                 }
 
-                // -----------------------
                 // PARENT CATEGORIES
-                // -----------------------
                 Category burgers = new Category(null, "Burgers & Sandwiches", null);
                 Category lavash = new Category(null, "Rolls & Lavash", null);
                 Category doner = new Category(null, "Doners", null);
@@ -294,9 +201,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 Category drinks = new Category(null, "Drinks", null);
                 Category desserts = new Category(null, "Desserts", null);
 
-                // -----------------------
                 // SUBCATEGORIES
-                // -----------------------
+
                 // Burgers
                 Category beefBurger = new Category(null, "Beef Burgers", burgers);
 
@@ -324,9 +230,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
                 categoryRepository.saveAll(categories);
 
-                // -----------------------
                 // DISCOUNTS
-                // -----------------------
                 Discount extra = discountRepository.findByNameWithProducts("Extra")
                                 .orElseThrow(() -> new RuntimeException("Discount 'Extra' not found"));
                 Discount extra2 = discountRepository.findByNameWithProducts("Extra-2")
@@ -334,14 +238,12 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 Discount navruz = discountRepository.findByNameWithProducts("Navruz")
                                 .orElseThrow(() -> new RuntimeException("Discount 'Navruz' not found"));
 
-                // -----------------------
                 // PRODUCTS
-                // -----------------------
 
                 // Beef Burger
                 Product classicBeefBurger = new Product(
                                 null,
-                                "Classic Beef Burger",
+                                CLASSIC_BEEF_BURGER_NAME,
                                 new BigDecimal(23000),
                                 beefBurger,
                                 280,
@@ -369,7 +271,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
                 Product beefLavashWithCheese = new Product(
                                 null,
-                                "Beef Lavash with Cheese",
+                                BEEF_LAVASH_WITH_CHEESE,
                                 new BigDecimal(30000),
                                 beefLavash,
                                 380,
@@ -395,7 +297,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 createAttachment("large_pepperoni_pizza_1", "webp"),
                                 createAttachment("large_pepperoni_pizza_2", "jpg"));
 
-                // Ice Cream
+                // ICE CREAM
                 Product vanillaIceCream = new Product(
                                 null,
                                 "Vanilla Ice Cream Cup",
@@ -413,7 +315,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 250,
                                 createAttachment("chocolate_ice_cream_1", "jpg"),
                                 createAttachment("chocolate_ice_cream_2", "jpg"));
-                // Cold drinks
+
+                // COLD DRINKS
                 Product sprite = new Product(
                                 null,
                                 "Sprite 0.5L",
@@ -439,9 +342,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
                 productRepository.saveAll(products);
 
-                // -----------------------
                 // PRODUCT DISCOUNTS
-                // -----------------------
 
                 ProductDiscount pd1 = new ProductDiscount(null, cocaCola, navruz);
 
@@ -455,10 +356,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 productDiscountReposity.saveAll(productDiscounts);
 
         }
-
-        // ------------------------------------------------------------------------
-        // DISCOUNTS
-        // ------------------------------------------------------------------------
 
         private void createDiscounts() {
                 if (discountRepository.count() > 0) {
@@ -496,12 +393,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 discountRepository.saveAll(discounts);
         }
 
-        // ------------------------------------------------------------------------
-        // ADMIN USER
-        // ------------------------------------------------------------------------
-
         private void createAdmin() {
-                Role adminRole = roleRepository.findByName("Admin")
+                Role adminRole = roleRepository.findByName(ADMIN)
                                 .orElseThrow(() -> new RuntimeException("No admin role found"));
 
                 String phoneNumber = "+97 675-00-00";
@@ -510,32 +403,25 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                         return;
                 }
 
-                Address address = new Address(null, 69.24007340, 41.29949580);
-
-                admin = new User(
+                adminUser = new User(
                                 null,
                                 phoneNumber,
                                 "asror",
-                                passwordEncoder.encode("123"),
+                                passwordEncoder.encode(ADMIN_PASSWORD),
                                 LocalDate.now());
 
-                admin.setAddress(address);
-                admin.setRoles(Set.of(adminRole));
-
-                userRepository.save(admin);
+                adminUser.setRoles(Set.of(adminRole));
+                userRepository.save(adminUser);
 
                 String token = jwtService.generateToken(phoneNumber);
 
                 log.warn("Token received {}", token);
         }
 
-        // ------------------------------------------------------------------------
         // ROLES
-        // ------------------------------------------------------------------------
-
         private void createRoles() {
                 Optional<Role> existingUserRole = roleRepository.findByName("User");
-                Optional<Role> existingAdminRole = roleRepository.findByName("Admin");
+                Optional<Role> existingAdminRole = roleRepository.findByName(ADMIN);
                 Optional<Role> existingStaffRole = roleRepository.findByName("Staff");
 
                 if (existingUserRole.isEmpty()) {
@@ -547,7 +433,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
                 if (existingAdminRole.isEmpty()) {
                         Set<Permission> adminPermissions = new HashSet<>(permissionRepository.findAll());
-                        Role adminRole = new Role("Admin", adminPermissions, Collections.emptySet());
+                        Role adminRole = new Role(ADMIN, adminPermissions, Collections.emptySet());
                         roleRepository.save(adminRole);
                 }
 
@@ -559,15 +445,11 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 }
         }
 
-        // ------------------------------------------------------------------------
         // PERMISSIONS
-        // ------------------------------------------------------------------------
-
         private void createPermissions() {
                 if (permissionRepository.count() > 0) {
                         return;
                 }
-
                 Set<Permission> permissions = new HashSet<>();
 
                 // USER PERMISSIONS
@@ -586,10 +468,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 permissionRepository.saveAll(permissions);
         }
 
-        // ------------------------------------------------------------------------
         // ATTACHMENTS
-        // ------------------------------------------------------------------------
-
         private Attachment createAttachment(String originalBaseName, String type) {
                 String storedName = originalBaseName + "." + type;
 

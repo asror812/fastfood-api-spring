@@ -3,7 +3,7 @@ package com.example.app_fast_food.order;
 import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDto;
 import com.example.app_fast_food.common.response.ApiMessageResponse;
 import com.example.app_fast_food.order.dto.OrderResponseDto;
-import com.example.app_fast_food.orderItem.dto.OrderItemCreateRequestDTO;
+import com.example.app_fast_food.orderitem.dto.OrderItemCreateRequestDTO;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.user.entity.User;
 import jakarta.validation.Valid;

@@ -4,13 +4,11 @@ import java.util.List;
 
 import com.example.app_fast_food.order.entity.OrderStatus;
 import com.example.app_fast_food.order.entity.PaymentType;
-import com.example.app_fast_food.orderItem.dto.OrderItemResponseDto;
+import com.example.app_fast_food.orderitem.dto.OrderItemResponseDto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
 @Getter
 @Setter
 public class OrderResponseDto {

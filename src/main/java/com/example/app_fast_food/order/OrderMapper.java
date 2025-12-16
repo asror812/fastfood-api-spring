@@ -6,7 +6,7 @@ import com.example.app_fast_food.order.dto.OrderCreateDto;
 import com.example.app_fast_food.order.dto.OrderResponseDto;
 import com.example.app_fast_food.order.dto.OrderUpdateDto;
 import com.example.app_fast_food.order.entity.Order;
-import com.example.app_fast_food.orderItem.OrderItemMapper;
+import com.example.app_fast_food.orderitem.OrderItemMapper;
 
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

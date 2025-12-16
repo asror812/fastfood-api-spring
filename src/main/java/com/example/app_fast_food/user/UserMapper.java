@@ -26,7 +26,6 @@ public interface UserMapper {
     @Mapping(target = "userBonuses", ignore = true)
     @Mapping(target = "favouriteProducts", ignore = true)
     @Mapping(target = "authorities", ignore = true)
-    @Mapping(target = "address", ignore = true)
     public User toEntity(SignUpDto signUpDTO);
 
     @Mapping(target = "id", ignore = true)
@@ -35,9 +34,9 @@ public interface UserMapper {
     @Mapping(target = "userBonuses", ignore = true)
     @Mapping(target = "favouriteProducts", ignore = true)
     @Mapping(target = "authorities", ignore = true)
-    @Mapping(target = "address", ignore = true)
     public void toEntity(UserUpdateDto updateDto, @MappingTarget User user);
 
+    @Mapping(target = "userBonuses", ignore = true)
     public UserResponseDto toResponseDto(User user);
 
     public UserListResponseDto toListResponseDto(User user);

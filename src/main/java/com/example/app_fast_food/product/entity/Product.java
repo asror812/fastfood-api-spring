@@ -3,7 +3,7 @@ package com.example.app_fast_food.product.entity;
 import com.example.app_fast_food.attachment.entity.Attachment;
 import com.example.app_fast_food.bonus.entity.BonusProductLink;
 import com.example.app_fast_food.category.entity.Category;
-import com.example.app_fast_food.product_discounts.entity.ProductDiscount;
+import com.example.app_fast_food.productdiscount.entity.ProductDiscount;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -29,12 +29,14 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @Column(nullable = false)
     private int weight;
 
     @OneToMany(mappedBy = "product")

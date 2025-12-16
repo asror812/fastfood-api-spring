@@ -1,24 +1,20 @@
 package com.example.app_fast_food.bonus.dto.bonus;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 public class BonusDto {
-    private String name;
+    protected String name;
 
-    private LocalDate startDate;
+    protected LocalDate startDate;
 
-    private LocalDate endDate;
+    protected LocalDate endDate;
 
-    private boolean isActive;
+    protected boolean isActive;
 
-    private int usageLimit;
+    protected int usageLimit;
 }

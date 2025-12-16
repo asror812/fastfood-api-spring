@@ -53,11 +53,8 @@ public class User implements UserDetails {
     @JoinTable(name = "user_favourite_products", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
     private Set<Product> favouriteProducts = new HashSet<>();
 
+    @Column(nullable = false)
     private LocalDate birthDate;
-
-    @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinColumn(name = "adress")
-    private Address address;
 
     public User(UUID id, String phoneNumber, String name,
             String password, LocalDate birthDate) {

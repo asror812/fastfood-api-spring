@@ -2,7 +2,6 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.7'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.vaadin' version '24.9.5'
 }
 
 group = 'com.example'
@@ -15,11 +14,12 @@ java {
 	}
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.compilerArgs += [
-            "-Amapstruct.suppressGeneratorTimestamp=false"];
+        "-Amapstruct.verbose=true",
+        "-Amapstruct.defaultComponentModel=spring"
+    ]
 }
-
 
 configurations {
 	compileOnly {
@@ -72,7 +72,6 @@ dependencies {
 
 	testImplementation 'org.springframework.security:spring-security-test'
 	
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// swagger
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
@@ -93,6 +92,7 @@ dependencies {
 	// mapstruct
     implementation "org.mapstruct:mapstruct:1.6.3"
     annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
+	annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
 }
 
 dependencyManagement {

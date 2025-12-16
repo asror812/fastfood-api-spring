@@ -2,9 +2,9 @@ package com.example.app_fast_food.otp;
 
 import com.example.app_fast_food.common.notification.sms.SmsNotificationService;
 import com.example.app_fast_food.common.response.ApiMessageResponse;
-import com.example.app_fast_food.exceptions.EntityNotFoundException;
-import com.example.app_fast_food.exceptions.OtpEarlyResentException;
-import com.example.app_fast_food.exceptions.OtpLimitExitedException;
+import com.example.app_fast_food.exception.EntityNotFoundException;
+import com.example.app_fast_food.exception.OtpEarlyResentException;
+import com.example.app_fast_food.exception.OtpLimitExitedException;
 import com.example.app_fast_food.otp.dto.ValidatePhoneNumberDTO;
 import com.example.app_fast_food.otp.entity.Otp;
 
@@ -21,7 +21,7 @@ import java.util.Random;
 public class OtpService {
     private final OtpRepository otpRepository;
     private final Random random = new Random();
-    private final String VERIFICATION_MASSAGE = "Your verification code is: %d%n";
+    private static final String VERIFICATION_MASSAGE = "Your verification code is: %d%n";
 
     @Value("${spring.otp.retry-wait-time}")
     private int retryWaitTime;

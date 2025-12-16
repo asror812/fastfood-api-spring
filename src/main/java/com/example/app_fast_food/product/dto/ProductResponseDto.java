@@ -1,7 +1,6 @@
 package com.example.app_fast_food.product.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -10,9 +9,8 @@ import java.util.UUID;
 
 import com.example.app_fast_food.attachment.dto.AttachmentResponseDto;
 import com.example.app_fast_food.bonus.dto.bonus_product_link.BonusProductLinkResponseDTO;
-import com.example.app_fast_food.product_discounts.dto.ProductDiscountResponseDto;
+import com.example.app_fast_food.productdiscount.dto.ProductDiscountResponseDto;
 
-@NoArgsConstructor
 @Getter
 @Setter
 public class ProductResponseDto {
@@ -32,7 +30,7 @@ public class ProductResponseDto {
 
     private List<ProductDiscountResponseDto> productDiscounts;
 
-    private List<BonusProductLinkResponseDTO> bonusProductLinks;
+    private List<BonusProductLinkResponseDTO> bonuses;
 
     @Override
     public String toString() {

@@ -5,16 +5,15 @@ import com.example.app_fast_food.check.CheckRepository;
 import com.example.app_fast_food.check.entity.Check;
 import com.example.app_fast_food.common.response.ApiMessageResponse;
 import com.example.app_fast_food.discount.entity.Discount;
-import com.example.app_fast_food.exceptions.EntityNotFoundException;
-import com.example.app_fast_food.exceptions.TooFarException;
-import com.example.app_fast_food.filial.FilialService;
-import com.example.app_fast_food.filial.entity.NearestFilial;
+import com.example.app_fast_food.exception.AlreadyAddedToBasketException;
+import com.example.app_fast_food.exception.EntityNotFoundException;
+import com.example.app_fast_food.exception.UserBasketNotFoundException;
 import com.example.app_fast_food.order.dto.OrderResponseDto;
 import com.example.app_fast_food.order.entity.Order;
 import com.example.app_fast_food.order.entity.OrderStatus;
-import com.example.app_fast_food.orderItem.OrderItemRepository;
-import com.example.app_fast_food.orderItem.dto.OrderItemCreateRequestDTO;
-import com.example.app_fast_food.orderItem.entity.OrderItem;
+import com.example.app_fast_food.orderitem.OrderItemRepository;
+import com.example.app_fast_food.orderitem.dto.OrderItemCreateRequestDTO;
+import com.example.app_fast_food.orderitem.entity.OrderItem;
 import com.example.app_fast_food.product.ProductMapper;
 import com.example.app_fast_food.product.ProductRepository;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
@@ -22,6 +21,7 @@ import com.example.app_fast_food.product.entity.Product;
 import com.example.app_fast_food.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,10 +36,12 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final CheckRepository checkRepository;
 
-    private final FilialService filialService;
-
     private final OrderMapper mapper;
     private final ProductMapper productMapper;
+
+    public static final String PRODUCT_ENTITY = "Product";
+    public static final String BASKET_ENTITY = "Basket";
+    public static final String BONUS_ENTITY = "Bonus";
 
     public OrderResponseDto addProduct(OrderItemCreateRequestDTO dto, User user) {
         Order order = repository.findBasketByUserId(user.getId())
@@ -52,14 +54,14 @@ public class OrderService {
 
         Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Product", dto.getProductId().toString()));
+                        PRODUCT_ENTITY, dto.getProductId().toString()));
 
         Optional<OrderItem> existing = order.getOrderItems().stream()
                 .filter(oi -> oi.getProduct().getId().equals(dto.getProductId()))
                 .findFirst();
 
         if (existing.isPresent()) {
-            throw new RuntimeException("Product already added to basket");
+            throw new AlreadyAddedToBasketException("Product already added to basket");
         }
 
         OrderItem orderItem = new OrderItem(null, 1, product, order);
@@ -74,34 +76,33 @@ public class OrderService {
     public OrderResponseDto updateQuantity(User user, UUID productId, int quantity) {
         Order order = repository.findBasketByUserId(user.getId())
                 .orElseThrow(
-                        () -> new EntityNotFoundException("Basket",
+                        () -> new EntityNotFoundException(BASKET_ENTITY,
                                 user.getId().toString()));
 
         OrderItem orderItem = order.getOrderItems().stream()
                 .filter(o -> o.getProduct().getId().equals(productId))
                 .findFirst()
                 .orElseThrow(
-                        () -> new EntityNotFoundException("Product", productId.toString()));
+                        () -> new EntityNotFoundException(PRODUCT_ENTITY, productId.toString()));
 
         orderItem.setQuantity(quantity);
         orderItemRepository.save(orderItem);
 
-        // todo
         calculateOrderPrices(order, user);
 
         repository.save(order);
         return mapper.toResponseDto(order);
     }
 
-    // to do
     private void calculateOrderPrices(Order order, User user) {
-
+        // FIXME: override full function
     }
 
     public OrderResponseDto getBasket(User user) {
         Order order = repository.findBasketByUserId(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Basket",
-                        "of user " + user.getId()));
+                .orElseThrow(
+                        () -> new UserBasketNotFoundException(
+                                "Basket with user id %s not found".formatted(user.getId())));
 
         return mapper.toResponseDto(order);
     }
@@ -124,26 +125,20 @@ public class OrderService {
 
         Order order = repository
                 .findBasketByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Basket",
+                .orElseThrow(() -> new EntityNotFoundException(BASKET_ENTITY,
                         userId.toString()));
 
         order.setOrderStatus(OrderStatus.IN_PROCESS);
         repository.save(order);
 
-        // todo
-        NearestFilial nearestOne = filialService.findTheNearestOne(10d, 10d);
-        if (nearestOne.getDistance() >= 5) {
-            throw new TooFarException("We cannot deliver to your location");
-        }
-
-        Check check = new Check(null, order, user, nearestOne, "John");
+        Check check = new Check(null, order, user, "John");
 
         checkRepository.save(check);
     }
 
     public OrderResponseDto removeProduct(User user, UUID productId) {
         Order order = repository.findBasketByUserId(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Basket",
+                .orElseThrow(() -> new EntityNotFoundException(BASKET_ENTITY,
                         "of user " + user.getId()));
 
         Product product = productRepository
@@ -161,11 +156,11 @@ public class OrderService {
 
     public ProductResponseDto selectBonus(User user, UUID bonusId) {
         Order o = repository.findBasketByUserId(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Basket",
-                        "of user " + user.getId()));
+                .orElseThrow(() -> new UserBasketNotFoundException(
+                        "Basket with user id %s not found".formatted(user.getId())));
 
         Product p = productRepository.findProductById(bonusId)
-                .orElseThrow(() -> new EntityNotFoundException("Product",
+                .orElseThrow(() -> new EntityNotFoundException(PRODUCT_ENTITY,
                         bonusId.toString()));
 
         OrderItem item = new OrderItem(null, 1, p, o);
@@ -209,11 +204,11 @@ public class OrderService {
     }
 
     public List<OrderResponseDto> getAll() {
-        return repository.findAll().stream().map(o -> mapper.toResponseDto(o)).toList();
+        return repository.findAll().stream().map(mapper::toResponseDto).toList();
 
     }
 
-    public OrderResponseDto getById(UUID id) {
+    public OrderResponseDto getById(@NonNull UUID id) {
         Order order = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Order", id.toString()));
 
         return mapper.toResponseDto(order);

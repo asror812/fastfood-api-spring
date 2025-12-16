@@ -1,7 +1,7 @@
 package com.example.app_fast_food.security;
 
-import com.example.app_fast_food.exceptions.dto.ErrorResponse;
-import com.example.app_fast_food.exceptions.entity.ErrorMessages;
+import com.example.app_fast_food.exception.dto.ErrorResponse;
+import com.example.app_fast_food.exception.entity.ErrorMessages;
 import com.example.app_fast_food.user.UserRepository;
 import com.example.app_fast_food.user.entity.User;
 import com.google.gson.Gson;

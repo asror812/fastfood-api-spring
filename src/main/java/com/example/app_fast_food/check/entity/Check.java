@@ -1,6 +1,5 @@
 package com.example.app_fast_food.check.entity;
 
-import com.example.app_fast_food.filial.entity.Filial;
 import com.example.app_fast_food.order.entity.Order;
 import com.example.app_fast_food.user.entity.User;
 import jakarta.persistence.*;
@@ -26,10 +25,6 @@ public class Check {
       @ManyToOne
       @JoinColumn(name = "user_id")
       private User user;
-
-      @ManyToOne
-      @JoinColumn(name = "filial_id")
-      private Filial filial;
 
       @NotBlank
       private String courier;

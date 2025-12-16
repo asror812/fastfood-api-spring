@@ -4,10 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
 @Getter
 @Setter
 public class CategoryResponseDto {
@@ -15,7 +13,7 @@ public class CategoryResponseDto {
 
     private String name;
 
-    private ParentCategoryDto parent; // safe parent
+    private ParentCategoryDto parent;
 
-    private List<SubCategory> subCategories; // safe children
+    private List<SubCategory> subCategories;
 }

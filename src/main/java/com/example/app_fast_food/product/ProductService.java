@@ -1,6 +1,6 @@
 package com.example.app_fast_food.product;
 
-import com.example.app_fast_food.exceptions.EntityNotFoundException;
+import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.product.dto.ProductCreateDto;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.product.entity.Product;

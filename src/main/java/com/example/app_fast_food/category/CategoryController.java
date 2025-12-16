@@ -40,7 +40,7 @@ public class CategoryController {
 
     @GetMapping("{id}")
     public ResponseEntity<CategoryResponseDto> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(categoryService.getById(id));
+        return ResponseEntity.ok(categoryService.findById(id));
     }
 
     @GetMapping("/menu/{id}")

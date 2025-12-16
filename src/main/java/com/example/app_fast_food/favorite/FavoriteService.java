@@ -1,7 +1,7 @@
 package com.example.app_fast_food.favorite;
 
 import com.example.app_fast_food.common.response.ApiMessageResponse;
-import com.example.app_fast_food.exceptions.EntityNotFoundException;
+import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.product.ProductRepository;
 import com.example.app_fast_food.product.ProductService;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
