@@ -14,7 +14,6 @@ import com.example.app_fast_food.exception.InvalidOperationException;
 import com.example.app_fast_food.exception.OtpEarlyResentException;
 import com.example.app_fast_food.exception.OtpLimitExitedException;
 import com.example.app_fast_food.exception.PhoneNumberNotVerifiedException;
-import com.example.app_fast_food.exception.TooFarException;
 import com.example.app_fast_food.exception.dto.ErrorResponse;
 import com.example.app_fast_food.exception.entity.ErrorMessages;
 
@@ -91,17 +90,6 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
-    // Filial
-    @ExceptionHandler(TooFarException.class)
-    public ResponseEntity<ErrorResponse> handleTooFar(TooFarException e) {
-        log.error("TooFarException: {}", e.getMessage());
-
-        ErrorResponse response = new ErrorResponse(
-                ErrorMessages.TOO_FAR,
-                "TOO_FAR");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-    }
-
     // Entity
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleAlreadyExist(AlreadyExistsException e) {
@@ -121,6 +109,17 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 ErrorMessages.INVALID_OPERATION,
                 "INVALID_OPERATION");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e) {
+        log.error("IllegalArgumentException: {}", e.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+                ErrorMessages.INVALID_ARGUMENT,
+                "INVALID_ARGUMENT");
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 

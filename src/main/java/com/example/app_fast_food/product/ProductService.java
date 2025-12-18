@@ -30,15 +30,8 @@ public class ProductService {
     }
 
     public List<ProductResponseDto> getAllByCategory(UUID categoryId) {
-        log.info("Parent category: " + categoryId);
-        List<ProductResponseDto> productResponseDtos = getProductResponseDTOS(
+        return getProductResponseDTOS(
                 repository.findProductsByCategoryTree(categoryId));
-
-        for (ProductResponseDto p : productResponseDtos) {
-            System.out.println(p);
-        }
-
-        return productResponseDtos;
     }
 
     public List<ProductResponseDto> getCampaignProducts() {
@@ -53,14 +46,14 @@ public class ProductService {
     }
 
     public List<ProductResponseDto> getProductResponseDTOS(List<Product> products) {
-        return products.stream().map(p -> mapper.toResponseDTO(p)).toList();
+        return products.stream().map(mapper::toResponseDTO).toList();
     }
 
     public List<ProductResponseDto> getPopularProducts() {
-        return repository.getPopularProducts().stream().map(p -> mapper.toResponseDTO(p)).toList();
+        return repository.getPopularProducts().stream().map(mapper::toResponseDTO).toList();
     }
 
     public List<ProductResponseDto> getAll() {
-        return repository.findAll().stream().map(p -> mapper.toResponseDTO(p)).toList();
+        return repository.findAll().stream().map(mapper::toResponseDTO).toList();
     }
 }

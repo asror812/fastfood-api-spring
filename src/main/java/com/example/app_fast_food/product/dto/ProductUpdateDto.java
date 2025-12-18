@@ -18,7 +18,7 @@ public class ProductUpdateDto {
     private UUID mainImageId;
     private UUID secondaryImageId;
 
-    private List<UUID> bonusProductsIds;
+    private List<UUID> bonusProductsIds = List.of();
 }
 
 

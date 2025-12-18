@@ -1,14 +1,11 @@
-server:
-  address:  0.0.0.0
-
 spring:
+  config:
+    import: optional:.env
+
   profiles:
     active: local
 
 
-
-#  docker:
-#    compose:
-#      lifecycle-management: start_only
-
-
+logging:
+  level:
+    springframework: DEBUG

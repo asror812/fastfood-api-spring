@@ -1,5 +1,6 @@
 package com.example.app_fast_food.user.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -12,9 +13,9 @@ import lombok.Setter;
 @Setter
 public class UserResponseDto extends UserDto {
 
-    public Set<UUID> favouriteProducts;
+    private Set<UUID> favouriteProducts = Set.of();
 
-    private List<UserBonusResponseDto> userBonuses;
+    private List<UserBonusResponseDto> userBonuses = new ArrayList<>();
 
-    private Set<String> roles;
+    private Set<String> roles = Set.of();
 }

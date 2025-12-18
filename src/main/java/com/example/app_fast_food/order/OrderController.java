@@ -8,6 +8,7 @@ import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/orders")
+@Slf4j
 public class OrderController {
     private final OrderService orderService;
 
@@ -49,8 +51,10 @@ public class OrderController {
                 .body(orderService.addProduct(dto, user));
     }
 
+    // TODO
     @GetMapping("/basket")
     public ResponseEntity<OrderResponseDto> getBasket(@AuthenticationPrincipal User user) {
+        log.error("{}", user.getId());
         return ResponseEntity.ok(orderService.getBasket(user));
     }
 

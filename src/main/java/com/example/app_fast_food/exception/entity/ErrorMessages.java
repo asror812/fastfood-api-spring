@@ -20,6 +20,7 @@ public class ErrorMessages {
 
     public static final String PHONE_ALREADY_REGISTERED = "This phone number is already registered";
     public static final String ALREADY_EXIST = "Resource already exists";
+    public static final String INVALID_ARGUMENT = "Invalid request params";
 
     private ErrorMessages() {
     }

@@ -34,6 +34,7 @@ public interface UserMapper {
     @Mapping(target = "userBonuses", ignore = true)
     @Mapping(target = "favouriteProducts", ignore = true)
     @Mapping(target = "authorities", ignore = true)
+    @Mapping(target = "password", ignore = true)
     public void toEntity(UserUpdateDto updateDto, @MappingTarget User user);
 
     @Mapping(target = "userBonuses", ignore = true)

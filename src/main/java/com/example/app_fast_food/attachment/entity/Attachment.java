@@ -15,20 +15,20 @@ import java.util.UUID;
 @Table(name = "attachments")
 public class Attachment {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
-    private String originalName; // user-uploaded name 
+    private String originalName;
+
+    // actual saved filename (e.g. 1f9d...-img.png)
+    @Column(nullable = false)
+    private String storedName;
 
     @Column(nullable = false)
-    private String storedName; // actual saved filename (e.g. 1f9d...-img.png)
+    private String contentType;
 
     @Column(nullable = false)
-    private String contentType; // image/jpeg
-
-    @Column(nullable = false)
-    private Long size; // bytes
+    private Long size;
 
     @Column(nullable = false)
     private String downloadUrl; // /uploads/1f9d...-img.png

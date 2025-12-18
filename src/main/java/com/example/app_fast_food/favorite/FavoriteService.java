@@ -34,7 +34,6 @@ public class FavoriteService {
     }
 
     public ApiMessageResponse add(UUID userId, UUID productId) {
-
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Product", productId.toString()));
@@ -42,9 +41,12 @@ public class FavoriteService {
         User user = userRepository.findUserByIdWithFavouriteProducts(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User", userId.toString()));
 
-        user.getFavouriteProducts().add(product);
+        boolean exists = user.getFavouriteProducts().stream().anyMatch(p -> p.getId().equals(productId));
 
-        userRepository.save(user);
+        if (!exists) {
+            user.getFavouriteProducts().add(product);
+            userRepository.save(user);
+        }
 
         return new ApiMessageResponse("Product added to favorites successfully");
     }

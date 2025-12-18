@@ -4,6 +4,7 @@ import com.example.app_fast_food.product.entity.Product;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             INNER JOIN categories c ON c.id = p.category_id
             WHERE c.name = :name
             """, nativeQuery = true)
-    List<Product> findProductsByCategoryName(String name);
+    List<Product> findProductsByCategoryName(@Param("name") String name);
 
     @Query(value = """
             WITH RECURSIVE subcats AS (
@@ -38,7 +39,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             FROM products p
             WHERE p.category_id = :id OR p.category_id IN (SELECT id FROM subcats)
             """, nativeQuery = true)
-    List<Product> findProductsByCategoryTree(UUID id);
+    List<Product> findProductsByCategoryTree(@Param("id") UUID id);
 
     Optional<Product> findProductById(UUID id);
 
@@ -49,8 +50,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             FROM products p
             JOIN product_discounts pd ON pd.product_id = p.id
             JOIN discounts d ON d.id = pd.discount_id
-            WHERE d.is_active = true
-              AND CURRENT_DATE BETWEEN d.start_date AND d.end_date
+            WHERE d.is_active = true AND CURRENT_DATE BETWEEN d.start_date AND d.end_date
             """, nativeQuery = true)
     List<Product> getCampaignProducts();
 

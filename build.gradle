@@ -64,25 +64,20 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	
 	// lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-
-	// tests	
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-	testImplementation 'org.springframework.security:spring-security-test'
+	compileOnly 'org.projectlombok:lombok:1.18.34'
+	annotationProcessor 'org.projectlombok:lombok:1.18.34'
 	
 
+	//lombok test
+	testCompileOnly 'org.projectlombok:lombok:1.18.34'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+
 	// swagger
-    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14")
 
 	// redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'redis.clients:jedis:5.1.0'
-
-	//model mapper
-    implementation 'org.modelmapper:modelmapper:3.2.0'
 
 	 // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'

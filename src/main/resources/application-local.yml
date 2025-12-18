@@ -1,25 +1,35 @@
 spring:
   datasource:
-    password: postgres
-    username: postgres
-    url: jdbc:postgresql://localhost:5433/fast_food
+    password: ${POSTGRES_PASSWORD}
+    username: ${POSTGRES_USER}
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: create-drop
-  otp:
-    retry-wait-time: 60
-    retry-count: 3
-    time-to-live: 86400
+  
+otp:
+  retry-wait-time: ${OTP_RETRY_WAIT_TIME}
+  retry-count: ${OTP_RETRY_COUNT}
+  time-to-live: ${OTP_TIME_TO_LIVE}
+
 notification:
   eskiz:
-    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTY5OTQ1NzMsImlhdCI6MTcxNDQwMjU3Mywicm9sZSI6InRlc3QiLCJzaWduIjoiMmYxMDliOTRmOWE3MWM1NjNhMGRmYWQ3NTUwYmZkOTY1ZmFkMGI4ZWQzNDQxMDFjMzE0NGJhNWQ2MzQ5YmEzOCIsInN1YiI6IjU1OTEifQ.LkOpwTRtapPhtczF4cfFtnG6c--113dKrEyIDTEuxkU
+    token: ${ESKIZ_TOKEN}
 
 security:
   token:
-    expiration: 86400
-    secretKey: my-fast-food-application-secret-key
+    expiration: ${JWT_EXPIRATION}
+    secretKey: ${JWT_KEY}
 
-logging:
-  level:
-    root: WARN
+api:
+  admin:
+    password: ${ADMIN_PASSWORD}
+
+  images:
+    base:
+      download-url: http://localhost:8080/attachments/download/
+
+  storage:
+    images-path: ${IMAGES_PATH}
+

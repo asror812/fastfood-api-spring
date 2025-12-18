@@ -95,24 +95,30 @@ public class OrderService {
     }
 
     private void calculateOrderPrices(Order order, User user) {
-        // FIXME: override full function
+        // TODO: override full function
     }
 
     public OrderResponseDto getBasket(User user) {
         Order order = repository.findBasketByUserId(user.getId())
                 .orElseThrow(
                         () -> new UserBasketNotFoundException(
-                                "Basket with user id %s not found".formatted(user.getId())));
+                                "Basket with user id `%s` not found".formatted(user.getId())));
 
         return mapper.toResponseDto(order);
     }
 
     public List<OrderResponseDto> getByOrderStatus(String status) {
-        List<Order> orders = repository.findByOrderStatus(OrderStatus.valueOf(status));
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(status);
+            List<Order> orders = repository.findByOrderStatus(orderStatus);
 
-        return orders.stream()
-                .map(mapper::toResponseDto)
-                .toList();
+            return orders.stream()
+                    .map(mapper::toResponseDto)
+                    .toList();
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid order status `%s`".formatted(status));
+        }
     }
 
     public ApiMessageResponse deleteBasket(UUID id) {

@@ -23,13 +23,13 @@ public class OtpService {
     private final Random random = new Random();
     private static final String VERIFICATION_MASSAGE = "Your verification code is: %d%n";
 
-    @Value("${spring.otp.retry-wait-time}")
+    @Value("${otp.retry-wait-time}")
     private int retryWaitTime;
 
-    @Value("${spring.otp.retry-count}")
+    @Value("${otp.retry-count}")
     private int retryCount;
 
-    @Value("${spring.otp.time-to-live}")
+    @Value("${otp.time-to-live}")
     private int timeToLive;
 
     private final SmsNotificationService smsNotificationService;

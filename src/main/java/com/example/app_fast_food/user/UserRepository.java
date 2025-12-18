@@ -18,11 +18,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByPhoneNumber(String phoneNumber);
 
     @Query(value = "SELECT * FROM users WHERE id = :userId", nativeQuery = true)
-    User findUserById(UUID userId);
+    User findUserById(@Param("userId") UUID userId);
 
-    @Query("""
-            SELECT u FROM User u LEFT JOIN FETCH u.favouriteProducts WHERE u.id = :userId
-            """)
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.favouriteProducts WHERE u.id = :userId")
     Optional<User> findUserByIdWithFavouriteProducts(@Param("userId") UUID userId);
 
 }

@@ -67,11 +67,11 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Stream<Permission> role_permissions = roles
+        Stream<Permission> rolePermissions = roles
                 .stream().map(Role::getPermissions)
                 .flatMap(Collection::stream);
 
-        return role_permissions
+        return rolePermissions
                 .map(permission -> new SimpleGrantedAuthority(permission.getName()))
                 .collect(Collectors.toSet());
     }

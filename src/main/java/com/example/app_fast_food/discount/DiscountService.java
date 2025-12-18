@@ -6,6 +6,8 @@ import com.example.app_fast_food.orderitem.entity.OrderItem;
 import com.example.app_fast_food.product.entity.Product;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -14,16 +16,11 @@ import java.util.Set;
 
 @Service
 @Getter
+@RequiredArgsConstructor
 public class DiscountService {
 
     private final DiscountRepository repository;
-    private final Class<Discount> entityClass = Discount.class;
     private final DiscountMapper mapper;
-
-    public DiscountService(DiscountRepository repository, DiscountMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
 
     public List<Discount> getActiveDiscountsWithoutRequirements() {
         return repository.getActiveHolidayDiscounts();
@@ -34,7 +31,7 @@ public class DiscountService {
 
         for (OrderItem item : order.getOrderItems()) {
             Product product = item.getProduct();
-            discounts.addAll(repository.findProductQuantityDiscounts(product, item.getQuantity()));
+            discounts.addAll(repository.findProductQuantityDiscounts(product.getId(), item.getQuantity()));
         }
 
         return discounts;

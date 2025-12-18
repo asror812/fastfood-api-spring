@@ -9,6 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface OtpRepository extends CrudRepository<Otp, String> {
-
     Optional<Otp> findByPhoneNumber(String phoneNumber);
 }

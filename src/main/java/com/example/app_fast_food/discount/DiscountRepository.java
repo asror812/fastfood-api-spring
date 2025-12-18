@@ -1,10 +1,10 @@
 package com.example.app_fast_food.discount;
 
 import com.example.app_fast_food.discount.entity.Discount;
-import com.example.app_fast_food.product.entity.Product;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,13 +24,14 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID> {
           FROM Discount d
           JOIN d.products p
           WHERE d.requiredQuantity <= :quantity
-            AND p = :product
+            AND p.id = :productId
             AND d.startDate <= CURRENT_DATE
             AND d.endDate >= CURRENT_DATE
             AND d.isActive = true
+          ORDER BY d.requiredQuantity
       """)
-  List<Discount> findProductQuantityDiscounts(Product product, int quantity);
+  List<Discount> findProductQuantityDiscounts(@Param("productId") UUID productId, @Param("quantity") int quantity);
 
-  @Query("select d from Discount d left join fetch d.products where d.name = :name")
-  Optional<Discount> findByNameWithProducts(String name);
+  @Query("SELECT d FROM Discount d LEFT JOIN FETCH d.products WHERE d.name = :name")
+  Optional<Discount> findByNameWithProducts(@Param("name") String name);
 }

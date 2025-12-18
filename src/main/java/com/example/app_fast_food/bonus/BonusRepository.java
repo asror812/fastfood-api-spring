@@ -11,8 +11,6 @@ import java.util.UUID;
 
 @Repository
 public interface BonusRepository extends JpaRepository<Bonus, UUID> {
-
     @Query("SELECT b FROM Bonus b WHERE b.isActive = true AND CURRENT_DATE BETWEEN b.startDate AND b.endDate")
     List<Bonus> findAllActiveAndValid();
-
 }

@@ -28,6 +28,7 @@ public interface OrderMapper {
     @Mapping(target = "finalPrice", ignore = true)
     @Mapping(target = "orderItems", ignore = true)
     @Mapping(target = "appliedBonus", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     Order toEntity(OrderCreateDto dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -38,6 +39,7 @@ public interface OrderMapper {
     @Mapping(target = "totalPrice", ignore = true)
     @Mapping(target = "discountAmount", ignore = true)
     @Mapping(target = "finalPrice", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     void toEntity(OrderUpdateDto dto, @MappingTarget Order order);
 
     OrderResponseDto toResponseDto(Order order);

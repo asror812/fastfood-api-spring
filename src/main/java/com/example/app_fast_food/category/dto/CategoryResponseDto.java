@@ -1,5 +1,6 @@
 package com.example.app_fast_food.category.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,5 +16,5 @@ public class CategoryResponseDto {
 
     private ParentCategoryDto parent;
 
-    private List<SubCategory> subCategories;
+    private List<SubCategory> subCategories = new ArrayList<>();
 }

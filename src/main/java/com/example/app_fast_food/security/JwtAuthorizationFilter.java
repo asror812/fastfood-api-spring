@@ -38,10 +38,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     public static final Set<String> EXCLUDED_URLS = Set.of(
             "/auth",
             "/v3/api-docs",
-            "/swagger-ui",
-            "/products",
-            "/categories",
-            "orders");
+            "/swagger-ui");
 
     @Override
     protected void doFilterInternal(

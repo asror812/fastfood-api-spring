@@ -13,6 +13,7 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
+
     public CategoryResponseDto toResponseDto(Category category);
 
     @Mapping(target = "id", ignore = true)

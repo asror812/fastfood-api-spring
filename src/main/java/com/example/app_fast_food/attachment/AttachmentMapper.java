@@ -9,5 +9,4 @@ import com.example.app_fast_food.attachment.entity.Attachment;
 public interface AttachmentMapper {
 
     AttachmentResponseDto toResponseDTO(Attachment attachment);
-
 }

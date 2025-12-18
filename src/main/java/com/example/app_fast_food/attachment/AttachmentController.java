@@ -25,12 +25,12 @@ public class AttachmentController {
 
     @GetMapping
     public ResponseEntity<List<AttachmentResponseDto>> getAll() {
-        return ResponseEntity.ok(attachmentService.getAll());
+        return ResponseEntity.ok(attachmentService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<AttachmentResponseDto>> getbyId(@PathVariable UUID id) {
-        return ResponseEntity.ok(attachmentService.getAll());
+    public ResponseEntity<AttachmentResponseDto> getById(@PathVariable UUID id) {
+        return ResponseEntity.ok(attachmentService.findById(id));
     }
 
     @GetMapping("/download/{id}")

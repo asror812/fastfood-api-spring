@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,17 +29,17 @@ public class ProductResponseDto {
 
     private AttachmentResponseDto secondaryImage;
 
-    private List<ProductDiscountResponseDto> productDiscounts;
+    private List<ProductDiscountResponseDto> productDiscounts = new ArrayList<>();
 
-    private List<BonusProductLinkResponseDTO> bonuses;
+    private List<BonusProductLinkResponseDTO> bonuses = new ArrayList<>();
 
     @Override
     public String toString() {
         return "\nProduct [" +
                 "\n    name=" + name +
                 ",\n    price=" + price +
-                ",\n    category=" + category.getName() +
-                ",\n    mainImage=" + mainImage.getDownloadUrl() +
-                ",\n    secondaryImage=" + secondaryImage.getDownloadUrl() + "]";
+                ",\n    category=" + (category != null ? category.getName() : "null") +
+                ",\n    mainImage=" + (mainImage != null ? mainImage.getDownloadUrl() : "null") +
+                ",\n    secondaryImage=" + (secondaryImage != null ? secondaryImage.getDownloadUrl() : "null") + "]";
     }
 }

@@ -24,7 +24,6 @@ import com.example.app_fast_food.user.dto.SignInDto;
 import com.example.app_fast_food.user.dto.SignUpDto;
 import com.example.app_fast_food.user.dto.TokenResponseDto;
 import com.example.app_fast_food.user.dto.UserResponseDto;
-import com.example.app_fast_food.user.dto.UserUpdateDto;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -69,7 +68,7 @@ public class AuthService implements UserDetailsService {
         }
     }
 
-    protected UserResponseDto update(UUID id, UserUpdateDto userUpdateDTO) {
+    protected UserResponseDto update(UUID id) {
         return mapper.toResponseDto(repository.findById(id).orElseThrow());
     }
 

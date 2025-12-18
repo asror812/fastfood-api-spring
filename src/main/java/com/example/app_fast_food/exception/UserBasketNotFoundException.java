@@ -5,5 +5,4 @@ public class UserBasketNotFoundException extends RuntimeException {
     public UserBasketNotFoundException(String message) {
         super(message);
     }
-
 }
