@@ -34,12 +34,12 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponseDto> getById(@PathVariable UUID id) {
+    public ResponseEntity<OrderResponseDto> getById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(orderService.getById(id));
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<OrderResponseDto>> getAllByOrderStatus(@PathVariable String status) {
+    public ResponseEntity<List<OrderResponseDto>> getAllByOrderStatus(@PathVariable("status") String status) {
         return ResponseEntity.ok(orderService.getByOrderStatus(status));
     }
 
@@ -54,14 +54,13 @@ public class OrderController {
     // TODO
     @GetMapping("/basket")
     public ResponseEntity<OrderResponseDto> getBasket(@AuthenticationPrincipal User user) {
-        log.error("{}", user.getId());
         return ResponseEntity.ok(orderService.getBasket(user));
     }
 
     @PatchMapping("/basket/items/{productId}")
     public ResponseEntity<OrderResponseDto> updateQuantity(
             @AuthenticationPrincipal User user,
-            @PathVariable UUID productId,
+            @PathVariable("productId") UUID productId,
             @RequestParam(required = true) int quantity) {
         return ResponseEntity.ok(orderService.updateQuantity(user, productId, quantity));
     }
@@ -74,7 +73,7 @@ public class OrderController {
     @DeleteMapping("/basket/items/{productId}")
     public ResponseEntity<OrderResponseDto> removeItem(
             @AuthenticationPrincipal User user,
-            @PathVariable UUID productId) {
+            @PathVariable("productId") UUID productId) {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(orderService.removeProduct(user, productId));
     }
@@ -87,7 +86,7 @@ public class OrderController {
     @PostMapping("/basket/bonus/{productId}")
     public ResponseEntity<ProductResponseDto> chooseBonus(
             @AuthenticationPrincipal User user,
-            @PathVariable UUID productId) {
+            @PathVariable("productId") UUID productId) {
         return ResponseEntity.ok(orderService.selectBonus(user, productId));
     }
 

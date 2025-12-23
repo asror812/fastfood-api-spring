@@ -4,7 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
+
+import com.example.app_fast_food.product.dto.ProductDto;
 
 @Setter
 @Getter
@@ -20,6 +23,8 @@ public class DiscountResponseDto {
     private LocalDate endDate;
 
     private Integer requiredQuantity;
+
+    private List<ProductDto> products;
 
     private boolean isActive;
 }

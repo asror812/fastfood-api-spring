@@ -21,7 +21,7 @@ public interface OrderMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "orderStatus", ignore = true)
+    @Mapping(target = "status", ignore = true)
     @Mapping(target = "discounts", ignore = true)
     @Mapping(target = "totalPrice", ignore = true)
     @Mapping(target = "discountAmount", ignore = true)

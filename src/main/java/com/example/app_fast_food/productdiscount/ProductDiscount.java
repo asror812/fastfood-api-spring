@@ -1,4 +1,4 @@
-package com.example.app_fast_food.productdiscount.entity;
+package com.example.app_fast_food.productdiscount;
 
 import java.util.UUID;
 

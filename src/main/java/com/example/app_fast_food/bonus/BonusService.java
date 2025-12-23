@@ -3,8 +3,8 @@ package com.example.app_fast_food.bonus;
 import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDto;
 import com.example.app_fast_food.bonus.entity.Bonus;
 import com.example.app_fast_food.bonus.entity.BonusProductLink;
-import com.example.app_fast_food.check.CheckRepository;
 import com.example.app_fast_food.exception.EntityNotFoundException;
+import com.example.app_fast_food.order.OrderRepository;
 import com.example.app_fast_food.order.entity.Order;
 import com.example.app_fast_food.orderitem.entity.OrderItem;
 import com.example.app_fast_food.user.entity.User;
@@ -20,9 +20,9 @@ import java.util.*;
 public class BonusService {
 
     private final BonusRepository repository;
+    private final OrderRepository orderRepository;
+    
     private final BonusMapper mapper;
-
-    private final CheckRepository checkRepository;
 
     public List<Bonus> getAvailableOrderBonuses(User user, Order order) {
         List<Bonus> appliableBonuses = new ArrayList<>();
@@ -40,7 +40,7 @@ public class BonusService {
 
         return switch (bonus.getCondition().getConditionType()) {
             case HOLIDAY_BONUS -> true;
-            case FIRST_PURCHASE -> checkRepository.getPurchasesCountOfUser(user.getId()) == 0;
+            case FIRST_PURCHASE -> orderRepository.getPurchasesCountOfUser(user.getId()) == 0;
             case TOTAL_PRICE -> checkOrderPrice(order, bonus.getCondition().getValue());
             case QUANTITY -> isProductBonusApplicable(bonus, order);
             default -> false;

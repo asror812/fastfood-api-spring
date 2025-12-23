@@ -39,12 +39,12 @@ public class CategoryController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<CategoryResponseDto> getById(@PathVariable UUID id) {
+    public ResponseEntity<CategoryResponseDto> getById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(categoryService.findById(id));
     }
 
     @GetMapping("/menu/{id}")
-    public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryName(@PathVariable UUID id) {
+    public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryName(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(productService.getAllByCategory(id));
     }
 

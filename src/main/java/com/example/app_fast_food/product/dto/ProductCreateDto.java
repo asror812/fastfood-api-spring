@@ -1,6 +1,7 @@
 package com.example.app_fast_food.product.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
@@ -17,14 +18,11 @@ public class ProductCreateDto {
     @NotNull
     private BigDecimal price;
 
-    @NotNull
-    private UUID categoryId;
-
     private int weight;
 
     @NotNull
-    private AttachmentCreateDto main;
+    private UUID categoryId;
 
     @NotNull
-    private AttachmentCreateDto other;
+    private List<ProductImageDto> images;
 }

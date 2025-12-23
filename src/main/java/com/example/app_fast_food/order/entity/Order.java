@@ -33,7 +33,7 @@ public class Order {
     private Set<OrderItem> orderItems = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    private OrderStatus status;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_type")
@@ -57,10 +57,10 @@ public class Order {
     private BigDecimal discountAmount;
     private BigDecimal finalPrice;
 
-    public Order(UUID id, OrderStatus orderStatus,
+    public Order(UUID id, OrderStatus status,
             PaymentType paymentType, User user) {
         this.id = id;
-        this.orderStatus = orderStatus;
+        this.status = status;
         this.paymentType = paymentType;
         this.user = user;
     }

@@ -32,4 +32,5 @@ public class Attachment {
 
     @Column(nullable = false)
     private String downloadUrl; // /uploads/1f9d...-img.png
+
 }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.example.app_fast_food.productdiscount.entity.ProductDiscount;
+import com.example.app_fast_food.productdiscount.ProductDiscount;
 
 @Entity
 @Table(name = "discounts")

@@ -5,9 +5,10 @@ import com.example.app_fast_food.attachment.dto.AttachmentResponseDto;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,9 +19,9 @@ public class AttachmentController {
 
     private final AttachmentService attachmentService;
 
-    @PostMapping("/upload")
-    public AttachmentResponseDto upload(MultipartHttpServletRequest request) {
-        return attachmentService.uploadImageToFileSystem(request);
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public AttachmentResponseDto upload(@RequestPart("file") MultipartFile file) {
+        return attachmentService.uploadImage(file);
     }
 
     @GetMapping
@@ -29,19 +30,18 @@ public class AttachmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AttachmentResponseDto> getById(@PathVariable UUID id) {
+    public ResponseEntity<AttachmentResponseDto> getById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(attachmentService.findById(id));
     }
 
     @GetMapping("/download/{id}")
-    public void load(@PathVariable UUID id,
-            HttpServletResponse response) {
+    public void load(@PathVariable("id") UUID id, HttpServletResponse response) {
         attachmentService.loadImageFromImageFolder(id, response);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        attachmentService.delete(id);
+    public void deleteProductImage(@PathVariable("id") UUID id) {
+        attachmentService.deleteProductImage(id);
     }
 
 }

@@ -25,7 +25,7 @@ public class BonusController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BonusResponseDto> getBonusById(@PathVariable UUID id) {
+    public ResponseEntity<BonusResponseDto> getById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(bonusService.findById(id));
     }
 

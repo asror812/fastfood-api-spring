@@ -22,7 +22,6 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "roles", ignore = true)
-    @Mapping(target = "checks", ignore = true)
     @Mapping(target = "userBonuses", ignore = true)
     @Mapping(target = "favouriteProducts", ignore = true)
     @Mapping(target = "authorities", ignore = true)
@@ -30,7 +29,6 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "roles", ignore = true)
-    @Mapping(target = "checks", ignore = true)
     @Mapping(target = "userBonuses", ignore = true)
     @Mapping(target = "favouriteProducts", ignore = true)
     @Mapping(target = "authorities", ignore = true)

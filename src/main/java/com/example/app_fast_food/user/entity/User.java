@@ -1,7 +1,6 @@
 package com.example.app_fast_food.user.entity;
 
 import com.example.app_fast_food.bonus.entity.UserBonus;
-import com.example.app_fast_food.check.entity.Check;
 import com.example.app_fast_food.product.entity.Product;
 import com.example.app_fast_food.user.permission.entity.Permission;
 import com.example.app_fast_food.user.role.Role;
@@ -23,7 +22,7 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = { "roles", "checks" })
+@ToString(exclude = { "roles"})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,9 +41,6 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<Check> checks = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<UserBonus> userBonuses = new ArrayList<>();

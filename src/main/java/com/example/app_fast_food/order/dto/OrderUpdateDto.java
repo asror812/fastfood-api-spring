@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderUpdateDto {
-    private OrderStatus orderStatus;
+    private OrderStatus status;
 
     private PaymentType paymentType;
 

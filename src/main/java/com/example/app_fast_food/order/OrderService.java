@@ -1,8 +1,6 @@
 package com.example.app_fast_food.order;
 
 import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDto;
-import com.example.app_fast_food.check.CheckRepository;
-import com.example.app_fast_food.check.entity.Check;
 import com.example.app_fast_food.common.response.ApiMessageResponse;
 import com.example.app_fast_food.discount.entity.Discount;
 import com.example.app_fast_food.exception.AlreadyAddedToBasketException;
@@ -34,7 +32,6 @@ public class OrderService {
     private final OrderRepository repository;
     private final OrderItemRepository orderItemRepository;
     private final ProductRepository productRepository;
-    private final CheckRepository checkRepository;
 
     private final OrderMapper mapper;
     private final ProductMapper productMapper;
@@ -48,7 +45,7 @@ public class OrderService {
                 .orElseGet(() -> {
                     Order newBasket = new Order();
                     newBasket.setUser(user);
-                    newBasket.setOrderStatus(OrderStatus.BASKET);
+                    newBasket.setStatus(OrderStatus.BASKET);
                     return repository.save(newBasket);
                 });
 
@@ -110,7 +107,7 @@ public class OrderService {
     public List<OrderResponseDto> getByOrderStatus(String status) {
         try {
             OrderStatus orderStatus = OrderStatus.valueOf(status);
-            List<Order> orders = repository.findByOrderStatus(orderStatus);
+            List<Order> orders = repository.findByStatus(orderStatus);
 
             return orders.stream()
                     .map(mapper::toResponseDto)
@@ -122,7 +119,7 @@ public class OrderService {
     }
 
     public ApiMessageResponse deleteBasket(UUID id) {
-        repository.deleteOrderByUserIdAndOrderStatus(id, OrderStatus.BASKET);
+        repository.deleteOrderByUserIdAndStatus(id, OrderStatus.BASKET);
         return new ApiMessageResponse("Basket successfully deleted");
     }
 
@@ -134,12 +131,9 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException(BASKET_ENTITY,
                         userId.toString()));
 
-        order.setOrderStatus(OrderStatus.IN_PROCESS);
+        order.setStatus(OrderStatus.IN_PROCESS);
         repository.save(order);
 
-        Check check = new Check(null, order, user, "John");
-
-        checkRepository.save(check);
     }
 
     public OrderResponseDto removeProduct(User user, UUID productId) {

@@ -1,9 +1,9 @@
 package com.example.app_fast_food.product.entity;
 
-import com.example.app_fast_food.attachment.entity.Attachment;
 import com.example.app_fast_food.bonus.entity.BonusProductLink;
 import com.example.app_fast_food.category.entity.Category;
-import com.example.app_fast_food.productdiscount.entity.ProductDiscount;
+import com.example.app_fast_food.productdiscount.ProductDiscount;
+import com.example.app_fast_food.productimage.ProductImage;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -40,29 +40,20 @@ public class Product {
     private int weight;
 
     @OneToMany(mappedBy = "product")
-    private List<ProductDiscount> productDiscounts = new ArrayList<>();
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "main_image")
-    private Attachment mainImage;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "secondary_image")
-    private Attachment secondaryImage;
+    private List<ProductDiscount> discounts = new ArrayList<>();
 
     @OneToMany(mappedBy = "product")
-    private List<BonusProductLink> bonusProductLinks = new ArrayList<>();
+    private List<BonusProductLink> bonuses = new ArrayList<>();
 
-    public Product(UUID id, String name, BigDecimal price, Category category, int weight, Attachment main,
-            Attachment other) {
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("position ASC")
+    private List<ProductImage> images = new ArrayList<>();
+
+    public Product(UUID id, String name, BigDecimal price, Category category, int weight) {
         this.id = id;
         this.name = name;
         this.price = price;
-
         this.category = category;
         this.weight = weight;
-        this.mainImage = main;
-        this.secondaryImage = other;
     }
-
 }

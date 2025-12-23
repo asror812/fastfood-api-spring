@@ -19,7 +19,7 @@ public class OrderResponseDto {
 
     private List<OrderItemResponseDto> orderItems;
 
-    private OrderStatus orderStatus;
+    private OrderStatus status;
 
     private PaymentType paymentType;
 
