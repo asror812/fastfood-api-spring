@@ -85,7 +85,7 @@ public class AuthService implements UserDetailsService {
                         () -> new InvalidCredentialsException(signInDTO.getPhoneNumber(), signInDTO.getPassword()));
 
         if (!passwordEncoder.matches(signInDTO.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Username or password is not correct");
+            throw new InvalidCredentialsException(user.getUsername(), user.getPassword());
         }
 
         return new TokenResponseDto(jwtService.generateToken(signInDTO.getPhoneNumber()));

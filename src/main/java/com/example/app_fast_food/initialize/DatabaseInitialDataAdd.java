@@ -40,6 +40,7 @@ import com.example.app_fast_food.productdiscount.ProductDiscount;
 import com.example.app_fast_food.productdiscount.ProductDiscountReposity;
 import com.example.app_fast_food.productimage.ProductImage;
 import com.example.app_fast_food.user.UserRepository;
+import com.example.app_fast_food.user.entity.AdminProfile;
 import com.example.app_fast_food.user.entity.User;
 import com.example.app_fast_food.user.permission.PermissionRepository;
 import com.example.app_fast_food.user.permission.entity.Permission;
@@ -408,21 +409,24 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
         @Transactional
         private void createAdmin() {
-                Role adminRole = roleRepository.findByName(ADMIN)
-                                .orElseThrow(() -> new RuntimeException("No admin role found"));
+                if (userRepository.findAll().isEmpty()) {
+                        Role adminRole = roleRepository.findByName(ADMIN)
+                                        .orElseThrow(() -> new com.example.app_fast_food.exception.EntityNotFoundException(
+                                                        "Role", ADMIN));
 
-                if (userRepository.existsByPhoneNumber(adminPhoneNumber))
-                        return;
+                        adminUser = new User(
+                                        null,
+                                        adminPhoneNumber,
+                                        adminName,
+                                        passwordEncoder.encode(adminPassword),
+                                        LocalDate.now());
 
-                adminUser = new User(
-                                null,
-                                adminPhoneNumber,
-                                adminName,
-                                passwordEncoder.encode(adminPassword),
-                                LocalDate.now());
+                        AdminProfile adminProfile = new AdminProfile();
+                        adminProfile.setUser(adminUser);
 
-                adminUser.setRoles(Set.of(adminRole));
-                userRepository.save(adminUser);
+                        adminUser.setRoles(Set.of(adminRole));
+                        userRepository.save(adminUser);
+                }
         }
 
         // ROLES
