@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query(value = "SELECT * FROM users WHERE id = :userId", nativeQuery = true)
     User findUserById(@Param("userId") UUID userId);
 
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.favouriteProducts WHERE u.id = :userId")
+    @Query("SELECT u FROM User u JOIN FETCH u.customerProfile p JOIN FETCH p.favouriteProducts WHERE u.id = :userId")
     Optional<User> findUserByIdWithFavouriteProducts(@Param("userId") UUID userId);
 
 }

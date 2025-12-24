@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, UUID> {
-    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.status = 'BASKET'")
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user.id = :userId AND o.status = 'BASKET'")
     Optional<Order> findBasketByUserId(@Param("userId") UUID userId);
 
     List<Order> findByStatus(OrderStatus status);

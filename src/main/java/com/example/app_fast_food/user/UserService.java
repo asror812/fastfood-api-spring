@@ -5,6 +5,7 @@ import com.example.app_fast_food.user.dto.UserResponseDto;
 import com.example.app_fast_food.user.entity.User;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -12,20 +13,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Getter
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserMapper mapper;
-
-    private Class<User> entityClass = User.class;
-
     private final UserRepository repository;
-
-    public UserService(UserMapper mapper,
-            UserRepository repository) {
-
-        this.mapper = mapper;
-        this.repository = repository;
-    }
 
     public UserResponseDto getMe(User user) {
         User userWithBonuses = repository.findUserById(user.getId());
@@ -33,6 +25,6 @@ public class UserService {
     }
 
     public List<UserListResponseDto> getAll() {
-        return repository.findAll().stream().map(u -> mapper.toListResponseDto(u)).toList();
+        return repository.findAll().stream().map(mapper::toListResponseDto).toList();
     }
 }

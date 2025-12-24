@@ -47,6 +47,8 @@ public class OrderService {
     public static final String BASKET_ENTITY = "Basket";
     public static final String BONUS_ENTITY = "Bonus";
 
+    private static final String USER_BASKET_NOT_FOUND = "Basket with user id `%s` not found";
+
     public OrderResponseDto addProduct(OrderItemCreateRequestDTO dto, User user) {
         Order order = repository.findBasketByUserId(user.getId())
                 .orElseGet(() -> {
@@ -106,7 +108,7 @@ public class OrderService {
         Order order = repository.findBasketByUserId(user.getId())
                 .orElseThrow(
                         () -> new UserBasketNotFoundException(
-                                "Basket with user id `%s` not found".formatted(user.getId())));
+                                USER_BASKET_NOT_FOUND.formatted(user.getId())));
 
         return mapper.toResponseDto(order);
     }
@@ -162,7 +164,7 @@ public class OrderService {
     public ProductResponseDto selectBonus(User user, UUID bonusId) {
         Order o = repository.findBasketByUserId(user.getId())
                 .orElseThrow(() -> new UserBasketNotFoundException(
-                        "Basket with user id %s not found".formatted(user.getId())));
+                        USER_BASKET_NOT_FOUND.formatted(user.getId())));
 
         Product p = productRepository.findProductById(bonusId)
                 .orElseThrow(() -> new EntityNotFoundException(PRODUCT_ENTITY,
@@ -205,7 +207,8 @@ public class OrderService {
 
     public List<BonusResponseDto> getAvailableBonuses(User user) {
         Order order = repository.findBasketByUserId(user.getId()).orElseThrow(
-                () -> new UserBasketNotFoundException("Basket with user id `%s` not found".formatted(user.getId())));
+                () -> new UserBasketNotFoundException(
+                        USER_BASKET_NOT_FOUND.formatted(user.getId())));
 
         return bonusService.getAvailableOrderBonuses(user, order).stream().map(bonusMapper::toResponseDto).toList();
     }
@@ -216,8 +219,8 @@ public class OrderService {
     }
 
     public OrderResponseDto getById(@NonNull UUID id) {
-        Order order = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Order", id.toString()));
-
+        Order order = repository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Order", id.toString()));
         return mapper.toResponseDto(order);
     }
 

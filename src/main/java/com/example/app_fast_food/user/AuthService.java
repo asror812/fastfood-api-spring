@@ -6,7 +6,7 @@ import com.example.app_fast_food.exception.PhoneNumberNotVerifiedException;
 import com.example.app_fast_food.otp.OtpRepository;
 import com.example.app_fast_food.otp.entity.Otp;
 import com.example.app_fast_food.security.JwtService;
-
+import com.example.app_fast_food.user.entity.CustomerProfile;
 import com.example.app_fast_food.user.entity.User;
 
 import jakarta.transaction.Transactional;
@@ -40,6 +40,7 @@ public class AuthService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    @Transactional
     protected UserResponseDto create(SignUpDto signUpDTO) {
         String phoneNumber = signUpDTO.getPhoneNumber();
 
@@ -54,7 +55,12 @@ public class AuthService implements UserDetailsService {
         User user = new User(null, phoneNumber, signUpDTO.getName(), password,
                 signUpDTO.getBirthDate());
 
+        CustomerProfile customer = new CustomerProfile();
+        customer.setUser(user);
+
+        user.setCustomerProfile(customer);
         repository.save(user);
+
         return mapper.toResponseDto(user);
     }
 

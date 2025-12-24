@@ -6,8 +6,8 @@ import com.example.app_fast_food.product.ProductRepository;
 import com.example.app_fast_food.product.ProductService;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.product.entity.Product;
-import com.example.app_fast_food.user.UserRepository;
-import com.example.app_fast_food.user.entity.User;
+import com.example.app_fast_food.user.CustomerProfileRepository;
+import com.example.app_fast_food.user.entity.CustomerProfile;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -19,14 +19,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FavoriteService {
 
-    private final UserRepository userRepository;
+    private final CustomerProfileRepository customerProfileRepository;
     private final ProductService productService;
     private final ProductRepository productRepository;
 
     public List<ProductResponseDto> getFavorites(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(
+        CustomerProfile profile = customerProfileRepository.findById(userId).orElseThrow(
                 () -> new RuntimeException("User with `%s` not found".formatted(userId)));
-        return productService.getProductResponseDTOS(user.getFavouriteProducts().stream().toList());
+
+        return productService
+                .getProductResponseDTOS(profile.getFavouriteProducts().stream().toList());
     }
 
     public ApiMessageResponse add(UUID userId, UUID productId) {
@@ -34,14 +36,15 @@ public class FavoriteService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Product", productId.toString()));
 
-        User user = userRepository.findUserByIdWithFavouriteProducts(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User", userId.toString()));
+        CustomerProfile profile = customerProfileRepository.findWithFavouriteProductsByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Customer", userId.toString()));
 
-        boolean exists = user.getFavouriteProducts().stream().anyMatch(p -> p.getId().equals(productId));
+        boolean exists = profile.getFavouriteProducts().stream()
+                .anyMatch(p -> p.getId().equals(productId));
 
         if (!exists) {
-            user.getFavouriteProducts().add(product);
-            userRepository.save(user);
+            profile.getFavouriteProducts().add(product);
+            customerProfileRepository.save(profile);
         }
 
         return new ApiMessageResponse("Product added to favorites");
@@ -52,11 +55,12 @@ public class FavoriteService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Product", productId.toString()));
 
-        User user = userRepository.findUserByIdWithFavouriteProducts(userId)
+        CustomerProfile profile = customerProfileRepository.findWithFavouriteProductsByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User", userId.toString()));
-        user.getFavouriteProducts().remove(product);
 
-        userRepository.save(user);
+        profile.getFavouriteProducts().remove(product);
+        customerProfileRepository.save(profile);
+
         return new ApiMessageResponse("Product removed from favorites");
     }
 

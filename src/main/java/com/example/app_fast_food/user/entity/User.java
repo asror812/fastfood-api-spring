@@ -1,8 +1,5 @@
 package com.example.app_fast_food.user.entity;
 
-import com.example.app_fast_food.bonus.entity.UserBonus;
-import com.example.app_fast_food.product.entity.Product;
-import com.example.app_fast_food.user.permission.entity.Permission;
 import com.example.app_fast_food.user.role.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
@@ -14,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
 @Table(name = "users")
@@ -22,7 +18,7 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = { "roles"})
+@ToString(exclude = { "roles" })
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,15 +38,14 @@ public class User implements UserDetails {
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<UserBonus> userBonuses = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(name = "user_favourite_products", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
-    private Set<Product> favouriteProducts = new HashSet<>();
-
     @Column(nullable = false)
     private LocalDate birthDate;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private CustomerProfile customerProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private AdminProfile adminProfile;
 
     public User(UUID id, String phoneNumber, String name,
             String password, LocalDate birthDate) {
@@ -63,13 +58,15 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Stream<Permission> rolePermissions = roles
-                .stream().map(Role::getPermissions)
-                .flatMap(Collection::stream);
-
-        return rolePermissions
-                .map(permission -> new SimpleGrantedAuthority(permission.getName()))
+        Set<SimpleGrantedAuthority> authorities = roles.stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(p -> new SimpleGrantedAuthority(p.getName()))
                 .collect(Collectors.toSet());
+
+        // 2. ОБЯЗАТЕЛЬНО добавляем сами роли (ROLE_ADMIN)
+        roles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName())));
+
+        return authorities;
     }
 
     @Override

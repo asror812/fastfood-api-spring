@@ -2,7 +2,8 @@ package com.example.app_fast_food.bonus.entity;
 
 import java.time.LocalDate;
 import java.util.UUID;
-import com.example.app_fast_food.user.entity.User;
+
+import com.example.app_fast_food.user.entity.CustomerProfile;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,8 +30,8 @@ public class UserBonus {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "cutomer_id")
+    private CustomerProfile customerProfile;
 
     @ManyToOne
     @JoinColumn(name = "bonus_id")

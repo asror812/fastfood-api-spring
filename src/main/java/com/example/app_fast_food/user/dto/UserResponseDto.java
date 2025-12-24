@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.example.app_fast_food.bonus.dto.user_bonus.UserBonusResponseDto;
+import com.example.app_fast_food.bonus.dto.bonus.BonusDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +15,7 @@ public class UserResponseDto extends UserDto {
 
     private Set<UUID> favouriteProducts = Set.of();
 
-    private List<UserBonusResponseDto> userBonuses = new ArrayList<>();
+    private List<BonusDto> userBonuses = new ArrayList<>();
 
     private Set<String> roles = Set.of();
 }

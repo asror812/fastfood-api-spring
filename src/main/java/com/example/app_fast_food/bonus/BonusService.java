@@ -21,7 +21,7 @@ public class BonusService {
 
     private final BonusRepository repository;
     private final OrderRepository orderRepository;
-    
+
     private final BonusMapper mapper;
 
     public List<Bonus> getAvailableOrderBonuses(User user, Order order) {

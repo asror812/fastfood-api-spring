@@ -39,7 +39,6 @@ import com.example.app_fast_food.product.entity.Product;
 import com.example.app_fast_food.productdiscount.ProductDiscount;
 import com.example.app_fast_food.productdiscount.ProductDiscountReposity;
 import com.example.app_fast_food.productimage.ProductImage;
-import com.example.app_fast_food.security.JwtService;
 import com.example.app_fast_food.user.UserRepository;
 import com.example.app_fast_food.user.entity.User;
 import com.example.app_fast_food.user.permission.PermissionRepository;
@@ -63,6 +62,12 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
         @Value("${api.admin.password}")
         private String adminPassword;
 
+        @Value("${api.admin.name}")
+        private String adminName;
+
+        @Value("${api.admin.phoneNumber}")
+        private String adminPhoneNumber;
+
         private final PasswordEncoder passwordEncoder;
 
         private final UserRepository userRepository;
@@ -76,8 +81,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
         private final BonusConditionRepository bonusConditionRepository;
         private final OrderRepository orderRepository;
         private final AttachmentRepository attachmentRepository;
-
-        private final JwtService jwtService;
 
         private static final String BEEF_LAVASH_WITH_CHEESE = "Beef Lavash with Cheese";
         private static final String CLASSIC_BEEF_BURGER_NAME = "Classic Beef Burger";
@@ -131,7 +134,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                         return;
                 }
 
-                // 1) CONDITIONS (по одному на каждый ConditionType)
                 BonusCondition holidayCondition = new BonusCondition(null, ConditionType.HOLIDAY_BONUS, "ANY");
                 BonusCondition birthdayCondition = new BonusCondition(null, ConditionType.USER_BIRTHDAY, "ANY");
                 BonusCondition quantityCondition = new BonusCondition(null, ConditionType.QUANTITY, "2");
@@ -145,7 +147,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 firstPurchaseCondition,
                                 totalPriceCondition));
 
-                // 2) PRODUCTS (берём существующие продукты)
                 Product classicBeefBurger = mustFindProduct(CLASSIC_BEEF_BURGER_NAME);
                 Product beefLavashWithCheese = mustFindProduct(BEEF_LAVASH_WITH_CHEESE);
                 Product pepperoniLarge = mustFindProduct("Pepperoni Large");
@@ -155,7 +156,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 Product vanillaIceCream = mustFindProduct("Vanilla Ice Cream Cup");
                 Product chocolateIceCream = mustFindProduct("Chocolate Ice Cream Cup");
 
-                // 3) BONUSES (по одному на каждый ConditionType)
                 Bonus birthdayBonus = new Bonus(
                                 null,
                                 "Birthday Bonus",
@@ -369,6 +369,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 product.getImages().add(image);
         }
 
+        @Transactional
         private void createDiscounts() {
                 if (discountRepository.count() > 0) {
                         return;
@@ -405,28 +406,23 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 discountRepository.saveAll(discounts);
         }
 
+        @Transactional
         private void createAdmin() {
                 Role adminRole = roleRepository.findByName(ADMIN)
                                 .orElseThrow(() -> new RuntimeException("No admin role found"));
 
-                String phoneNumber = "+97 675-00-00";
-
-                if (userRepository.existsByPhoneNumber(phoneNumber))
+                if (userRepository.existsByPhoneNumber(adminPhoneNumber))
                         return;
 
                 adminUser = new User(
                                 null,
-                                phoneNumber,
-                                "asror",
+                                adminPhoneNumber,
+                                adminName,
                                 passwordEncoder.encode(adminPassword),
                                 LocalDate.now());
 
                 adminUser.setRoles(Set.of(adminRole));
                 userRepository.save(adminUser);
-
-                String token = jwtService.generateToken(phoneNumber);
-
-                log.warn("Token: {}", token);
         }
 
         // ROLES
