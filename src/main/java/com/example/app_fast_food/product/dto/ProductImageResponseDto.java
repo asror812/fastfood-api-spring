@@ -13,6 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProductImageResponseDto {
     private UUID id;
-    private int position;
     private String downloadUrl;
+    private int position;
 }

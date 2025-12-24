@@ -1,6 +1,7 @@
 package com.example.app_fast_food.product;
 
-import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDto;
+import com.example.app_fast_food.bonus.dto.bonus.BonusDto;
+import com.example.app_fast_food.bonus.dto.bonus_condition.BonusConditionResponseDto;
 import com.example.app_fast_food.bonus.entity.Bonus;
 import com.example.app_fast_food.bonus.entity.BonusProductLink;
 import com.example.app_fast_food.category.CategoryMapper;
@@ -22,6 +23,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = { CategoryMapper.class, ProductDiscountMapper.class })
 public interface ProductMapper {
 
+    String BASE_DOWNLOAD_URL = "/attachments/";
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "bonuses", ignore = true)
@@ -34,28 +37,34 @@ public interface ProductMapper {
     default List<ProductImageResponseDto> toProductImageResponseDto(List<ProductImage> pis) {
         List<ProductImageResponseDto> images = new ArrayList<>();
         for (ProductImage pi : pis) {
-            ProductImageResponseDto productImage = new ProductImageResponseDto(pi.getId(), pi.getPosition(),
-                    pi.getAttachment().getDownloadUrl());
+            ProductImageResponseDto productImage = new ProductImageResponseDto(pi.getId(),
+                    BASE_DOWNLOAD_URL + pi.getId(), pi.getPosition());
             images.add(productImage);
         }
 
         return images;
     }
 
-    default List<BonusResponseDto> toBonusResponseDto(List<BonusProductLink> bpls) {
-        List<BonusResponseDto> bonuses = new ArrayList<>();
+    default List<BonusDto> toBonusDto(List<BonusProductLink> bpls) {
+        List<BonusDto> bonuses = new ArrayList<>();
+
         for (BonusProductLink bpl : bpls) {
             Bonus bs = bpl.getBonus();
+            BonusDto bonus = new BonusDto();
 
-            BonusResponseDto bonus = new BonusResponseDto();
-
-            bonus.setActive(bs.isActive());
-            bonus.setEndDate(bs.getEndDate());
             bonus.setId(bs.getId());
             bonus.setName(bs.getName());
             bonus.setStartDate(bs.getStartDate());
+            bonus.setEndDate(bs.getEndDate());
+            bonus.setActive(bs.isActive());
 
-            bonuses.add(new BonusResponseDto());
+            BonusConditionResponseDto bonusCondition = new BonusConditionResponseDto();
+            bonusCondition.setId(bs.getId());
+            bonusCondition.setValue(bs.getCondition().getValue());
+            bonusCondition.setConditionType(bs.getCondition().getConditionType());
+
+            bonus.setCondition(bonusCondition);
+            bonuses.add(bonus);
         }
         return bonuses;
     }

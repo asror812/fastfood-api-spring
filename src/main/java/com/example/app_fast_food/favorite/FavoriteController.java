@@ -26,13 +26,13 @@ public class FavoriteController {
 
     @PostMapping("/{productId}")
     public ResponseEntity<ApiMessageResponse> addToFavorite(@AuthenticationPrincipal User user,
-            @PathVariable UUID productId) {
+            @PathVariable("productId") UUID productId) {
         return ResponseEntity.ok(favoriteService.add(user.getId(), productId));
     }
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiMessageResponse> removeFromFavorite(@AuthenticationPrincipal User user,
-            @PathVariable UUID productId) {
+            @PathVariable("productId") UUID productId) {
         return ResponseEntity.ok(favoriteService.remove(user.getId(), productId));
     }
 

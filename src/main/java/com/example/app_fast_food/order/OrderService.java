@@ -1,5 +1,7 @@
 package com.example.app_fast_food.order;
 
+import com.example.app_fast_food.bonus.BonusMapper;
+import com.example.app_fast_food.bonus.BonusService;
 import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDto;
 import com.example.app_fast_food.common.response.ApiMessageResponse;
 import com.example.app_fast_food.discount.entity.Discount;
@@ -18,6 +20,7 @@ import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.product.entity.Product;
 import com.example.app_fast_food.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository repository;
@@ -35,6 +39,9 @@ public class OrderService {
 
     private final OrderMapper mapper;
     private final ProductMapper productMapper;
+    private final BonusMapper bonusMapper;
+
+    private final BonusService bonusService;
 
     public static final String PRODUCT_ENTITY = "Product";
     public static final String BASKET_ENTITY = "Basket";
@@ -61,8 +68,8 @@ public class OrderService {
             throw new AlreadyAddedToBasketException("Product already added to basket");
         }
 
-        OrderItem orderItem = new OrderItem(null, 1, product, order);
-        orderItemRepository.save(orderItem);
+        OrderItem orderItem = new OrderItem(null, dto.getQuantity(), product, order);
+        order.getOrderItems().add(orderItem);
 
         calculateOrderPrices(order, user);
 
@@ -124,12 +131,10 @@ public class OrderService {
     }
 
     public void confirmOrder(User user) {
-        UUID userId = user.getId();
-
         Order order = repository
-                .findBasketByUserId(userId)
+                .findBasketByUserId(user.getId())
                 .orElseThrow(() -> new EntityNotFoundException(BASKET_ENTITY,
-                        userId.toString()));
+                        user.getId().toString()));
 
         order.setStatus(OrderStatus.IN_PROCESS);
         repository.save(order);
@@ -199,8 +204,10 @@ public class OrderService {
     }
 
     public List<BonusResponseDto> getAvailableBonuses(User user) {
-        // TODO:
-        throw new UnsupportedOperationException("Unimplemented method 'getAvailableBonuses'");
+        Order order = repository.findBasketByUserId(user.getId()).orElseThrow(
+                () -> new UserBasketNotFoundException("Basket with user id `%s` not found".formatted(user.getId())));
+
+        return bonusService.getAvailableOrderBonuses(user, order).stream().map(bonusMapper::toResponseDto).toList();
     }
 
     public List<OrderResponseDto> getAll() {

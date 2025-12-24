@@ -28,8 +28,9 @@ api:
 
   images:
     base:
-      download-url: http://localhost:8080/attachments/download/
+      download-url: http://localhost:8080/
 
   storage:
     images-path: ${IMAGES_PATH}
+
 

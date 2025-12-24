@@ -76,8 +76,7 @@ public class AttachmentService {
                 originalName,
                 storedName,
                 contentType,
-                size,
-                downloadBaseUrl + id);
+                size);
 
         repository.save(attachment);
 
@@ -164,10 +163,8 @@ public class AttachmentService {
         }
 
         long size = file.getSize();
-        if (size > LIMIT_BYTES) {
+        if (size > LIMIT_BYTES)
             throw new FileSizeLimitExceedException("Image exceeded limit size: 1 MB", 1L);
-        }
-
 
         UUID id = UUID.randomUUID();
 
@@ -179,8 +176,7 @@ public class AttachmentService {
                 originalName,
                 storedName,
                 contentType,
-                size,
-                downloadBaseUrl + id);
+                size);
 
         repository.save(attachment);
 

@@ -1,10 +1,15 @@
 package com.example.app_fast_food.exception.handler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.example.app_fast_food.exception.AlreadyAddedToBasketException;
 import com.example.app_fast_food.exception.AlreadyExistsException;
 import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.exception.FileNotFoundException;
@@ -14,6 +19,7 @@ import com.example.app_fast_food.exception.InvalidOperationException;
 import com.example.app_fast_food.exception.OtpEarlyResentException;
 import com.example.app_fast_food.exception.OtpLimitExitedException;
 import com.example.app_fast_food.exception.PhoneNumberNotVerifiedException;
+import com.example.app_fast_food.exception.UserBasketNotFoundException;
 import com.example.app_fast_food.exception.dto.ErrorResponse;
 import com.example.app_fast_food.exception.entity.ErrorMessages;
 
@@ -62,6 +68,17 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 ErrorMessages.ENTITY_NOT_FOUND,
                 "NOT_FOUND");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(UserBasketNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserBasketNotFound(UserBasketNotFoundException e) {
+        log.error("UserBasketNotFoundException: {}", e.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+                ErrorMessages.USER_BASKET_NOT_FOUND,
+                "NOT_FOUND");
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
@@ -132,6 +149,30 @@ public class GlobalExceptionHandler {
                 "INTERNAL_ERROR");
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        log.error("MethodArgumentNotValidException: {}", ex.getMessage());
+
+        ErrorResponse response = new ErrorResponse();
+        response.setCode("INVALID_REQUEST");
+
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors()
+                .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
+        response.setMessage(errors.toString());
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(AlreadyAddedToBasketException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyAddedToBasket(AlreadyAddedToBasketException ex) {
+        log.error("AlreadyAddedToBasketException: {}", ex.getMessage());
+
+        ErrorResponse response = new ErrorResponse(ErrorMessages.ALREADY_ADDED_TO_BASKET, "ALREADY EXISTS");
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
 }

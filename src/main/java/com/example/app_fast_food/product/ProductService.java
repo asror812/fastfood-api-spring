@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,11 +22,11 @@ public class ProductService {
 
     private final ProductRepository repository;
 
+    @Transactional
     protected ProductResponseDto create(ProductCreateDto createDto) {
         Product product = mapper.toEntity(createDto);
 
         repository.save(product);
-
         return mapper.toResponseDTO(product);
     }
 

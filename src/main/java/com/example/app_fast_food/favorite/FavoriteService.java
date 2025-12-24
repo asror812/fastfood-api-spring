@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -26,11 +25,8 @@ public class FavoriteService {
 
     public List<ProductResponseDto> getFavorites(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new RuntimeException("User not found"));
-
-        Set<Product> favoriteProducts = user.getFavouriteProducts();
-
-        return productService.getProductResponseDTOS(favoriteProducts.stream().toList());
+                () -> new RuntimeException("User with `%s` not found".formatted(userId)));
+        return productService.getProductResponseDTOS(user.getFavouriteProducts().stream().toList());
     }
 
     public ApiMessageResponse add(UUID userId, UUID productId) {
@@ -48,7 +44,7 @@ public class FavoriteService {
             userRepository.save(user);
         }
 
-        return new ApiMessageResponse("Product added to favorites successfully");
+        return new ApiMessageResponse("Product added to favorites");
     }
 
     public ApiMessageResponse remove(UUID userId, UUID productId) {
@@ -58,12 +54,10 @@ public class FavoriteService {
 
         User user = userRepository.findUserByIdWithFavouriteProducts(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User", userId.toString()));
-
         user.getFavouriteProducts().remove(product);
 
         userRepository.save(user);
-
-        return new ApiMessageResponse("Product removed from favorites successfully");
+        return new ApiMessageResponse("Product removed from favorites");
     }
 
 }

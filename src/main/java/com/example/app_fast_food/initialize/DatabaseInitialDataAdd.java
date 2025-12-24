@@ -16,9 +16,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.example.app_fast_food.attachment.AttachmentRepository;
 import com.example.app_fast_food.attachment.entity.Attachment;
 import com.example.app_fast_food.bonus.BonusConditionRepository;
-import com.example.app_fast_food.bonus.BonusProductLinkRepository;
 import com.example.app_fast_food.bonus.BonusRepository;
 import com.example.app_fast_food.bonus.entity.Bonus;
 import com.example.app_fast_food.bonus.entity.BonusCondition;
@@ -38,6 +38,7 @@ import com.example.app_fast_food.product.ProductRepository;
 import com.example.app_fast_food.product.entity.Product;
 import com.example.app_fast_food.productdiscount.ProductDiscount;
 import com.example.app_fast_food.productdiscount.ProductDiscountReposity;
+import com.example.app_fast_food.productimage.ProductImage;
 import com.example.app_fast_food.security.JwtService;
 import com.example.app_fast_food.user.UserRepository;
 import com.example.app_fast_food.user.entity.User;
@@ -73,8 +74,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
         private final CategoryRepository categoryRepository;
         private final BonusRepository bonusRepository;
         private final BonusConditionRepository bonusConditionRepository;
-        private final BonusProductLinkRepository bonusProductLinkRepository;
         private final OrderRepository orderRepository;
+        private final AttachmentRepository attachmentRepository;
 
         private final JwtService jwtService;
 
@@ -97,7 +98,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
                 createBonuses();
                 createOrders();
-
         }
 
         // BONUSES
@@ -125,74 +125,133 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 orderRepository.save(order);
         }
 
+        @Transactional
         private void createBonuses() {
                 if (bonusRepository.count() > 0) {
                         return;
                 }
 
+                // 1) CONDITIONS (по одному на каждый ConditionType)
                 BonusCondition holidayCondition = new BonusCondition(null, ConditionType.HOLIDAY_BONUS, "ANY");
                 BonusCondition birthdayCondition = new BonusCondition(null, ConditionType.USER_BIRTHDAY, "ANY");
-                BonusCondition productBonusCondition = new BonusCondition(null, ConditionType.QUANTITY, "2");
+                BonusCondition quantityCondition = new BonusCondition(null, ConditionType.QUANTITY, "2");
                 BonusCondition firstPurchaseCondition = new BonusCondition(null, ConditionType.FIRST_PURCHASE, "1");
-                BonusCondition orderTotalCondition = new BonusCondition(null, ConditionType.TOTAL_PRICE, "150000");
+                BonusCondition totalPriceCondition = new BonusCondition(null, ConditionType.TOTAL_PRICE, "150000");
 
-                List<BonusCondition> bonusConditions = new ArrayList<>(Arrays.asList(
+                bonusConditionRepository.saveAll(List.of(
                                 holidayCondition,
                                 birthdayCondition,
-                                productBonusCondition,
+                                quantityCondition,
                                 firstPurchaseCondition,
-                                orderTotalCondition));
+                                totalPriceCondition));
 
-                bonusConditionRepository.saveAll(bonusConditions);
+                // 2) PRODUCTS (берём существующие продукты)
+                Product classicBeefBurger = mustFindProduct(CLASSIC_BEEF_BURGER_NAME);
+                Product beefLavashWithCheese = mustFindProduct(BEEF_LAVASH_WITH_CHEESE);
+                Product pepperoniLarge = mustFindProduct("Pepperoni Large");
+                Product pepperoniMedium = mustFindProduct("Pepperoni Medium");
+                Product cocaCola = mustFindProduct("Coca Cola 0.5L");
+                Product sprite = mustFindProduct("Sprite 0.5L");
+                Product vanillaIceCream = mustFindProduct("Vanilla Ice Cream Cup");
+                Product chocolateIceCream = mustFindProduct("Chocolate Ice Cream Cup");
 
-                Bonus birthday2025 = new Bonus(
+                // 3) BONUSES (по одному на каждый ConditionType)
+                Bonus birthdayBonus = new Bonus(
                                 null,
-                                "Birthday-2025",
+                                "Birthday Bonus",
                                 birthdayCondition,
                                 1,
                                 LocalDate.now(),
                                 LocalDate.now().plusMonths(12),
                                 true);
 
-                Bonus navruzBonus = new Bonus(
+                Bonus navruzHolidayBonus = new Bonus(
                                 null,
-                                "Navruz Bonus",
+                                "Navruz Holiday Bonus",
                                 holidayCondition,
                                 1,
                                 LocalDate.now(),
                                 LocalDate.now().plusWeeks(3),
                                 true);
 
-                bonusRepository.save(birthday2025);
-                bonusRepository.save(navruzBonus);
-
-                Product classicBeefBurger = productRepository.findByName(CLASSIC_BEEF_BURGER_NAME)
-                                .orElseThrow(() -> new EntityNotFoundException("CLassic burger not found"));
-
-                Product beefLavashWithCheese = productRepository.findByName(BEEF_LAVASH_WITH_CHEESE)
-                                .orElseThrow(() -> new EntityNotFoundException("Beef lavash with cheese"));
-
-                BonusProductLink link1 = new BonusProductLink(
+                Bonus quantityBonus = new Bonus(
                                 null,
-                                birthday2025,
-                                classicBeefBurger,
-                                1);
+                                "Buy 2 Get Bonus",
+                                quantityCondition,
+                                1,
+                                LocalDate.now(),
+                                LocalDate.now().plusMonths(2),
+                                true);
 
-                BonusProductLink link2 = new BonusProductLink(
+                Bonus firstPurchaseBonus = new Bonus(
                                 null,
-                                navruzBonus,
-                                beefLavashWithCheese,
-                                2);
+                                "First Purchase Bonus",
+                                firstPurchaseCondition,
+                                1,
+                                LocalDate.now(),
+                                LocalDate.now().plusMonths(6),
+                                true);
 
-                bonusProductLinkRepository.save(link1);
-                bonusProductLinkRepository.save(link2);
+                Bonus totalPriceBonus = new Bonus(
+                                null,
+                                "150k Order Bonus",
+                                totalPriceCondition,
+                                1,
+                                LocalDate.now(),
+                                LocalDate.now().plusMonths(1),
+                                true);
 
-                birthday2025.getBonusProductLinks().add(link1);
-                navruzBonus.getBonusProductLinks().add(link2);
+                bonusRepository.saveAll(List.of(
+                                birthdayBonus,
+                                navruzHolidayBonus,
+                                quantityBonus,
+                                firstPurchaseBonus,
+                                totalPriceBonus));
 
-                bonusRepository.save(navruzBonus);
-                bonusRepository.save(birthday2025);
+                // 4) BONUS PRODUCT LINKS
+                // Birthday
+                addLinks(birthdayBonus,
+                                link(birthdayBonus, classicBeefBurger, 1),
+                                link(birthdayBonus, vanillaIceCream, 1));
 
+                // Holiday
+                addLinks(navruzHolidayBonus,
+                                link(navruzHolidayBonus, beefLavashWithCheese, 1),
+                                link(navruzHolidayBonus, pepperoniLarge, 1));
+
+                // Quantity
+                addLinks(quantityBonus,
+                                link(quantityBonus, pepperoniMedium, 1),
+                                link(quantityBonus, cocaCola, 2));
+
+                // First purchase
+                addLinks(firstPurchaseBonus,
+                                link(firstPurchaseBonus, sprite, 1),
+                                link(firstPurchaseBonus, chocolateIceCream, 1));
+
+                // Total price
+                addLinks(totalPriceBonus,
+                                link(totalPriceBonus, pepperoniLarge, 1),
+                                link(totalPriceBonus, beefLavashWithCheese, 1));
+
+                bonusRepository.saveAll(List.of(
+                                birthdayBonus, navruzHolidayBonus, quantityBonus, firstPurchaseBonus, totalPriceBonus));
+        }
+
+        private Product mustFindProduct(String name) {
+                return productRepository.findByName(name)
+                                .orElseThrow(() -> new EntityNotFoundException(
+                                                "Product with name `%s` not found".formatted(name)));
+        }
+
+        private BonusProductLink link(Bonus bonus, Product product, int qty) {
+                return new BonusProductLink(null, bonus, product, qty);
+        }
+
+        private void addLinks(Bonus bonus, BonusProductLink... links) {
+                List<BonusProductLink> list = Arrays.asList(links);
+
+                bonus.getBonusProductLinks().addAll(list);
         }
 
         @Transactional
@@ -201,7 +260,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                         return;
                 }
 
-                // PARENT CATEGORIES
+                // ================= CATEGORIES =================
                 Category burgers = new Category(null, "Burgers & Sandwiches", null);
                 Category lavash = new Category(null, "Rolls & Lavash", null);
                 Category doner = new Category(null, "Doners", null);
@@ -209,170 +268,105 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 Category drinks = new Category(null, "Drinks", null);
                 Category desserts = new Category(null, "Desserts", null);
 
-                // SUBCATEGORIES
-
-                // Burgers
                 Category beefBurger = new Category(null, "Beef Burgers", burgers);
-
-                // Lavash
                 Category beefLavash = new Category(null, "Beef Lavash", lavash);
                 Category cheeseLavash = new Category(null, "Cheese Lavash", lavash);
-
-                // Doner
                 Category beefDoner = new Category(null, "Beef Doner", doner);
-
-                // Pizza
                 Category pepperoniPizza = new Category(null, "Pepperoni Pizza", pizza);
-
-                // Drinks
                 Category coldDrinks = new Category(null, "Cold Drinks", drinks);
-
-                // Desserts
                 Category iceCream = new Category(null, "Ice Cream", desserts);
                 Category donuts = new Category(null, "Donuts", desserts);
 
-                List<Category> categories = new ArrayList<>(Arrays.asList(
+                categoryRepository.saveAll(List.of(
                                 burgers, lavash, doner, pizza, drinks, desserts,
                                 beefBurger, beefLavash, cheeseLavash, beefDoner,
                                 pepperoniPizza, coldDrinks, iceCream, donuts));
 
-                categoryRepository.saveAll(categories);
-
-                // DISCOUNTS
+                // ================= DISCOUNTS =================
                 Discount extra = discountRepository.findByNameWithProducts("Extra")
-                                .orElseThrow(() -> new RuntimeException("Discount 'Extra' not found"));
+                                .orElseThrow(() -> new RuntimeException("Discount Extra not found"));
                 Discount extra2 = discountRepository.findByNameWithProducts("Extra-2")
-                                .orElseThrow(() -> new RuntimeException("Discount 'Extra-2' not found"));
+                                .orElseThrow(() -> new RuntimeException("Discount Extra-2 not found"));
                 Discount navruz = discountRepository.findByNameWithProducts("Navruz")
-                                .orElseThrow(() -> new RuntimeException("Discount 'Navruz' not found"));
+                                .orElseThrow(() -> new RuntimeException("Discount Navruz not found"));
 
-                // PRODUCTS
+                // ================= PRODUCTS =================
 
-                // Beef Burger
-                Product classicBeefBurger = new Product(
-                                null,
-                                CLASSIC_BEEF_BURGER_NAME,
-                                new BigDecimal(23000),
-                                beefBurger,
-                                280);
+                Product classicBeefBurger = new Product(null, CLASSIC_BEEF_BURGER_NAME,
+                                new BigDecimal(23000), beefBurger, 280);
+                addProductImage(classicBeefBurger, "burger_1", "jpg", 1);
+                addProductImage(classicBeefBurger, "burger_2", "jpg", 2);
 
-                createAttachment("burger_1", "jpg");
-                createAttachment("burger_2", "jpg");
+                Product cheeseBurger = new Product(null, "Cheeseburger",
+                                new BigDecimal(30000), beefBurger, 380);
+                addProductImage(cheeseBurger, "cheese_burger_1", "jpg", 1);
+                addProductImage(cheeseBurger, "cheese_burger_2", "jpg", 2);
 
-                Product cheeseBurger = new Product(
-                                null,
-                                "Cheeseburger",
-                                new BigDecimal(30000),
-                                beefBurger,
-                                380);
+                Product classicBeefLavash = new Product(null, "Classic Beef Lavash",
+                                new BigDecimal(23000), beefLavash, 280);
+                addProductImage(classicBeefLavash, "beef_lavash_1", "webp", 1);
+                addProductImage(classicBeefLavash, "beef_lavash_2", "webp", 2);
 
-                createAttachment("cheese_burger_1", "jpg");
-                createAttachment("cheese_burger_2", "jpg");
+                Product beefLavashWithCheese = new Product(null, BEEF_LAVASH_WITH_CHEESE,
+                                new BigDecimal(30000), beefLavash, 380);
+                addProductImage(beefLavashWithCheese, "beef_lavash_with_cheese_1", "jpg", 1);
+                addProductImage(beefLavashWithCheese, "beefe_lavash_with_cheese_2", "jpg", 2);
 
-                // Beef Lavash
-                Product classicBeefLavash = new Product(
-                                null,
-                                "Classic Beef Lavash",
-                                new BigDecimal(23000),
-                                beefLavash,
-                                280);
+                Product pepperoniMedium = new Product(null, "Pepperoni Medium",
+                                new BigDecimal(23000), pepperoniPizza, 280);
+                addProductImage(pepperoniMedium, "pepperoni_pizza_1", "jpeg", 1);
+                addProductImage(pepperoniMedium, "pepperoni_pizza_2", "jpeg", 2);
 
-                createAttachment("beef_lavash_1", "webp");
-                createAttachment("beef_lavash_2", "webp");
+                Product pepperoniLarge = new Product(null, "Pepperoni Large",
+                                new BigDecimal(30000), pepperoniPizza, 380);
+                addProductImage(pepperoniLarge, "large_pepperoni_pizza_1", "webp", 1);
+                addProductImage(pepperoniLarge, "large_pepperoni_pizza_2", "jpg", 2);
 
-                Product beefLavashWithCheese = new Product(
-                                null,
-                                BEEF_LAVASH_WITH_CHEESE,
-                                new BigDecimal(30000),
-                                beefLavash,
-                                380);
+                Product vanillaIceCream = new Product(null, "Vanilla Ice Cream Cup",
+                                new BigDecimal(20_000), iceCream, 250);
+                addProductImage(vanillaIceCream, "vanilla_ice_cream_1", "jpg", 1);
+                addProductImage(vanillaIceCream, "vanilla_ice_cream_2", "jpeg", 2);
 
-                createAttachment("beef_lavash_with_cheese_1", "jpg");
-                createAttachment("beefe_lavash_with_cheese_2", "jpg");
+                Product chocolateIceCream = new Product(null, "Chocolate Ice Cream Cup",
+                                new BigDecimal(20_000), iceCream, 250);
+                addProductImage(chocolateIceCream, "chocolate_ice_cream_1", "jpg", 1);
+                addProductImage(chocolateIceCream, "chocolate_ice_cream_2", "jpg", 2);
 
-                // Pepperoni Pizza
-                Product pepperoniMedium = new Product(
-                                null,
-                                "Pepperoni Medium",
-                                new BigDecimal(23000),
-                                pepperoniPizza,
-                                280);
+                Product sprite = new Product(null, "Sprite 0.5L",
+                                new BigDecimal(25_000), coldDrinks, 300);
+                addProductImage(sprite, "sprite_0.5_1", "png", 1);
+                addProductImage(sprite, "sprite_0.5_2", "png", 2);
 
-                createAttachment("pepperoni_pizza_1", "jpeg");
-                createAttachment("pepperoni_pizza_2", "jpeg");
+                Product cocaCola = new Product(null, "Coca Cola 0.5L",
+                                new BigDecimal(10_000), coldDrinks, 500);
+                addProductImage(cocaCola, "cocacola_0.5_1", "avif", 1);
+                addProductImage(cocaCola, "cocacola_0.5_2", "avif", 2);
 
-                Product pepperoniLarge = new Product(
-                                null,
-                                "Pepperoni Large",
-                                new BigDecimal(30000),
-                                pepperoniPizza,
-                                380);
-
-                createAttachment("large_pepperoni_pizza_1", "webp");
-                createAttachment("large_pepperoni_pizza_2", "jpg");
-
-                // ICE CREAM
-                Product vanillaIceCream = new Product(
-                                null,
-                                "Vanilla Ice Cream Cup",
-                                new BigDecimal(20_000),
-                                iceCream,
-                                250);
-
-                createAttachment("vanilla_ice_cream_1", "jpg");
-                createAttachment("vanilla_ice_cream_2", "jpeg");
-
-                Product chocolateIceCream = new Product(
-                                null,
-                                "Chocolate Ice Cream Cup",
-                                new BigDecimal(20_000),
-                                iceCream,
-                                250);
-
-                createAttachment("chocolate_ice_cream_1", "jpg");
-                createAttachment("chocolate_ice_cream_2", "jpg");
-
-                // COLD DRINKS
-                Product sprite = new Product(
-                                null,
-                                "Sprite 0.5L",
-                                new BigDecimal(25_000),
-                                coldDrinks,
-                                300);
-
-                createAttachment("sprite_0.5_1", "png");
-                createAttachment("sprite_0.5_2", "png");
-
-                Product cocaCola = new Product(
-                                null,
-                                "Coca Cola 0.5L",
-                                new BigDecimal(10_000),
-                                coldDrinks,
-                                500);
-
-                createAttachment("cocacola_0.5_1", "avif");
-                createAttachment("cocacola_0.5_2", "avif");
-
-                List<Product> products = new ArrayList<>(
-                                List.of(classicBeefBurger, cheeseBurger, vanillaIceCream, chocolateIceCream,
-                                                cocaCola, sprite, pepperoniLarge, pepperoniMedium, classicBeefLavash,
-                                                beefLavashWithCheese));
+                List<Product> products = List.of(
+                                classicBeefBurger, cheeseBurger,
+                                classicBeefLavash, beefLavashWithCheese,
+                                pepperoniMedium, pepperoniLarge,
+                                vanillaIceCream, chocolateIceCream,
+                                sprite, cocaCola);
 
                 productRepository.saveAll(products);
 
-                // PRODUCT DISCOUNTS
+                // ================= PRODUCT DISCOUNTS =================
+                productDiscountReposity.saveAll(List.of(
+                                new ProductDiscount(null, cocaCola, navruz),
+                                new ProductDiscount(null, sprite, navruz),
+                                new ProductDiscount(null, pepperoniLarge, extra),
+                                new ProductDiscount(null, pepperoniMedium, extra),
+                                new ProductDiscount(null, vanillaIceCream, extra2),
+                                new ProductDiscount(null, chocolateIceCream, extra2)));
+        }
 
-                ProductDiscount pd1 = new ProductDiscount(null, cocaCola, navruz);
+        private void addProductImage(Product product, String baseName, String type, int position) {
+                Attachment attachment = createAttachment(baseName, type);
 
-                ProductDiscount pd2 = new ProductDiscount(null, pepperoniLarge, extra);
-                ProductDiscount pd3 = new ProductDiscount(null, pepperoniMedium, extra);
-
-                ProductDiscount pd4 = new ProductDiscount(null, vanillaIceCream, extra2);
-                ProductDiscount pd5 = new ProductDiscount(null, chocolateIceCream, extra2);
-
-                List<ProductDiscount> productDiscounts = new ArrayList<>(List.of(pd1, pd2, pd3, pd4, pd5));
-                productDiscountReposity.saveAll(productDiscounts);
-
+                attachmentRepository.save(attachment);
+                ProductImage image = new ProductImage(null, product, attachment, position);
+                product.getImages().add(image);
         }
 
         private void createDiscounts() {
@@ -495,8 +489,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 fileName,
                                 fileName,
                                 getContentType(type),
-                                10L,
-                                baseDownloadUrl + id);
+                                10L);
         }
 
         private String getContentType(String type) {
