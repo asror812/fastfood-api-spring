@@ -2,6 +2,7 @@ package com.example.app_fast_food.discount.dto;
 
 import lombok.*;
 import jakarta.validation.constraints.*;
+
 import java.time.LocalDate;
 
 @Getter

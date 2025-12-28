@@ -1,5 +1,6 @@
 package com.example.app_fast_food.category.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -9,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CategoryResponseDto {
+public class CategoryResponseDto implements Serializable{
     private UUID id;
 
     private String name;

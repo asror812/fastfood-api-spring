@@ -6,11 +6,11 @@ import com.example.app_fast_food.user.permission.entity.Permission;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "roles")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class Role {
@@ -26,6 +26,11 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<User> users;
+    private Set<User> users = new HashSet<>();
+
+    public Role(String name, Set<Permission> permissions) {
+        this.name = name;
+        this.permissions = permissions;
+    }
 
 }

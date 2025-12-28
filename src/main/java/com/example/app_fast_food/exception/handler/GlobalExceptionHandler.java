@@ -15,6 +15,7 @@ import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.exception.FileNotFoundException;
 import com.example.app_fast_food.exception.FileReadException;
 import com.example.app_fast_food.exception.FileSizeLimitExceedException;
+import com.example.app_fast_food.exception.InvalidCredentialsException;
 import com.example.app_fast_food.exception.InvalidOperationException;
 import com.example.app_fast_food.exception.OtpEarlyResentException;
 import com.example.app_fast_food.exception.OtpLimitExitedException;
@@ -130,14 +131,25 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e) {
-        log.error("IllegalArgumentException: {}", e.getMessage());
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        log.error("IllegalArgumentException: {}", ex.getMessage());
 
         ErrorResponse response = new ErrorResponse(
                 ErrorMessages.INVALID_ARGUMENT,
                 "INVALID_ARGUMENT");
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
+        log.error("InvalidCredentialsException: {}", ex.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+                ErrorMessages.INVALID_CREDENTIALS,
+                "INVALID_CREDENTIALS");
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     @ExceptionHandler(Exception.class)

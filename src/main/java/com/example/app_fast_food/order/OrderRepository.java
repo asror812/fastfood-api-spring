@@ -17,6 +17,9 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user.id = :userId AND o.status = 'BASKET'")
     Optional<Order> findBasketByUserId(@Param("userId") UUID userId);
 
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user.phoneNumber = :phoneNumber AND o.status = 'BASKET'")
+    Optional<Order> findBasketByUserPhoneNumber(@Param("phoneNumber") String phoneNumber);
+
     List<Order> findByStatus(OrderStatus status);
 
     Optional<Order> findOrderById(UUID orderId);

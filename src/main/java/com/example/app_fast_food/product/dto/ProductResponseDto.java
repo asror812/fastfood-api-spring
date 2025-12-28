@@ -3,16 +3,17 @@ package com.example.app_fast_food.product.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-
-import com.example.app_fast_food.bonus.dto.bonus.BonusDto;
 
 @Getter
 @Setter
-public class ProductResponseDto {
+public class ProductResponseDto implements Serializable {
     private UUID id;
     private String name;
     private BigDecimal price;
@@ -20,7 +21,7 @@ public class ProductResponseDto {
 
     private int weight;
 
-    private List<ProductDiscountResponseDto> discounts = new ArrayList<>();
-    private List<BonusDto> bonuses = new ArrayList<>();
+    private Set<ProductDiscountResponseDto> discounts = new HashSet<>();
+    private Set<ProductBonusDto> bonuses = new HashSet<>();
     private List<ProductImageResponseDto> images = new ArrayList<>();
 }

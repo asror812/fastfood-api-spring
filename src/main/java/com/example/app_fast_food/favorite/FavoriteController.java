@@ -2,7 +2,8 @@ package com.example.app_fast_food.favorite;
 
 import com.example.app_fast_food.common.response.ApiMessageResponse;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
-import com.example.app_fast_food.user.entity.User;
+import com.example.app_fast_food.user.dto.AuthDto;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -20,20 +21,20 @@ public class FavoriteController {
     private final FavoriteService favoriteService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getFavoriteProducts(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(favoriteService.getFavorites(user.getId()));
+    public ResponseEntity<List<ProductResponseDto>> getFavoriteProducts(@AuthenticationPrincipal AuthDto auth) {
+        return ResponseEntity.ok(favoriteService.getFavorites(auth));
     }
 
     @PostMapping("/{productId}")
-    public ResponseEntity<ApiMessageResponse> addToFavorite(@AuthenticationPrincipal User user,
+    public ResponseEntity<ApiMessageResponse> addToFavorite(@AuthenticationPrincipal AuthDto auth,
             @PathVariable("productId") UUID productId) {
-        return ResponseEntity.ok(favoriteService.add(user.getId(), productId));
+        return ResponseEntity.ok(favoriteService.add(auth, productId));
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiMessageResponse> removeFromFavorite(@AuthenticationPrincipal User user,
+    public ResponseEntity<ApiMessageResponse> removeFromFavorite(@AuthenticationPrincipal AuthDto auth,
             @PathVariable("productId") UUID productId) {
-        return ResponseEntity.ok(favoriteService.remove(user.getId(), productId));
+        return ResponseEntity.ok(favoriteService.remove(auth, productId));
     }
 
 }

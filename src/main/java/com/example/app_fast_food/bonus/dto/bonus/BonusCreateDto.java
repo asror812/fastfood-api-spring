@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BonusCreateDto extends BonusDto {
+public class BonusCreateDto extends BonusDto{
 
     private List<BonusProductLinkCreateDTO> bonusProductLinks;
 }

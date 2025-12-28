@@ -3,19 +3,24 @@ package com.example.app_fast_food.user.dto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
-import com.example.app_fast_food.bonus.dto.bonus.BonusDto;
+import com.example.app_fast_food.product.dto.ProductDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseDto extends UserDto {
 
-    private Set<UUID> favouriteProducts = Set.of();
+    private String department;
 
-    private List<BonusDto> userBonuses = new ArrayList<>();
+    private Integer accessLevel;
 
-    private Set<String> roles = Set.of();
+    private Set<ProductDto> favouriteProducts = Set.of();
+
+    private List<UserBonusDto> userBonuses = new ArrayList<>();
+
 }

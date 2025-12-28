@@ -1,34 +1,28 @@
-package com.example.app_fast_food.bonus.dto.bonus;
+package com.example.app_fast_food.product.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import com.example.app_fast_food.bonus.dto.bonus_condition.BonusConditionResponseDto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
 @Getter
 @Setter
-public class BonusDto {
-    
-    @NotBlank
+public class ProductBonusDto implements Serializable {
+    private UUID id;
+
     protected String name;
 
-    @NotNull
     protected LocalDate startDate;
 
-    @NotNull
     protected LocalDate endDate;
 
-    @NotNull
     protected BonusConditionResponseDto condition;
 
-    @NotNull
-    protected boolean isActive;
+    protected boolean active;
 
-    @NotNull
     protected int usageLimit;
 }

@@ -45,8 +45,7 @@ public class Category {
     @OneToMany(mappedBy = "category")
     private List<Product> products = new ArrayList<>();
 
-    public Category(UUID id, String name, Category parent) {
-        this.id = id;
+    public Category(String name, Category parent) {
         this.name = name;
         this.parent = parent;
     }

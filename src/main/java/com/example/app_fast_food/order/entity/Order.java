@@ -53,13 +53,12 @@ public class Order {
 
     private LocalDateTime createdAt;
 
-    private BigDecimal totalPrice;
-    private BigDecimal discountAmount;
-    private BigDecimal finalPrice;
+    private BigDecimal totalPrice = BigDecimal.ZERO;
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+    private BigDecimal finalPrice = BigDecimal.ZERO;
 
-    public Order(UUID id, OrderStatus status,
+    public Order(OrderStatus status,
             PaymentType paymentType, User user) {
-        this.id = id;
         this.status = status;
         this.paymentType = paymentType;
         this.user = user;

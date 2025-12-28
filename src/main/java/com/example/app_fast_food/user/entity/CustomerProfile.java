@@ -17,6 +17,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +27,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(name = "customer_profiles")
 public class CustomerProfile {
     @Id
     private UUID id;
@@ -38,6 +41,7 @@ public class CustomerProfile {
     private List<UserBonus> userBonuses = new ArrayList<>();
 
     @ManyToMany
-    @JoinTable(name = "customer_favourite_products", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
+    @JoinTable(name = "customer_profile_favourites", joinColumns = @JoinColumn(name = "customer_profile_id"), inverseJoinColumns = @JoinColumn(name = "product_id"), uniqueConstraints = @UniqueConstraint(columnNames = {
+            "customer_profile_id", "product_id" }))
     private Set<Product> favouriteProducts = new HashSet<>();
 }

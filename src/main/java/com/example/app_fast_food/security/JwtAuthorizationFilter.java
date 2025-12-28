@@ -2,12 +2,9 @@ package com.example.app_fast_food.security;
 
 import com.example.app_fast_food.exception.dto.ErrorResponse;
 import com.example.app_fast_food.exception.entity.ErrorMessages;
-import com.example.app_fast_food.user.UserRepository;
-import com.example.app_fast_food.user.entity.User;
+import com.example.app_fast_food.user.dto.AuthDto;
 import com.google.gson.Gson;
 
-import io.jsonwebtoken.Claims;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,12 +16,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -32,7 +33,6 @@ import java.util.Set;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserRepository userRepository;
     private final Gson gson;
 
     public static final Set<String> EXCLUDED_URLS = Set.of(
@@ -63,38 +63,42 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         try {
-            Claims claims = jwtService.claims(token);
-            String phoneNumber = claims.getSubject();
+            UUID userId = jwtService.extractUserId(token);
+            String phoneNumber = jwtService.extractPhoneNumber(token);
 
-            if (phoneNumber == null) {
+            if (userId == null) {
                 sendError(response, ErrorMessages.TOKEN_INVALID, "TOKEN_INVALID");
                 return;
             }
 
-            if (SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                User user = userRepository.findByPhoneNumber(phoneNumber)
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                "User with phone %s not found".formatted(phoneNumber)));
-
-                if (!jwtService.isTokenValid(token, phoneNumber)) {
-                    sendError(response, ErrorMessages.TOKEN_INVALID, "TOKEN_INVALID");
-                    return;
-                }
-
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        user,
-                        null,
-                        user.getAuthorities());
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (!jwtService.isTokenValid(token, userId)) {
+                sendError(response, ErrorMessages.TOKEN_INVALID, "TOKEN_INVALID");
+                return;
             }
 
-        } catch (EntityNotFoundException e) {
-            log.error("User not found: {}", e.getMessage());
-            sendError(response, ErrorMessages.USER_NOT_FOUND, "USER_NOT_FOUND");
-            return;
+            if (SecurityContextHolder.getContext().getAuthentication() != null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
+            List<String> roles = jwtService.extractRoles(token);
+            List<String> perms = jwtService.extractPermissions(token);
+
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+            if (roles != null) {
+                roles.forEach(r -> authorities.add(new SimpleGrantedAuthority("ROLE_" + r)));
+            }
+            if (perms != null) {
+                perms.forEach(p -> authorities.add(new SimpleGrantedAuthority(p)));
+            }
+
+            AuthDto auth = new AuthDto(userId, phoneNumber);
+
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(auth, null,
+                    authorities);
+
+            SecurityContextHolder.getContext().setAuthentication(authToken);
         } catch (Exception e) {
             log.error("Authentication failed: {}", e.getMessage());
             sendError(response, ErrorMessages.AUTH_FAILED, "AUTH_FAILED");

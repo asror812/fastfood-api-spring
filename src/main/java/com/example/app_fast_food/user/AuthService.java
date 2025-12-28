@@ -13,7 +13,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,8 +23,6 @@ import com.example.app_fast_food.user.dto.SignInDto;
 import com.example.app_fast_food.user.dto.SignUpDto;
 import com.example.app_fast_food.user.dto.TokenResponseDto;
 import com.example.app_fast_food.user.dto.UserResponseDto;
-
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -52,8 +49,8 @@ public class AuthService implements UserDetailsService {
 
         String password = passwordEncoder.encode(signUpDTO.getPassword());
 
-        User user = new User(null, phoneNumber, signUpDTO.getName(), password,
-                signUpDTO.getBirthDate());
+        User user = new User(phoneNumber, signUpDTO.getName(),
+                password, signUpDTO.getBirthDate());
 
         CustomerProfile customer = new CustomerProfile();
         customer.setUser(user);
@@ -88,14 +85,13 @@ public class AuthService implements UserDetailsService {
             throw new InvalidCredentialsException(user.getUsername(), user.getPassword());
         }
 
-        return new TokenResponseDto(jwtService.generateToken(signInDTO.getPhoneNumber()));
+        return new TokenResponseDto(jwtService.generateToken(user));
     }
 
     @Override
     public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
-        Optional<User> optionalUser = repository.findByPhoneNumber(phoneNumber);
-
-        return optionalUser.orElseThrow(
+        return repository.findByPhoneNumber(phoneNumber).orElseThrow(
                 () -> new UsernameNotFoundException("User not found with phone number %s".formatted(phoneNumber)));
+
     }
 }

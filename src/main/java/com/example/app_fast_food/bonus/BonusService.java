@@ -10,6 +10,7 @@ import com.example.app_fast_food.orderitem.entity.OrderItem;
 import com.example.app_fast_food.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -73,11 +74,13 @@ public class BonusService {
         return false;
     }
 
+    @Cacheable(value = "bonusById", key = "#p0")
     public BonusResponseDto findById(UUID id) {
         return repository.findById(id).map(mapper::toResponseDto)
                 .orElseThrow(() -> new EntityNotFoundException("Bonus", id.toString()));
     }
 
+    @Cacheable(value = "bonuses")
     public List<BonusResponseDto> findAll() {
         return repository.findAll().stream().map(mapper::toResponseDto).toList();
     }

@@ -1,12 +1,18 @@
-FROM openjdk:17-slim
+FROM gradle:8.7-jdk21 AS build
+WORKDIR /home/gradle/project
 
-WORKDIR /app
-
-COPY . .
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle* settings.gradle* ./
+COPY src src
 
 RUN chmod +x gradlew
-RUN ./gradlew clean bootJar
+RUN ./gradlew clean bootJar --no-daemon
 
-COPY build/libs/*.jar app.jar
+FROM eclipse-temurin:21-jre
+WORKDIR /app
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
+
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]

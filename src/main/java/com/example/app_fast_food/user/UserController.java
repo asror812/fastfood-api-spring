@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.app_fast_food.user.dto.AuthDto;
 import com.example.app_fast_food.user.dto.UserListResponseDto;
 import com.example.app_fast_food.user.dto.UserResponseDto;
-import com.example.app_fast_food.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,8 +21,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> getMe(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(userService.getMe(user));
+    public ResponseEntity<UserResponseDto> getMe(@AuthenticationPrincipal AuthDto auth) {
+        return ResponseEntity.ok(userService.getMe(auth));
     }
 
     @GetMapping

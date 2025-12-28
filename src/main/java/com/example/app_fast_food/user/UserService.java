@@ -1,5 +1,7 @@
 package com.example.app_fast_food.user;
 
+import com.example.app_fast_food.exception.EntityNotFoundException;
+import com.example.app_fast_food.user.dto.AuthDto;
 import com.example.app_fast_food.user.dto.UserListResponseDto;
 import com.example.app_fast_food.user.dto.UserResponseDto;
 import com.example.app_fast_food.user.entity.User;
@@ -19,8 +21,12 @@ public class UserService {
     private final UserMapper mapper;
     private final UserRepository repository;
 
-    public UserResponseDto getMe(User user) {
-        User userWithBonuses = repository.findUserById(user.getId());
+    public UserResponseDto getMe(AuthDto auth) {
+        User userWithBonuses = repository.findById(
+                auth.getId())
+                .orElseThrow(
+                        () -> new EntityNotFoundException("User", auth.getId().toString()));
+
         return mapper.toResponseDto(userWithBonuses);
     }
 

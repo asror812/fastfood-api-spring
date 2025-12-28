@@ -41,6 +41,7 @@ import com.example.app_fast_food.productdiscount.ProductDiscountReposity;
 import com.example.app_fast_food.productimage.ProductImage;
 import com.example.app_fast_food.user.UserRepository;
 import com.example.app_fast_food.user.entity.AdminProfile;
+import com.example.app_fast_food.user.entity.CustomerProfile;
 import com.example.app_fast_food.user.entity.User;
 import com.example.app_fast_food.user.permission.PermissionRepository;
 import com.example.app_fast_food.user.permission.entity.Permission;
@@ -86,7 +87,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
         private static final String BEEF_LAVASH_WITH_CHEESE = "Beef Lavash with Cheese";
         private static final String CLASSIC_BEEF_BURGER_NAME = "Classic Beef Burger";
 
-        private static final String ADMIN = "Admin";
+        private static final String ADMIN = "ADMIN";
+        private static final String CUSTOMER = "CUSTOMER";
 
         private User adminUser;
 
@@ -95,7 +97,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
                 createPermissions();
                 createRoles();
-                createAdmin();
+                createUsers();
 
                 createDiscounts();
                 createCategoriesAndProducts();
@@ -106,9 +108,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
         // BONUSES
         private void createOrders() {
-                if (orderRepository.count() > 0) {
+                if (orderRepository.count() > 0)
                         return;
-                }
 
                 Product beefLavashWithCheese = productRepository.findByName(BEEF_LAVASH_WITH_CHEESE)
                                 .orElseThrow(() -> new RuntimeException("Beef Lavash with Cheese product not found"));
@@ -119,7 +120,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 Product pepperoniLarge = productRepository.findByName("Pepperoni Large")
                                 .orElseThrow(() -> new RuntimeException("Pepperoni Large product not found"));
 
-                Order order = new Order(null, OrderStatus.TAKEN, PaymentType.CASH, adminUser);
+                Order order = new Order(OrderStatus.TAKEN, PaymentType.CASH, adminUser);
                 OrderItem orderItem1 = new OrderItem(null, 4, beefLavashWithCheese, order);
                 OrderItem orderItem2 = new OrderItem(null, 1, classicBeefBurger, order);
                 OrderItem orderItem3 = new OrderItem(null, 10, pepperoniLarge, order);
@@ -131,12 +132,12 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
         @Transactional
         private void createBonuses() {
-                if (bonusRepository.count() > 0) {
+                if (bonusRepository.count() > 0)
                         return;
-                }
+                
 
-                BonusCondition holidayCondition = new BonusCondition(null, ConditionType.HOLIDAY_BONUS, "ANY");
-                BonusCondition birthdayCondition = new BonusCondition(null, ConditionType.USER_BIRTHDAY, "ANY");
+                BonusCondition holidayCondition = new BonusCondition(null, ConditionType.HOLIDAY_BONUS, "1");
+                BonusCondition birthdayCondition = new BonusCondition(null, ConditionType.USER_BIRTHDAY, "1");
                 BonusCondition quantityCondition = new BonusCondition(null, ConditionType.QUANTITY, "2");
                 BonusCondition firstPurchaseCondition = new BonusCondition(null, ConditionType.FIRST_PURCHASE, "1");
                 BonusCondition totalPriceCondition = new BonusCondition(null, ConditionType.TOTAL_PRICE, "150000");
@@ -262,21 +263,21 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 }
 
                 // ================= CATEGORIES =================
-                Category burgers = new Category(null, "Burgers & Sandwiches", null);
-                Category lavash = new Category(null, "Rolls & Lavash", null);
-                Category doner = new Category(null, "Doners", null);
-                Category pizza = new Category(null, "Pizza", null);
-                Category drinks = new Category(null, "Drinks", null);
-                Category desserts = new Category(null, "Desserts", null);
+                Category burgers = new Category("Burgers & Sandwiches", null);
+                Category lavash = new Category("Rolls & Lavash", null);
+                Category doner = new Category("Doners", null);
+                Category pizza = new Category("Pizza", null);
+                Category drinks = new Category("Drinks", null);
+                Category desserts = new Category("Desserts", null);
 
-                Category beefBurger = new Category(null, "Beef Burgers", burgers);
-                Category beefLavash = new Category(null, "Beef Lavash", lavash);
-                Category cheeseLavash = new Category(null, "Cheese Lavash", lavash);
-                Category beefDoner = new Category(null, "Beef Doner", doner);
-                Category pepperoniPizza = new Category(null, "Pepperoni Pizza", pizza);
-                Category coldDrinks = new Category(null, "Cold Drinks", drinks);
-                Category iceCream = new Category(null, "Ice Cream", desserts);
-                Category donuts = new Category(null, "Donuts", desserts);
+                Category beefBurger = new Category("Beef Burgers", burgers);
+                Category beefLavash = new Category("Beef Lavash", lavash);
+                Category cheeseLavash = new Category("Cheese Lavash", lavash);
+                Category beefDoner = new Category("Beef Doner", doner);
+                Category pepperoniPizza = new Category("Pepperoni Pizza", pizza);
+                Category coldDrinks = new Category("Cold Drinks", drinks);
+                Category iceCream = new Category("Ice Cream", desserts);
+                Category donuts = new Category("Donuts", desserts);
 
                 categoryRepository.saveAll(List.of(
                                 burgers, lavash, doner, pizza, drinks, desserts,
@@ -408,14 +409,13 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
         }
 
         @Transactional
-        private void createAdmin() {
+        private void createUsers() {
                 if (userRepository.findAll().isEmpty()) {
                         Role adminRole = roleRepository.findByName(ADMIN)
                                         .orElseThrow(() -> new com.example.app_fast_food.exception.EntityNotFoundException(
                                                         "Role", ADMIN));
 
                         adminUser = new User(
-                                        null,
                                         adminPhoneNumber,
                                         adminName,
                                         passwordEncoder.encode(adminPassword),
@@ -424,34 +424,45 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                         AdminProfile adminProfile = new AdminProfile();
                         adminProfile.setUser(adminUser);
 
-                        adminUser.setRoles(Set.of(adminRole));
+                        Role customerRole = roleRepository.findByName(CUSTOMER)
+                                        .orElseThrow(() -> new com.example.app_fast_food.exception.EntityNotFoundException(
+                                                        "Role", CUSTOMER));
+
+                        CustomerProfile customerProfile = new CustomerProfile();
+                        customerProfile.setUser(adminUser);
+
+                        adminUser.setCustomerProfile(customerProfile);
+                        adminUser.setAdminProfile(adminProfile);
+
+                        adminUser.setRoles(Set.of(adminRole, customerRole));
+
                         userRepository.save(adminUser);
                 }
         }
 
         // ROLES
         private void createRoles() {
-                Optional<Role> existingUserRole = roleRepository.findByName("User");
+                Optional<Role> existingCustomerRole = roleRepository.findByName(CUSTOMER);
                 Optional<Role> existingAdminRole = roleRepository.findByName(ADMIN);
                 Optional<Role> existingStaffRole = roleRepository.findByName("Staff");
 
-                if (existingUserRole.isEmpty()) {
-                        Set<Permission> userPermissions = permissionRepository.findAllByNameIn(
+                if (existingCustomerRole.isEmpty()) {
+                        Set<Permission> customerPermissions = permissionRepository.findAllByNameIn(
                                         Set.of("order:create", "menu:view", "profile:manage", "order_history:view"));
-                        Role userRole = new Role("User", userPermissions, Collections.emptySet());
-                        roleRepository.save(userRole);
+                        Role customerRole = new Role(CUSTOMER, customerPermissions);
+                        roleRepository.save(customerRole);
                 }
 
                 if (existingAdminRole.isEmpty()) {
                         Set<Permission> adminPermissions = new HashSet<>(permissionRepository.findAll());
-                        Role adminRole = new Role(ADMIN, adminPermissions, Collections.emptySet());
+                        Role adminRole = new Role(ADMIN, adminPermissions);
                         roleRepository.save(adminRole);
                 }
 
                 if (existingStaffRole.isEmpty()) {
                         Set<Permission> staffPermissions = permissionRepository.findAllByNameIn(
                                         Set.of("order:update", "menu:view"));
-                        Role staffRole = new Role("Staff", staffPermissions, Collections.emptySet());
+                        Role staffRole = new Role("Staff", staffPermissions);
                         roleRepository.save(staffRole);
                 }
         }

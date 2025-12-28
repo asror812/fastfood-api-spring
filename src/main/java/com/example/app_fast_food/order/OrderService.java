@@ -11,13 +11,14 @@ import com.example.app_fast_food.exception.UserBasketNotFoundException;
 import com.example.app_fast_food.order.dto.OrderResponseDto;
 import com.example.app_fast_food.order.entity.Order;
 import com.example.app_fast_food.order.entity.OrderStatus;
-import com.example.app_fast_food.orderitem.OrderItemRepository;
 import com.example.app_fast_food.orderitem.dto.OrderItemCreateRequestDTO;
 import com.example.app_fast_food.orderitem.entity.OrderItem;
 import com.example.app_fast_food.product.ProductMapper;
 import com.example.app_fast_food.product.ProductRepository;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.product.entity.Product;
+import com.example.app_fast_food.user.UserRepository;
+import com.example.app_fast_food.user.dto.AuthDto;
 import com.example.app_fast_food.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -34,8 +36,8 @@ import java.util.*;
 public class OrderService {
 
     private final OrderRepository repository;
-    private final OrderItemRepository orderItemRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     private final OrderMapper mapper;
     private final ProductMapper productMapper;
@@ -49,14 +51,8 @@ public class OrderService {
 
     private static final String USER_BASKET_NOT_FOUND = "Basket with user id `%s` not found";
 
-    public OrderResponseDto addProduct(OrderItemCreateRequestDTO dto, User user) {
-        Order order = repository.findBasketByUserId(user.getId())
-                .orElseGet(() -> {
-                    Order newBasket = new Order();
-                    newBasket.setUser(user);
-                    newBasket.setStatus(OrderStatus.BASKET);
-                    return repository.save(newBasket);
-                });
+    public OrderResponseDto addProduct(OrderItemCreateRequestDTO dto, AuthDto auth) {
+        Order order = getOrCreateBasket(auth);
 
         Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -73,17 +69,17 @@ public class OrderService {
         OrderItem orderItem = new OrderItem(null, dto.getQuantity(), product, order);
         order.getOrderItems().add(orderItem);
 
-        calculateOrderPrices(order, user);
+        calculateOrderPrices(order);
 
         repository.save(order);
         return mapper.toResponseDto(order);
     }
 
-    public OrderResponseDto updateQuantity(User user, UUID productId, int quantity) {
-        Order order = repository.findBasketByUserId(user.getId())
+    public OrderResponseDto updateQuantity(AuthDto auth, UUID productId, int quantity) {
+        Order order = repository.findBasketByUserId(
+                auth.getId())
                 .orElseThrow(
-                        () -> new EntityNotFoundException(BASKET_ENTITY,
-                                user.getId().toString()));
+                        () -> new UserBasketNotFoundException(USER_BASKET_NOT_FOUND.formatted(auth.getId())));
 
         OrderItem orderItem = order.getOrderItems().stream()
                 .filter(o -> o.getProduct().getId().equals(productId))
@@ -91,29 +87,38 @@ public class OrderService {
                 .orElseThrow(
                         () -> new EntityNotFoundException(PRODUCT_ENTITY, productId.toString()));
 
-        orderItem.setQuantity(quantity);
-        orderItemRepository.save(orderItem);
+        if (quantity <= 0) {
+            order.getOrderItems().removeIf(i -> i.getProduct().getId().equals(productId));
+        } else {
+            orderItem.setQuantity(quantity);
+        }
 
-        calculateOrderPrices(order, user);
-
+        calculateOrderPrices(order);
         repository.save(order);
-        return mapper.toResponseDto(order);
-    }
-
-    private void calculateOrderPrices(Order order, User user) {
-        // TODO: override full function
-    }
-
-    public OrderResponseDto getBasket(User user) {
-        Order order = repository.findBasketByUserId(user.getId())
-                .orElseThrow(
-                        () -> new UserBasketNotFoundException(
-                                USER_BASKET_NOT_FOUND.formatted(user.getId())));
 
         return mapper.toResponseDto(order);
     }
 
-    public List<OrderResponseDto> getByOrderStatus(String status) {
+    public Order getOrCreateBasket(AuthDto auth) {
+        return repository.findBasketByUserId(auth.getId())
+                .orElseGet(() -> {
+                    User user = userRepository.findById(auth.getId())
+                            .orElseThrow(() -> new EntityNotFoundException("User", auth.getId().toString()));
+
+                    Order order = new Order();
+                    order.setUser(user);
+                    order.setCreatedAt(LocalDateTime.now());
+                    order.setStatus(OrderStatus.BASKET);
+
+                    order.setDiscountAmount(BigDecimal.ZERO);
+                    order.setTotalPrice(BigDecimal.ZERO);
+                    order.setFinalPrice(BigDecimal.ZERO);
+
+                    return repository.save(order);
+                });
+    }
+
+    public List<OrderResponseDto> getOrderByStatus(String status) {
         try {
             OrderStatus orderStatus = OrderStatus.valueOf(status);
             List<Order> orders = repository.findByStatus(orderStatus);
@@ -127,48 +132,51 @@ public class OrderService {
         }
     }
 
-    public ApiMessageResponse deleteBasket(UUID id) {
-        repository.deleteOrderByUserIdAndStatus(id, OrderStatus.BASKET);
+    public ApiMessageResponse deleteBasket(AuthDto auth) {
+        repository.deleteOrderByUserIdAndStatus(auth.getId(), OrderStatus.BASKET);
         return new ApiMessageResponse("Basket successfully deleted");
     }
 
-    public void confirmOrder(User user) {
+    public void confirmOrder(AuthDto auth) {
         Order order = repository
-                .findBasketByUserId(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException(BASKET_ENTITY,
-                        user.getId().toString()));
+                .findBasketByUserId(auth.getId())
+                .orElseThrow(() -> new EntityNotFoundException(BASKET_ENTITY, auth.getId().toString()));
 
+        if (order.getOrderItems().isEmpty()) {
+            throw new IllegalStateException("Basket is empty");
+        }
+
+        calculateOrderPrices(order);
         order.setStatus(OrderStatus.IN_PROCESS);
         repository.save(order);
 
     }
 
-    public OrderResponseDto removeProduct(User user, UUID productId) {
-        Order order = repository.findBasketByUserId(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException(BASKET_ENTITY,
-                        "of user " + user.getId()));
+    public OrderResponseDto removeProduct(AuthDto auth, UUID productId) {
+        Order order = repository.findBasketByUserId(auth.getId())
+                .orElseThrow(
+                        () -> new UserBasketNotFoundException(USER_BASKET_NOT_FOUND.formatted(auth.getId())));
 
-        Product product = productRepository
-                .findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("Order item",
-                        productId.toString()));
+        boolean removed = order.getOrderItems().removeIf(oi -> oi.getProduct().getId().equals(productId));
 
-        order.getOrderItems().removeIf(oi -> oi.getProduct().equals(product));
+        if (!removed) {
+            throw new EntityNotFoundException(PRODUCT_ENTITY, productId.toString());
+        }
 
-        calculateOrderPrices(order, user);
+        calculateOrderPrices(order);
         repository.save(order);
 
         return mapper.toResponseDto(order);
     }
 
-    public ProductResponseDto selectBonus(User user, UUID bonusId) {
-        Order o = repository.findBasketByUserId(user.getId())
+    public ProductResponseDto selectBonus(AuthDto auth, UUID productBonusId) {
+        Order o = repository.findBasketByUserId(auth.getId())
                 .orElseThrow(() -> new UserBasketNotFoundException(
-                        USER_BASKET_NOT_FOUND.formatted(user.getId())));
+                        USER_BASKET_NOT_FOUND.formatted(auth.getId())));
 
-        Product p = productRepository.findProductById(bonusId)
+        Product p = productRepository.findById(productBonusId)
                 .orElseThrow(() -> new EntityNotFoundException(PRODUCT_ENTITY,
-                        bonusId.toString()));
+                        productBonusId.toString()));
 
         OrderItem item = new OrderItem(null, 1, p, o);
 
@@ -176,6 +184,34 @@ public class OrderService {
         repository.save(o);
 
         return productMapper.toResponseDTO(p);
+    }
+
+    public List<BonusResponseDto> getAvailableBonuses(AuthDto auth) {
+        Order order = repository.findBasketByUserId(
+                auth.getId()).orElseThrow(
+                        () -> new UserBasketNotFoundException(
+                                USER_BASKET_NOT_FOUND.formatted(auth.getId())));
+
+        User user = userRepository.findById(auth.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User", auth.getId().toString()));
+
+        return bonusService.getAvailableOrderBonuses(
+                user, order).stream().map(bonusMapper::toResponseDto).toList();
+    }
+
+    public List<OrderResponseDto> getAll() {
+        return repository.findAll().stream().map(mapper::toResponseDto).toList();
+
+    }
+
+    public OrderResponseDto getById(@NonNull UUID id) {
+        Order order = repository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Order", id.toString()));
+        return mapper.toResponseDto(order);
+    }
+
+    public OrderResponseDto getBasket(AuthDto auth) {
+        return mapper.toResponseDto(getOrCreateBasket(auth));
     }
 
     private void applyDiscounts(
@@ -205,23 +241,7 @@ public class OrderService {
         order.setFinalPrice(orderTotal.subtract(totalDiscount));
     }
 
-    public List<BonusResponseDto> getAvailableBonuses(User user) {
-        Order order = repository.findBasketByUserId(user.getId()).orElseThrow(
-                () -> new UserBasketNotFoundException(
-                        USER_BASKET_NOT_FOUND.formatted(user.getId())));
-
-        return bonusService.getAvailableOrderBonuses(user, order).stream().map(bonusMapper::toResponseDto).toList();
+    private void calculateOrderPrices(Order order) {
+        // write down it already
     }
-
-    public List<OrderResponseDto> getAll() {
-        return repository.findAll().stream().map(mapper::toResponseDto).toList();
-
-    }
-
-    public OrderResponseDto getById(@NonNull UUID id) {
-        Order order = repository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Order", id.toString()));
-        return mapper.toResponseDto(order);
-    }
-
 }

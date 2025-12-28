@@ -2,9 +2,11 @@ package com.example.app_fast_food.product;
 
 import com.example.app_fast_food.product.entity.Product;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,12 +16,12 @@ import java.util.UUID;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID> {
 
-    @Query(value = """
-            SELECT p.*
-            FROM products p
-            INNER JOIN categories c ON c.id = p.category_id
+    @Query("""
+            SELECT p
+            FROM Product p
+            JOIN FETCH p.category c
             WHERE c.name = :name
-            """, nativeQuery = true)
+            """)
     List<Product> findProductsByCategoryName(@Param("name") String name);
 
     @Query(value = """
@@ -40,8 +42,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             WHERE p.category_id = :id OR p.category_id IN (SELECT id FROM subcats)
             """, nativeQuery = true)
     List<Product> findProductsByCategoryTree(@Param("id") UUID id);
-
-    Optional<Product> findProductById(UUID id);
 
     Optional<Product> findByName(String name);
 
@@ -64,4 +64,24 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             """, nativeQuery = true)
     List<Product> getPopularProducts();
 
+    @Override
+    @EntityGraph(attributePaths = {
+            "category",
+            "images",
+            "discounts.discount",
+            "bonuses.bonus.condition"
+    })
+    @NonNull
+    List<Product> findAll();
+
+    @Override
+    @EntityGraph(attributePaths = {
+            "category",
+            "images",
+            "discounts.discount",
+            "bonuses.bonus.condition"
+    })
+
+    @NonNull
+    Optional<Product> findById(@NonNull UUID id);
 }

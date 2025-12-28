@@ -1,8 +1,8 @@
 package com.example.app_fast_food.discount;
 
-import com.example.app_fast_food.bonus.dto.bonus.CategoryDto;
 import com.example.app_fast_food.discount.dto.DiscountResponseDto;
 import com.example.app_fast_food.discount.entity.Discount;
+import com.example.app_fast_food.product.dto.CategoryDto;
 import com.example.app_fast_food.product.dto.ProductDto;
 import com.example.app_fast_food.product.entity.Product;
 import com.example.app_fast_food.productdiscount.ProductDiscount;

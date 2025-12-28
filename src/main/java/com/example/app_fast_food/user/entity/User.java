@@ -47,9 +47,8 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private AdminProfile adminProfile;
 
-    public User(UUID id, String phoneNumber, String name,
+    public User(String phoneNumber, String name,
             String password, LocalDate birthDate) {
-        this.id = id;
         this.phoneNumber = phoneNumber;
         this.name = name;
         this.password = password;

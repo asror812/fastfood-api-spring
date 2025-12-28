@@ -1,17 +1,17 @@
 package com.example.app_fast_food.user;
 
-import com.example.app_fast_food.bonus.dto.bonus.BonusDto;
 import com.example.app_fast_food.bonus.entity.Bonus;
+import com.example.app_fast_food.product.dto.CategoryDto;
+import com.example.app_fast_food.product.dto.ProductDto;
 import com.example.app_fast_food.product.entity.Product;
+import com.example.app_fast_food.user.dto.UserBonusDto;
 import com.example.app_fast_food.user.dto.UserListResponseDto;
 import com.example.app_fast_food.user.dto.UserResponseDto;
 import com.example.app_fast_food.user.dto.UserUpdateDto;
+import com.example.app_fast_food.user.entity.AdminProfile;
 import com.example.app_fast_food.user.entity.CustomerProfile;
 import com.example.app_fast_food.user.entity.User;
-import com.example.app_fast_food.user.role.Role;
 
-import java.util.Collections;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.mapstruct.AfterMapping;
@@ -32,18 +32,11 @@ public interface UserMapper {
 
     @Mapping(target = "userBonuses", ignore = true)
     @Mapping(target = "favouriteProducts", ignore = true)
+    @Mapping(target = "accessLevel", ignore = true)
+    @Mapping(target = "department", ignore = true)
     public UserResponseDto toResponseDto(User user);
 
     public UserListResponseDto toListResponseDto(User user);
-
-    default Set<String> mapRoles(Set<Role> roles) {
-        if (roles == null || roles.isEmpty())
-            return Collections.emptySet();
-
-        return roles.stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet());
-    }
 
     @AfterMapping
     default void mapCustomerProfileData(User user, @MappingTarget UserResponseDto dto) {
@@ -55,7 +48,7 @@ public interface UserMapper {
 
         if (profile.getFavouriteProducts() != null) {
             dto.setFavouriteProducts(profile.getFavouriteProducts().stream()
-                    .map(Product::getId)
+                    .map(this::toProductDto)
                     .collect(Collectors.toSet()));
         }
 
@@ -66,11 +59,27 @@ public interface UserMapper {
         }
     }
 
-    default BonusDto mapToBonusDto(Bonus bonus) {
+    @AfterMapping
+    default void mapAdminProfileData(User user, @MappingTarget UserResponseDto dto) {
+        if (user.getAdminProfile() == null) {
+            return;
+        }
+
+        AdminProfile profile = user.getAdminProfile();
+
+        if (profile.getDepartment() != null)
+            dto.setDepartment(profile.getDepartment());
+
+        if (profile.getAccessLevel() != null)
+            dto.setAccessLevel(profile.getAccessLevel());
+    }
+
+    default UserBonusDto mapToBonusDto(Bonus bonus) {
         if (bonus == null)
             return null;
 
-        BonusDto dto = new BonusDto();
+        UserBonusDto dto = new UserBonusDto();
+
         dto.setId(bonus.getId());
         dto.setName(bonus.getName());
         dto.setStartDate(bonus.getStartDate());
@@ -78,6 +87,11 @@ public interface UserMapper {
         dto.setActive(bonus.isActive());
         dto.setUsageLimit(bonus.getUsageLimit());
         return dto;
+    }
+
+    default ProductDto toProductDto(Product p) {
+        CategoryDto category = new CategoryDto(p.getCategory().getId(), p.getCategory().getName());
+        return new ProductDto(p.getId(), p.getName(), p.getPrice(), category, p.getWeight());
     }
 
 }

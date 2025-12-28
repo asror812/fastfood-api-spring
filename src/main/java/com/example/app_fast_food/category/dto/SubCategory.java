@@ -1,5 +1,6 @@
 package com.example.app_fast_food.category.dto;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class SubCategory {
+public class SubCategory implements Serializable {
     private UUID id;
     private String name;
 }

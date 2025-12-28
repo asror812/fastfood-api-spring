@@ -23,6 +23,7 @@ public class ErrorMessages {
     public static final String ALREADY_EXIST = "Resource already exists";
     public static final String INVALID_ARGUMENT = "Invalid request params";
     public static final String ALREADY_ADDED_TO_BASKET = "Already added to basket";
+    public static final String INVALID_CREDENTIALS = "Invalid phoneNumber or password";
 
     private ErrorMessages() {
     }

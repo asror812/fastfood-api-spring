@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +22,7 @@ public class CategoryService {
     private final CategoryMapper mapper;
     private static final String CATEGORY_ENTITY = "Category";
 
+    @CacheEvict(value = {"categories", "parentCategories"}, allEntries = true)
     public CategoryResponseDto create(CategoryCreateDto createDto) {
         UUID parentId = createDto.getParentId();
         String name = createDto.getName();
@@ -44,15 +47,18 @@ public class CategoryService {
         return mapper.toResponseDto(category);
     }
 
+    @Cacheable(value = "categories")
     public List<CategoryResponseDto> getAll() {
         return repository.findAll().stream().map(mapper::toResponseDto).toList();
     }
 
+    @Cacheable(value = "categoryById", key = "#p0")
     public CategoryResponseDto findById(UUID id) {
         return repository.findById(id).map(mapper::toResponseDto)
                 .orElseThrow(() -> new EntityNotFoundException(CATEGORY_ENTITY, id.toString()));
     }
 
+    @Cacheable("parentCategories")
     public List<CategoryResponseDto> getParentCategories() {
         List<Category> parentCategories = repository.getParentCategories();
 

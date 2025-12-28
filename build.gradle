@@ -39,6 +39,10 @@ dependencies {
 	// spring boot actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+	// spring boot redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
 	// spring jpa
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	
@@ -77,7 +81,9 @@ dependencies {
 
 	// redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'redis.clients:jedis:5.1.0'
+
+	// https://mvnrepository.com/artifact/com.google.code.gson/gson
+	implementation("com.google.code.gson:gson:2.7")
 
 	 // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'

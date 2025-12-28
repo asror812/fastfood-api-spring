@@ -1,5 +1,7 @@
 package com.example.app_fast_food.bonus.dto.bonus;
 
+import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,8 +15,19 @@ import com.example.app_fast_food.product.dto.ProductDto;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BonusResponseDto extends BonusDto {
-    private UUID id;
+public class BonusResponseDto implements Serializable {
+
+    protected UUID id;
+
+    protected String name;
+
+    protected LocalDate startDate;
+
+    protected LocalDate endDate;
+
+    protected boolean isActive;
+
+    protected int usageLimit;
 
     private BonusConditionResponseDto condition;
 

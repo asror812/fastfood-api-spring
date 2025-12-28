@@ -1,4 +1,4 @@
-package com.example.app_fast_food.bonus.dto.bonus;
+package com.example.app_fast_food.user.dto;
 
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryDto {
+public class AuthDto {
     private UUID id;
-    private String name;
+    private String phoneNumber;
 }

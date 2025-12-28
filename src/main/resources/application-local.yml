@@ -3,14 +3,26 @@ spring:
     password: ${POSTGRES_PASSWORD}
     username: ${POSTGRES_USER}
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    
   jpa:
     show-sql: true
     properties:
       hibernate:
+        generate_statistics: true
         format_sql: true
     hibernate:
-      ddl-auto: create-drop
-  
+      ddl-auto: create
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: ${REDIS_TIME_TO_LIVE}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+       
 otp:
   retry-wait-time: ${OTP_RETRY_WAIT_TIME}
   retry-count: ${OTP_RETRY_COUNT}
@@ -37,3 +49,4 @@ api:
 
   storage:
     images-path: ${IMAGES_PATH}
+
