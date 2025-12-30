@@ -38,10 +38,14 @@ public class AttachmentService {
     private String downloadBaseUrl;
 
     private final AttachmentRepository repository;
-    private final ProductImageRepository productImageRepository;
 
     private final AttachmentMapper mapper;
+
     private final ProductRepository productRepository;
+
+    private final ProductImageRepository productImageRepository;
+
+    private static final String ATTACHMENT_ENTITY = "Image";
 
     private static final long LIMIT_BYTES = 1L * 1024 * 1024;
 
@@ -98,7 +102,7 @@ public class AttachmentService {
 
     public void loadImageFromImageFolder(@NonNull UUID id, HttpServletResponse response) {
         Attachment image = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Image", id.toString()));
+                .orElseThrow(() -> new EntityNotFoundException(ATTACHMENT_ENTITY, id.toString()));
 
         Path path = Paths.get(imagesFolderPath, image.getStoredName());
         File file = path.toFile();
@@ -119,18 +123,25 @@ public class AttachmentService {
     }
 
     @Transactional
-    public void deleteProductImage(UUID productImageId) {
+    public void delete(UUID productImageId) {
         ProductImage productImage = productImageRepository.findById(productImageId)
                 .orElseThrow(() -> new EntityNotFoundException("ProductImage", productImageId.toString()));
 
-        Path path = Paths.get(imagesFolderPath, productImage.getAttachment().getStoredName());
+        UUID attachmentId = productImage.getId();
+        String storedName = productImage.getAttachment().getStoredName();
+
+        productImageRepository.delete(productImage);
+
+        Path path = Paths.get(imagesFolderPath, storedName);
+
         try {
             Files.deleteIfExists(path);
         } catch (IOException e) {
             log.warn("Failed to delete file from disk: {}", path, e);
         }
 
-        repository.deleteById(productImageId);
+        repository.deleteById(attachmentId);
+
     }
 
     private static String getExtension(String originalName) {

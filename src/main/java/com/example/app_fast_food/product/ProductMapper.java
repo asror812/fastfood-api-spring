@@ -11,9 +11,7 @@ import com.example.app_fast_food.productimage.ProductImage;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Mapper(componentModel = "spring", uses = { CategoryMapper.class, ProductDiscountMapper.class, BonusMapper.class })
@@ -33,6 +31,8 @@ public interface ProductMapper {
     @Mapping(target = "discounts", source = "discounts")
     ProductResponseDto toResponseDTO(Product product);
 
+    ProductListResponseDto toListResponseDto(Product product);
+
     default Set<ProductDiscountResponseDto> toProductDiscountResponseDto(Set<ProductDiscount> pds) {
         Set<ProductDiscountResponseDto> productDiscounts = new HashSet<>();
         if (pds == null)
@@ -47,15 +47,14 @@ public interface ProductMapper {
                     pd.getId(),
                     discount.getName(),
                     discount.getPercentage(),
-                    discount.getStartDate(),
-                    discount.getEndDate(),
                     discount.getRequiredQuantity()));
         }
+
         return productDiscounts;
     }
 
-    default List<ProductImageResponseDto> toProductDiscountResponseDto(List<ProductImage> pis) {
-        List<ProductImageResponseDto> productImages = new ArrayList<>();
+    default Set<ProductImageResponseDto> toProductImageResponseDto(Set<ProductImage> pis) {
+        Set<ProductImageResponseDto> productImages = new HashSet<>();
         if (pis == null)
             return productImages;
 

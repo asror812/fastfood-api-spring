@@ -22,7 +22,5 @@ public class ProductBonusDto implements Serializable {
 
     protected BonusConditionResponseDto condition;
 
-    protected boolean active;
-
     protected int usageLimit;
 }

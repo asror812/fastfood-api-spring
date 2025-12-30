@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 @Setter
 public class BonusDto {
-    
+
     @NotBlank
     protected String name;
 
@@ -25,9 +25,6 @@ public class BonusDto {
 
     @NotNull
     protected BonusConditionResponseDto condition;
-
-    @NotNull
-    protected boolean isActive;
 
     @NotNull
     protected int usageLimit;

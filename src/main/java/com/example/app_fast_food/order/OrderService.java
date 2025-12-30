@@ -5,6 +5,7 @@ import com.example.app_fast_food.bonus.BonusService;
 import com.example.app_fast_food.bonus.dto.bonus.BonusResponseDto;
 import com.example.app_fast_food.common.response.ApiMessageResponse;
 import com.example.app_fast_food.discount.entity.Discount;
+import com.example.app_fast_food.discount.entity.DiscountType;
 import com.example.app_fast_food.exception.AlreadyAddedToBasketException;
 import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.exception.UserBasketNotFoundException;
@@ -17,24 +18,23 @@ import com.example.app_fast_food.product.ProductMapper;
 import com.example.app_fast_food.product.ProductRepository;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.product.entity.Product;
+import com.example.app_fast_food.productdiscount.ProductDiscount;
 import com.example.app_fast_food.user.UserRepository;
 import com.example.app_fast_food.user.dto.AuthDto;
 import com.example.app_fast_food.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class OrderService {
-
     private final OrderRepository repository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
@@ -66,9 +66,14 @@ public class OrderService {
             throw new AlreadyAddedToBasketException("Product already added to basket");
         }
 
-        OrderItem orderItem = new OrderItem(null, dto.getQuantity(), product, order);
-        order.getOrderItems().add(orderItem);
+        OrderItem orderItem = new OrderItem();
+        orderItem.setBonus(false);
+        orderItem.setOrder(order);
+        orderItem.setProduct(product);
+        orderItem.setQuantity(dto.getQuantity());
+        orderItem.setUnitPrice(product.getPrice());
 
+        order.getOrderItems().add(orderItem);
         calculateOrderPrices(order);
 
         repository.save(order);
@@ -87,11 +92,7 @@ public class OrderService {
                 .orElseThrow(
                         () -> new EntityNotFoundException(PRODUCT_ENTITY, productId.toString()));
 
-        if (quantity <= 0) {
-            order.getOrderItems().removeIf(i -> i.getProduct().getId().equals(productId));
-        } else {
-            orderItem.setQuantity(quantity);
-        }
+        orderItem.setQuantity(quantity);
 
         calculateOrderPrices(order);
         repository.save(order);
@@ -132,9 +133,24 @@ public class OrderService {
         }
     }
 
-    public ApiMessageResponse deleteBasket(AuthDto auth) {
-        repository.deleteOrderByUserIdAndStatus(auth.getId(), OrderStatus.BASKET);
-        return new ApiMessageResponse("Basket successfully deleted");
+    public ApiMessageResponse emptyBasket(AuthDto auth) {
+        Order basket = repository
+                .findBasketByUserId(auth.getId())
+                .orElseThrow(
+                        () -> new UserBasketNotFoundException(
+                                USER_BASKET_NOT_FOUND.formatted(auth.getId().toString())));
+
+        basket.getOrderItems().clear();
+
+        basket.setAppliedBonus(false);
+        basket.setSelectedBonus(null);
+
+        basket.setDiscountAmount(BigDecimal.ZERO);
+        basket.setFinalPrice(BigDecimal.ZERO);
+        basket.setTotalPrice(BigDecimal.ZERO);
+
+        repository.save(basket);
+        return new ApiMessageResponse("Basket successfully emptied");
     }
 
     public void confirmOrder(AuthDto auth) {
@@ -178,7 +194,7 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException(PRODUCT_ENTITY,
                         productBonusId.toString()));
 
-        OrderItem item = new OrderItem(null, 1, p, o);
+        OrderItem item = new OrderItem();
 
         o.getOrderItems().add(item);
         repository.save(o);
@@ -214,34 +230,54 @@ public class OrderService {
         return mapper.toResponseDto(getOrCreateBasket(auth));
     }
 
-    private void applyDiscounts(
-            Order order,
-            List<Discount> holidayDiscounts,
-            Set<Discount> productQuantityBasedDiscounts) {
+    private BigDecimal applyProductDiscounts(OrderItem orderItem, BigDecimal lineTotal, LocalDate today) {
+        Product product = orderItem.getProduct();
+        int quantity = orderItem.getQuantity();
 
-        BigDecimal orderTotal = BigDecimal.ZERO;
+        Discount best = product.getDiscounts().stream()
+                .map(ProductDiscount::getDiscount)
+                .filter(Discount::isActive)
+                .filter(d -> !today.isBefore(d.getStartDate()) && !today.isAfter(d.getEndDate()))
+                .filter(d -> d.getType() == DiscountType.PRODUCT_QUANTITY)
+                .filter(d -> d.getRequiredQuantity() != null && d.getRequiredQuantity() <= quantity)
+                .max(Comparator.comparingInt(Discount::getRequiredQuantity))
+                .orElse(null);
 
-        for (OrderItem item : order.getOrderItems()) {
-            BigDecimal price = item.getProduct().getPrice();
-            BigDecimal qty = BigDecimal.valueOf(item.getQuantity());
-            orderTotal = orderTotal.add(price.multiply(qty));
-        }
+        if (best == null)
+            return BigDecimal.ZERO;
 
-        order.setTotalPrice(orderTotal);
+        BigDecimal percent = BigDecimal.valueOf(best.getPercentage())
+                .divide(BigDecimal.valueOf(100));
 
-        BigDecimal totalDiscount = BigDecimal.ZERO;
-
-        for (Discount discount : holidayDiscounts) {
-            BigDecimal percent = BigDecimal.valueOf(discount.getPercentage()).divide(BigDecimal.valueOf(100));
-
-            totalDiscount = totalDiscount.add(orderTotal.multiply(percent));
-        }
-
-        order.setDiscountAmount(totalDiscount);
-        order.setFinalPrice(orderTotal.subtract(totalDiscount));
+        return lineTotal.multiply(percent);
     }
 
     private void calculateOrderPrices(Order order) {
-        // write down it already
+        LocalDate today = LocalDate.now();
+
+        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal totalDiscount = BigDecimal.ZERO;
+
+        Set<OrderItem> orderItems = order.getOrderItems();
+
+        for (OrderItem oi : orderItems) {
+            BigDecimal lineTotal = oi.getProduct().getPrice()
+                    .multiply(BigDecimal.valueOf(oi.getQuantity()));
+
+            BigDecimal itemDiscount = applyProductDiscounts(oi, lineTotal, today);
+
+            oi.setLineTotal(lineTotal);
+            oi.setDiscountAmount(itemDiscount);
+            oi.setFinalPrice(lineTotal.subtract(itemDiscount));
+
+            total = total.add(lineTotal);
+            totalDiscount = totalDiscount.add(itemDiscount);
+        }
+
+        order.setTotalPrice(total);
+        order.setDiscountAmount(totalDiscount);
+        order.setFinalPrice(total.subtract(totalDiscount));
+
+        repository.save(order);
     }
 }

@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,14 +29,11 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
                 SELECT id
                 FROM categories
                 WHERE id = :id
-
                 UNION ALL
-
                 SELECT c.id
                 FROM categories c
                 INNER JOIN subcats sc ON c.parent_id = sc.id
             )
-
             SELECT p.*
             FROM products p
             WHERE p.category_id = :id OR p.category_id IN (SELECT id FROM subcats)
@@ -45,43 +42,47 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     Optional<Product> findByName(String name);
 
-    @Query(value = """
-            SELECT DISTINCT p.*
-            FROM products p
-            JOIN product_discounts pd ON pd.product_id = p.id
-            JOIN discounts d ON d.id = pd.discount_id
-            WHERE d.is_active = true AND CURRENT_DATE BETWEEN d.start_date AND d.end_date
-            """, nativeQuery = true)
-    List<Product> getCampaignProducts();
+    @EntityGraph(attributePaths = {
+            "category", "images",
+            "images.attachment",
+            "discounts.discount",
+            "bonuses.bonus.condition"
+    })
+    @Query("""
+                select distinct p
+                from Product p
+                join p.discounts pd
+                join pd.discount d
+                where d.active = true and :today between d.startDate and d.endDate
+            """)
+    List<Product> getCampaignProducts(@Param("today") LocalDate today);
 
     @Query(value = """
-            SELECT p.*
-            FROM products p
-            JOIN order_items oi ON oi.product_id = p.id
-            GROUP BY p.id
-            ORDER BY COUNT(oi.product_id) DESC
-            LIMIT 4
+                SELECT p.*
+                FROM products p
+                JOIN order_items oi ON oi.product_id = p.id
+                JOIN orders o ON o.id = oi.order_id
+                WHERE o.status = 'COMPLETED'
+                GROUP BY p.id
+                ORDER BY SUM(oi.quantity) DESC
+                LIMIT 4
             """, nativeQuery = true)
     List<Product> getPopularProducts();
 
-    @Override
     @EntityGraph(attributePaths = {
             "category",
             "images",
-            "discounts.discount",
-            "bonuses.bonus.condition"
+            "images.attachment"
     })
-    @NonNull
-    List<Product> findAll();
+    @Query("select p from Product p")
+    List<Product> findAllProductsDetails();
 
-    @Override
     @EntityGraph(attributePaths = {
             "category",
             "images",
+            "images.attachment",
             "discounts.discount",
             "bonuses.bonus.condition"
     })
-
-    @NonNull
-    Optional<Product> findById(@NonNull UUID id);
+    Optional<Product> findProductDetailsById(@Param("id") UUID id);
 }

@@ -14,6 +14,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -28,7 +29,7 @@ public class BonusService {
     public List<Bonus> getAvailableOrderBonuses(User user, Order order) {
         List<Bonus> appliableBonuses = new ArrayList<>();
 
-        for (Bonus bonus : repository.findAllActiveAndValid()) {
+        for (Bonus bonus : repository.findAllActiveBonusesDetails(LocalDate.now())) {
             if (isBonusApplicable(bonus, user, order)) {
                 appliableBonuses.add(bonus);
             }
@@ -76,13 +77,15 @@ public class BonusService {
 
     @Cacheable(value = "bonusById", key = "#p0")
     public BonusResponseDto findById(UUID id) {
-        return repository.findById(id).map(mapper::toResponseDto)
+        LocalDate now = LocalDate.now();
+        return repository.findBonusDetails(id, now).map(mapper::toResponseDto)
                 .orElseThrow(() -> new EntityNotFoundException("Bonus", id.toString()));
     }
 
     @Cacheable(value = "bonuses")
     public List<BonusResponseDto> findAll() {
-        return repository.findAll().stream().map(mapper::toResponseDto).toList();
+        LocalDate now = LocalDate.now();
+        return repository.findAllActiveBonusesDetails(now).stream().map(mapper::toResponseDto).toList();
     }
 
 }

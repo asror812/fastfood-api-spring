@@ -12,22 +12,12 @@ import com.example.app_fast_food.user.entity.CustomerProfile;
 
 @Repository
 public interface CustomerProfileRepository extends JpaRepository<CustomerProfile, UUID> {
-
     @Query("""
                 SELECT DISTINCT cp
                 FROM CustomerProfile cp
                 JOIN cp.user u
                 LEFT JOIN FETCH cp.favouriteProducts
-                WHERE u.phoneNumber = :phone
-            """)
-    Optional<CustomerProfile> findByPhone(@Param("phone") String phone);
-
-    @Query("""
-                SELECT DISTINCT cp
-                FROM CustomerProfile cp
-                JOIN cp.user u
-                LEFT JOIN FETCH cp.favouriteProducts
-                WHERE u.phoneNumber = :phone
+                WHERE u.id = :id
             """)
     @NonNull
     Optional<CustomerProfile> findById(@NonNull @Param("id") UUID id);

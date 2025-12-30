@@ -17,14 +17,13 @@ public class Attachment {
     @Id
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "original_name")
     private String originalName;
 
-    // actual saved filename (e.g. 1f9d...-img.png)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "stored_name")
     private String storedName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "content_type")
     private String contentType;
 
     @Column(nullable = false)

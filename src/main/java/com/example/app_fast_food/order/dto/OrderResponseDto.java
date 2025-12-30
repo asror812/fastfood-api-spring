@@ -34,8 +34,8 @@ public class OrderResponseDto implements Serializable {
 
     public static OrderResponseDto empty() {
         OrderResponseDto dto = new OrderResponseDto();
+        
         dto.setStatus(OrderStatus.BASKET);
-
         dto.setOrderItems(List.of());
         dto.setTotalPrice(BigDecimal.ZERO);
         dto.setFinalPrice(BigDecimal.ZERO);

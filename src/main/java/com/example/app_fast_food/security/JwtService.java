@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.example.app_fast_food.user.entity.User;
-import com.example.app_fast_food.user.permission.entity.Permission;
+import com.example.app_fast_food.user.permission.Permission;
 import com.example.app_fast_food.user.role.Role;
 
 import javax.crypto.SecretKey;

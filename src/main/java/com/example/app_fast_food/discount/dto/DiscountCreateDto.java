@@ -12,7 +12,8 @@ public class DiscountCreateDto {
     @NotBlank
     private String name;
 
-    @Min(1)
+    @Min(0)
+    @Max(100)
     private int percentage;
 
     @NotNull
@@ -24,5 +25,5 @@ public class DiscountCreateDto {
     @Min(1)
     private int requiredQuantity;
 
-    private boolean isActive;
+    private boolean active;
 }

@@ -1,7 +1,5 @@
 package com.example.app_fast_food.user.permission;
 
-import com.example.app_fast_food.user.permission.entity.Permission;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

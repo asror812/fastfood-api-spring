@@ -21,5 +21,5 @@ public class DiscountUpdateDto {
 
     private int requiredQuantity;
 
-    private boolean isActive;
+    private boolean active;
 }

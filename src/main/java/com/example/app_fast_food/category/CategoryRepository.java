@@ -13,6 +13,6 @@ import java.util.UUID;
 public interface CategoryRepository extends JpaRepository<Category, UUID> {
     Optional<Category> findByName(String name);
 
-    @Query("SELECT c FROM Category c WHERE c.parent IS NULL")
+    @Query("select c from Category c where c.parent is null")
     List<Category> getParentCategories();
 }

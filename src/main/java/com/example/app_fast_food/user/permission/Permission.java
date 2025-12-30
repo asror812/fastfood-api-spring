@@ -1,4 +1,4 @@
-package com.example.app_fast_food.user.permission.entity;
+package com.example.app_fast_food.user.permission;
 
 import com.example.app_fast_food.user.role.Role;
 import jakarta.persistence.*;

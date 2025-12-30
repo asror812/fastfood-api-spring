@@ -1,7 +1,7 @@
 package com.example.app_fast_food.user.role;
 
 import com.example.app_fast_food.user.entity.User;
-import com.example.app_fast_food.user.permission.entity.Permission;
+import com.example.app_fast_food.user.permission.Permission;
 
 import jakarta.persistence.*;
 import lombok.*;

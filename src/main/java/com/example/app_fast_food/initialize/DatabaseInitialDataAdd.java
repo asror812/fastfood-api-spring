@@ -28,6 +28,7 @@ import com.example.app_fast_food.category.CategoryRepository;
 import com.example.app_fast_food.category.entity.Category;
 import com.example.app_fast_food.discount.DiscountRepository;
 import com.example.app_fast_food.discount.entity.Discount;
+import com.example.app_fast_food.discount.entity.DiscountType;
 import com.example.app_fast_food.exception.InvalidImageTypeException;
 import com.example.app_fast_food.order.OrderRepository;
 import com.example.app_fast_food.order.entity.Order;
@@ -43,8 +44,8 @@ import com.example.app_fast_food.user.UserRepository;
 import com.example.app_fast_food.user.entity.AdminProfile;
 import com.example.app_fast_food.user.entity.CustomerProfile;
 import com.example.app_fast_food.user.entity.User;
+import com.example.app_fast_food.user.permission.Permission;
 import com.example.app_fast_food.user.permission.PermissionRepository;
-import com.example.app_fast_food.user.permission.entity.Permission;
 import com.example.app_fast_food.user.role.Role;
 import com.example.app_fast_food.user.role.RoleRepository;
 
@@ -117,15 +118,23 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 Product classicBeefBurger = productRepository.findByName(CLASSIC_BEEF_BURGER_NAME)
                                 .orElseThrow(() -> new RuntimeException("Classic Beef Burger product not found"));
 
-                Product pepperoniLarge = productRepository.findByName("Pepperoni Large")
-                                .orElseThrow(() -> new RuntimeException("Pepperoni Large product not found"));
-
                 Order order = new Order(OrderStatus.TAKEN, PaymentType.CASH, adminUser);
-                OrderItem orderItem1 = new OrderItem(null, 4, beefLavashWithCheese, order);
-                OrderItem orderItem2 = new OrderItem(null, 1, classicBeefBurger, order);
-                OrderItem orderItem3 = new OrderItem(null, 10, pepperoniLarge, order);
 
-                order.getOrderItems().addAll(List.of(orderItem1, orderItem2, orderItem3));
+                BigDecimal totalPrice1 = beefLavashWithCheese.getPrice().multiply(BigDecimal.valueOf(4));
+                OrderItem orderItem1 = new OrderItem(beefLavashWithCheese.getPrice(), 4, totalPrice1, BigDecimal.ZERO,
+                                totalPrice1, beefLavashWithCheese, order);
+
+                BigDecimal totalPrice2 = classicBeefBurger.getPrice().multiply(BigDecimal.valueOf(1));
+                OrderItem orderItem2 = new OrderItem(classicBeefBurger.getPrice(), 1, totalPrice2, BigDecimal.ZERO,
+                                totalPrice2, classicBeefBurger, order);
+
+                order.getOrderItems().addAll(List.of(orderItem1, orderItem2));
+
+                order.setAppliedBonus(false);
+                
+                order.setDiscountAmount(BigDecimal.ZERO);
+                order.setTotalPrice(totalPrice1.add(totalPrice2));
+                order.setFinalPrice(order.getTotalPrice());
 
                 orderRepository.save(order);
         }
@@ -134,7 +143,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
         private void createBonuses() {
                 if (bonusRepository.count() > 0)
                         return;
-                
 
                 BonusCondition holidayCondition = new BonusCondition(null, ConditionType.HOLIDAY_BONUS, "1");
                 BonusCondition birthdayCondition = new BonusCondition(null, ConditionType.USER_BIRTHDAY, "1");
@@ -159,7 +167,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 Product chocolateIceCream = mustFindProduct("Chocolate Ice Cream Cup");
 
                 Bonus birthdayBonus = new Bonus(
-                                null,
                                 "Birthday Bonus",
                                 birthdayCondition,
                                 1,
@@ -168,7 +175,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 true);
 
                 Bonus navruzHolidayBonus = new Bonus(
-                                null,
                                 "Navruz Holiday Bonus",
                                 holidayCondition,
                                 1,
@@ -177,7 +183,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 true);
 
                 Bonus quantityBonus = new Bonus(
-                                null,
                                 "Buy 2 Get Bonus",
                                 quantityCondition,
                                 1,
@@ -186,7 +191,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 true);
 
                 Bonus firstPurchaseBonus = new Bonus(
-                                null,
                                 "First Purchase Bonus",
                                 firstPurchaseCondition,
                                 1,
@@ -195,7 +199,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 true);
 
                 Bonus totalPriceBonus = new Bonus(
-                                null,
                                 "150k Order Bonus",
                                 totalPriceCondition,
                                 1,
@@ -261,7 +264,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 if (categoryRepository.count() > 0 || productRepository.count() > 0) {
                         return;
                 }
-
                 // ================= CATEGORIES =================
                 Category burgers = new Category("Burgers & Sandwiches", null);
                 Category lavash = new Category("Rolls & Lavash", null);
@@ -285,15 +287,13 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 pepperoniPizza, coldDrinks, iceCream, donuts));
 
                 // ================= DISCOUNTS =================
-                Discount extra = discountRepository.findByNameWithProducts("Extra")
+                Discount extra1 = discountRepository.findByNameWithProducts("Extra-1")
                                 .orElseThrow(() -> new RuntimeException("Discount Extra not found"));
+
                 Discount extra2 = discountRepository.findByNameWithProducts("Extra-2")
                                 .orElseThrow(() -> new RuntimeException("Discount Extra-2 not found"));
-                Discount navruz = discountRepository.findByNameWithProducts("Navruz")
-                                .orElseThrow(() -> new RuntimeException("Discount Navruz not found"));
 
                 // ================= PRODUCTS =================
-
                 Product classicBeefBurger = new Product(null, CLASSIC_BEEF_BURGER_NAME,
                                 new BigDecimal(23000), beefBurger, 280);
                 addProductImage(classicBeefBurger, "burger_1", "jpg", 1);
@@ -355,12 +355,11 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
                 // ================= PRODUCT DISCOUNTS =================
                 productDiscountReposity.saveAll(List.of(
-                                new ProductDiscount(null, cocaCola, navruz),
-                                new ProductDiscount(null, sprite, navruz),
-                                new ProductDiscount(null, pepperoniLarge, extra),
-                                new ProductDiscount(null, pepperoniMedium, extra),
-                                new ProductDiscount(null, vanillaIceCream, extra2),
-                                new ProductDiscount(null, chocolateIceCream, extra2)));
+                                new ProductDiscount(pepperoniLarge, extra1),
+                                new ProductDiscount(pepperoniLarge, extra2),
+                                new ProductDiscount(chocolateIceCream, extra1),
+                                new ProductDiscount(vanillaIceCream, extra1),
+                                new ProductDiscount(classicBeefBurger, extra2)));
         }
 
         private void addProductImage(Product product, String baseName, String type, int position) {
@@ -373,35 +372,37 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
         @Transactional
         private void createDiscounts() {
-                if (discountRepository.count() > 0) {
+                if (discountRepository.count() > 0)
                         return;
-                }
 
                 Discount discount1 = new Discount(
-                                null,
                                 "Navruz",
-                                10,
+                                DiscountType.HOLIDAY,
+                                5,
+                                null,
+                                null,
                                 LocalDate.now(),
                                 LocalDate.now().plusDays(10),
-                                0,
                                 true);
 
                 Discount discount2 = new Discount(
+                                "Extra-1",
+                                DiscountType.PRODUCT_QUANTITY,
+                                10,
+                                3,
                                 null,
-                                "Extra",
-                                15,
                                 LocalDate.now(),
                                 LocalDate.now().plusDays(10),
-                                3,
                                 true);
 
                 Discount discount3 = new Discount(
-                                null,
                                 "Extra-2",
-                                5,
+                                DiscountType.PRODUCT_QUANTITY,
+                                15,
+                                2,
+                                null,
                                 LocalDate.now(),
                                 LocalDate.now().plusDays(5),
-                                2,
                                 true);
 
                 List<Discount> discounts = new ArrayList<>(List.of(discount1, discount2, discount3));

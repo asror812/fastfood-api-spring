@@ -39,9 +39,9 @@ public class AttachmentController {
         attachmentService.loadImageFromImageFolder(id, response);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteProductImage(@PathVariable("id") UUID id) {
-        attachmentService.deleteProductImage(id);
+    @DeleteMapping("/product-images/{id}")
+    public void delete(@PathVariable("id") UUID id) {
+        attachmentService.delete(id);
     }
 
 }

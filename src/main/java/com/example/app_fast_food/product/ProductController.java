@@ -2,6 +2,7 @@ package com.example.app_fast_food.product;
 
 import com.example.app_fast_food.attachment.AttachmentService;
 import com.example.app_fast_food.attachment.dto.AttachmentResponseDto;
+import com.example.app_fast_food.product.dto.ProductListResponseDto;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class ProductController {
     private final AttachmentService attachmentService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAll() {
+    public ResponseEntity<List<ProductListResponseDto>> getAll() {
         return ResponseEntity.ok(productService.getAll());
     }
 
@@ -38,7 +39,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getById(@PathVariable("id") UUID id) {
-        return ResponseEntity.ok(productService.getSpecificProduct(id));
+        return ResponseEntity.ok(productService.getById(id));
     }
 
     @PostMapping(value = "/{id}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

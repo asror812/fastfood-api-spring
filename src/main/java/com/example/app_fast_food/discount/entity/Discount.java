@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,17 @@ public class Discount {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    private DiscountType type;
+
+    @Column(name = "percentage")
     private int percentage;
+
+    @Column(name = "required_quantity")
+    private Integer requiredQuantity;
+
+    @Column(name = "required_amount")
+    private BigDecimal requiredAmount;
 
     @Column(nullable = false, name = "start_date")
     private LocalDate startDate;
@@ -34,24 +45,22 @@ public class Discount {
     @Column(nullable = false, name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "required_quantity")
-    private int requiredQuantity;
-
     @Column(name = "is_active")
-    private boolean isActive;
+    private boolean active;
 
     @OneToMany(mappedBy = "discount")
     private List<ProductDiscount> products = new ArrayList<>();
 
-    public Discount(UUID id, String name, int percentage, LocalDate startDate, LocalDate endDate,
-            int requiredQuantity, boolean isActive) {
-        this.id = id;
+    public Discount(String name, DiscountType type, int precentage, Integer requiredQuantity, BigDecimal requiredAmount,
+            LocalDate startDate, LocalDate endDate, boolean active) {
         this.name = name;
-        this.percentage = percentage;
+        this.type = type;
+        this.percentage = precentage;
+        this.requiredQuantity = requiredQuantity;
+        this.requiredAmount = requiredAmount;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.requiredQuantity = requiredQuantity;
-        this.isActive = isActive;
+        this.active = active;
     }
 
 }

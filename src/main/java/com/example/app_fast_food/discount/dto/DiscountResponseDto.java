@@ -12,7 +12,7 @@ import com.example.app_fast_food.product.dto.ProductDto;
 
 @Setter
 @Getter
-public class DiscountResponseDto implements Serializable{
+public class DiscountResponseDto implements Serializable {
     private UUID id;
 
     private String name;
@@ -27,5 +27,5 @@ public class DiscountResponseDto implements Serializable{
 
     private List<ProductDto> products;
 
-    private boolean isActive;
+    private boolean active;
 }

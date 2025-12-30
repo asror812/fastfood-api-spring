@@ -10,8 +10,6 @@ public interface ProductDiscountMapper {
 
     @Mapping(target = "name", source = "discount.name")
     @Mapping(target = "percentage", source = "discount.percentage")
-    @Mapping(target = "startDate", source = "discount.startDate")
-    @Mapping(target = "endDate", source = "discount.endDate")
     @Mapping(target = "requiredQuantity", source = "discount.requiredQuantity")
     ProductDiscountResponseDto toResponseDTO(ProductDiscount product);
 }

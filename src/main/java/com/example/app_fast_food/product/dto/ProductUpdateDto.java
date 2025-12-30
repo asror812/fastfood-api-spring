@@ -1,7 +1,7 @@
 package com.example.app_fast_food.product.dto;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,5 +15,5 @@ public class ProductUpdateDto {
     private UUID categoryId;
     private Integer weight;
 
-    private List<ProductImageDto> images;
+    private Set<ProductImageDto> images;
 }

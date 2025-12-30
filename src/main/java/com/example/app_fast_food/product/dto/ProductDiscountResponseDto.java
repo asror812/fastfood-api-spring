@@ -1,7 +1,6 @@
 package com.example.app_fast_food.product.dto;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -13,12 +12,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDiscountResponseDto implements Serializable{
+public class ProductDiscountResponseDto implements Serializable {
     private UUID id;
     private String name;
     private int percentage;
 
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private int requiredQuantity;
+    private Integer requiredQuantity;
 }

@@ -47,17 +47,16 @@ public class Bonus {
     private LocalDate endDate;
 
     @Column(name = "is_active")
-    private boolean isActive = true;
+    private boolean active = true;
 
-    public Bonus(UUID id, String name, BonusCondition condition, int usageLimit, LocalDate startDate, LocalDate endDate,
-            boolean isActive) {
-        this.id = id;
+    public Bonus(String name, BonusCondition condition, int usageLimit, LocalDate startDate,
+            LocalDate endDate, boolean active) {
         this.name = name;
         this.condition = condition;
         this.usageLimit = usageLimit;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.isActive = isActive;
+        this.active = active;
     }
-    
+
 }

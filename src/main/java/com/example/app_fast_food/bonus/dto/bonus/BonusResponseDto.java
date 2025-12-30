@@ -25,8 +25,6 @@ public class BonusResponseDto implements Serializable {
 
     protected LocalDate endDate;
 
-    protected boolean isActive;
-
     protected int usageLimit;
 
     private BonusConditionResponseDto condition;

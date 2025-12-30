@@ -43,7 +43,7 @@ public class AuthService implements UserDetailsService {
 
         isPhoneNumberVerified(phoneNumber);
 
-        if (repository.findByPhoneNumber(phoneNumber).isPresent()) {
+        if (repository.existsByPhoneNumber(phoneNumber)) {
             throw new AlreadyExistsException("User", "phone number", phoneNumber);
         }
 

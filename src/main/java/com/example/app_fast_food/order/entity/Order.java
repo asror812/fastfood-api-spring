@@ -29,7 +29,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderItem> orderItems = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
@@ -39,7 +39,7 @@ public class Order {
     @Column(name = "payment_type")
     private PaymentType paymentType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -47,15 +47,17 @@ public class Order {
     @JoinTable(name = "order_discounts", joinColumns = @JoinColumn(name = "order_id"), inverseJoinColumns = @JoinColumn(name = "discount_id"))
     private List<Discount> discounts = new ArrayList<>();
 
-    @ManyToOne()
-    @JoinColumn(name = "applied_bonus")
-    private Bonus appliedBonus;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "selected_bonus")
+    private Bonus selectedBonus;
+
+    private boolean appliedBonus = true;
 
     private LocalDateTime createdAt;
 
-    private BigDecimal totalPrice = BigDecimal.ZERO;
-    private BigDecimal discountAmount = BigDecimal.ZERO;
-    private BigDecimal finalPrice = BigDecimal.ZERO;
+    private BigDecimal totalPrice;
+    private BigDecimal discountAmount;
+    private BigDecimal finalPrice;
 
     public Order(OrderStatus status,
             PaymentType paymentType, User user) {

@@ -73,7 +73,7 @@ public class OrderController {
     @DeleteMapping("/basket/items/{productId}")
     public ResponseEntity<Void> removeItem(
             @AuthenticationPrincipal AuthDto auth,
-            @PathVariable UUID productId) {
+            @PathVariable("productId") UUID productId) {
 
         orderService.removeProduct(auth, productId);
         return ResponseEntity.noContent().build();
@@ -81,7 +81,7 @@ public class OrderController {
 
     @DeleteMapping("/basket")
     public ResponseEntity<Void> deleteBasket(@AuthenticationPrincipal AuthDto auth) {
-        orderService.deleteBasket(auth);
+        orderService.emptyBasket(auth);
         return ResponseEntity.noContent().build();
     }
 

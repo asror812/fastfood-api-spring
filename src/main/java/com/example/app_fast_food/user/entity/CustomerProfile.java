@@ -9,7 +9,9 @@ import java.util.UUID;
 import com.example.app_fast_food.bonus.entity.UserBonus;
 import com.example.app_fast_food.product.entity.Product;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -32,15 +34,15 @@ public class CustomerProfile {
     @Id
     private UUID id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "customerProfile")
+    @OneToMany(mappedBy = "customerProfile", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserBonus> userBonuses = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "customer_profile_favourites", joinColumns = @JoinColumn(name = "customer_profile_id"), inverseJoinColumns = @JoinColumn(name = "product_id"), uniqueConstraints = @UniqueConstraint(columnNames = {
             "customer_profile_id", "product_id" }))
     private Set<Product> favouriteProducts = new HashSet<>();

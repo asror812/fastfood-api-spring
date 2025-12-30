@@ -11,15 +11,12 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class ProductResponseDto implements Serializable {
+public class ProductListResponseDto implements Serializable {
     private UUID id;
     private String name;
     private BigDecimal price;
     private CategoryResponseDto category;
-
     private int weight;
 
-    private Set<ProductDiscountResponseDto> discounts = new HashSet<>();
-    private Set<ProductBonusDto> bonuses = new HashSet<>();
     private Set<ProductImageResponseDto> images = new HashSet<>();
 }

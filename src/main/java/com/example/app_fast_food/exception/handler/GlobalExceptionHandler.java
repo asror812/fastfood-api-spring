@@ -169,11 +169,13 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = new ErrorResponse();
         response.setCode("INVALID_REQUEST");
+        response.setMessage("Validation failed");
 
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
                 .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
-        response.setMessage(errors.toString());
+
+        response.setErrors(errors);
 
         return ResponseEntity.badRequest().body(response);
     }
