@@ -45,9 +45,6 @@ public class OrderItem {
     @Column(name = "is_bonus")
     private boolean bonus;
 
-    @Column(name = "bonus_id")
-    private UUID selectedBonusId;
-
     public OrderItem(BigDecimal unitPrice, int quantity, BigDecimal totalPrice, BigDecimal discountAmount,
             BigDecimal finalPrice, Product product, Order order) {
         this.unitPrice = unitPrice;

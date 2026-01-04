@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -20,16 +21,19 @@ public class AttachmentController {
     private final AttachmentService attachmentService;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
     public AttachmentResponseDto upload(@RequestPart("file") MultipartFile file) {
         return attachmentService.uploadImage(file);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AttachmentResponseDto>> getAll() {
         return ResponseEntity.ok(attachmentService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AttachmentResponseDto> getById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(attachmentService.findById(id));
     }
@@ -40,6 +44,7 @@ public class AttachmentController {
     }
 
     @DeleteMapping("/product-images/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable("id") UUID id) {
         attachmentService.delete(id);
     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,11 +22,14 @@ public class DiscountController {
     private final DiscountService discountService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<List<DiscountResponseDto>> getAll() {
         return ResponseEntity.ok(discountService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DiscountResponseDto> getById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(discountService.findById(id));
     }

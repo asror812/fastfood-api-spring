@@ -57,7 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class DatabaseInitialDataAdd implements CommandLineRunner {
+public class DatabaseInitializer implements CommandLineRunner {
 
         @Value("${api.images.base.download-url}")
         private String baseDownloadUrl;
@@ -131,7 +131,7 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 order.getOrderItems().addAll(List.of(orderItem1, orderItem2));
 
                 order.setAppliedBonus(false);
-                
+
                 order.setDiscountAmount(BigDecimal.ZERO);
                 order.setTotalPrice(totalPrice1.add(totalPrice2));
                 order.setFinalPrice(order.getTotalPrice());
@@ -239,8 +239,8 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                 link(totalPriceBonus, pepperoniLarge, 1),
                                 link(totalPriceBonus, beefLavashWithCheese, 1));
 
-                bonusRepository.saveAll(List.of(
-                                birthdayBonus, navruzHolidayBonus, quantityBonus, firstPurchaseBonus, totalPriceBonus));
+                bonusRepository.saveAll(List.of(birthdayBonus, navruzHolidayBonus, quantityBonus, firstPurchaseBonus,
+                                totalPriceBonus));
         }
 
         private Product mustFindProduct(String name) {
@@ -281,10 +281,11 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                 Category iceCream = new Category("Ice Cream", desserts);
                 Category donuts = new Category("Donuts", desserts);
 
-                categoryRepository.saveAll(List.of(
-                                burgers, lavash, doner, pizza, drinks, desserts,
-                                beefBurger, beefLavash, cheeseLavash, beefDoner,
-                                pepperoniPizza, coldDrinks, iceCream, donuts));
+                categoryRepository.saveAll(
+                                List.of(
+                                                burgers, lavash, doner, pizza, drinks, desserts,
+                                                beefBurger, beefLavash, cheeseLavash, beefDoner,
+                                                pepperoniPizza, coldDrinks, iceCream, donuts));
 
                 // ================= DISCOUNTS =================
                 Discount extra1 = discountRepository.findByNameWithProducts("Extra-1")
@@ -416,6 +417,10 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                                         .orElseThrow(() -> new com.example.app_fast_food.exception.EntityNotFoundException(
                                                         "Role", ADMIN));
 
+                        Role customerRole = roleRepository.findByName(CUSTOMER)
+                                        .orElseThrow(() -> new com.example.app_fast_food.exception.EntityNotFoundException(
+                                                        "Role", CUSTOMER));
+
                         adminUser = new User(
                                         adminPhoneNumber,
                                         adminName,
@@ -425,10 +430,6 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
                         AdminProfile adminProfile = new AdminProfile();
                         adminProfile.setUser(adminUser);
 
-                        Role customerRole = roleRepository.findByName(CUSTOMER)
-                                        .orElseThrow(() -> new com.example.app_fast_food.exception.EntityNotFoundException(
-                                                        "Role", CUSTOMER));
-
                         CustomerProfile customerProfile = new CustomerProfile();
                         customerProfile.setUser(adminUser);
 
@@ -437,7 +438,17 @@ public class DatabaseInitialDataAdd implements CommandLineRunner {
 
                         adminUser.setRoles(Set.of(adminRole, customerRole));
 
-                        userRepository.save(adminUser);
+                        // TEST USER
+                        User user = new User("+97 675-08-12", "r1", passwordEncoder.encode("12345"),
+                                        LocalDate.of(2024, 12, 8));
+
+                        CustomerProfile customerProfile2 = new CustomerProfile();
+                        customerProfile2.setUser(user);
+
+                        user.setCustomerProfile(customerProfile2);
+                        user.setRoles(Set.of(customerRole));
+
+                        userRepository.saveAll(List.of(adminUser, user));
                 }
         }
 
