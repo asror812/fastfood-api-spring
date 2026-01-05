@@ -36,7 +36,7 @@ It uses:
 - Remove product from favorites
 - View user favorites
 
-## 🧺 Shopping Cart (planned or optional)
+## 🧺 Shopping Cart
 
 - Add items
 - Remove items
