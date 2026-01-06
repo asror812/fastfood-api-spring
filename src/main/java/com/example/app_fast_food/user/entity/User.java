@@ -25,7 +25,7 @@ public class User implements UserDetails {
     private UUID id;
 
     @Column(unique = true, name = "phone_number", nullable = false)
-    @Pattern(regexp = "^\\+\\d{2} \\d{3}-\\d{2}-\\d{2}$")
+    @Pattern(regexp = "^\\+\\d{9}$")
     private String phoneNumber;
 
     @Column(nullable = false)

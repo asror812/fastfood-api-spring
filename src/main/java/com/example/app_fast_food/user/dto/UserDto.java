@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+
 @Getter
 @Setter
 public class UserDto {
@@ -14,7 +15,7 @@ public class UserDto {
     protected String name;
 
     @NotBlank
-    @Pattern(regexp = "^\\+\\d{2} \\d{3}-\\d{2}-\\d{2}$")
+    @Pattern(regexp = "^\\+\\d{9}$")
     protected String phoneNumber;
 
     @NotNull

@@ -1,5 +1,6 @@
 package com.example.app_fast_food.order.dto;
 
+import com.example.app_fast_food.bonus.entity.Bonus;
 import com.example.app_fast_food.order.entity.OrderStatus;
 import com.example.app_fast_food.order.entity.PaymentType;
 
@@ -12,4 +13,8 @@ public class OrderUpdateDto {
     private OrderStatus status;
 
     private PaymentType paymentType;
+
+    private Bonus selectedBonus;
+
+    private boolean appliedBonus = true;
 }

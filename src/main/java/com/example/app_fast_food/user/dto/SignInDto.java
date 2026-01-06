@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class SignInDto {
     @NotBlank
-    @Pattern(regexp = "^\\+\\d{2} \\d{3}-\\d{2}-\\d{2}$")
+    @Pattern(regexp = "^\\+\\d{9}$")
     private String phoneNumber;
 
     @NotBlank

@@ -29,6 +29,7 @@ public interface OrderMapper {
     @Mapping(target = "orderItems", ignore = true)
     @Mapping(target = "appliedBonus", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "selectedBonus", ignore = true)
     Order toEntity(OrderCreateDto dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

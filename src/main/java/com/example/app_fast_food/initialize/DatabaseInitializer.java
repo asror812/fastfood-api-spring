@@ -439,7 +439,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                         adminUser.setRoles(Set.of(adminRole, customerRole));
 
                         // TEST USER
-                        User user = new User("+97 675-08-12", "r1", passwordEncoder.encode("12345"),
+                        User user = new User("+976750812", "r1", passwordEncoder.encode("12345"),
                                         LocalDate.of(2024, 12, 8));
 
                         CustomerProfile customerProfile2 = new CustomerProfile();
