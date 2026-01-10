@@ -18,5 +18,6 @@ public class ProductListResponseDto implements Serializable {
     private CategoryResponseDto category;
     private int weight;
 
+    private boolean favorite;
     private Set<ProductImageResponseDto> images = new HashSet<>();
 }

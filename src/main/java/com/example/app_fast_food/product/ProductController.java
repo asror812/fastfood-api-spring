@@ -23,25 +23,24 @@ import java.util.UUID;
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService productService;
-    private final ProductCacheService cacheService;
     private final AttachmentService attachmentService;
 
     @GetMapping
-    public ResponseEntity<List<ProductListResponseDto>> getAll() {
-        return ResponseEntity.ok(cacheService.getAll());
+    public ResponseEntity<List<ProductListResponseDto>> getAll(@AuthenticationPrincipal AuthDto auth) {
+        return ResponseEntity.ok(productService.getAll(auth));
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<List<ProductResponseDto>> getPopularProducts() {
-        return ResponseEntity.ok(cacheService.getPopularProducts());
+    public ResponseEntity<List<ProductResponseDto>> getPopularProducts(@AuthenticationPrincipal AuthDto auth) {
+        return ResponseEntity.ok(productService.getPopularProducts(auth));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> getById(@PathVariable("id") UUID id) {
-        return ResponseEntity.ok(cacheService.getById(id));
+    public ResponseEntity<ProductResponseDto> getById(@PathVariable("id") UUID id,
+            @AuthenticationPrincipal AuthDto auth) {
+        return ResponseEntity.ok(productService.getById(id));
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/campaign")
     public ResponseEntity<List<ProductResponseDto>> getCampaignProducts(@AuthenticationPrincipal AuthDto auth) {
         return ResponseEntity.ok(productService.getCampaignProducts(auth));

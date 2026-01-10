@@ -22,8 +22,7 @@ public class UserService {
     private final UserRepository repository;
 
     public UserResponseDto getMe(AuthDto auth) {
-        User userWithBonuses = repository.findById(
-                auth.getId())
+        User userWithBonuses = repository.findById(auth.getId())
                 .orElseThrow(
                         () -> new EntityNotFoundException("User", auth.getId().toString()));
 

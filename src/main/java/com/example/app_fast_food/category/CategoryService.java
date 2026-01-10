@@ -22,7 +22,7 @@ public class CategoryService {
     private final CategoryMapper mapper;
     private static final String CATEGORY_ENTITY = "Category";
 
-    @CacheEvict(value = {"categories", "parentCategories"}, allEntries = true)
+    @CacheEvict(value = { "categories", "parentCategories" }, allEntries = true)
     public CategoryResponseDto create(CategoryCreateDto createDto) {
         UUID parentId = createDto.getParentId();
         String name = createDto.getName();
@@ -52,7 +52,6 @@ public class CategoryService {
         return repository.findAll().stream().map(mapper::toResponseDto).toList();
     }
 
-    @Cacheable(value = "categoryById", key = "#p0")
     public CategoryResponseDto findById(UUID id) {
         return repository.findById(id).map(mapper::toResponseDto)
                 .orElseThrow(() -> new EntityNotFoundException(CATEGORY_ENTITY, id.toString()));

@@ -24,7 +24,7 @@ public class ErrorMessages {
     public static final String INVALID_ARGUMENT = "Invalid request params";
     public static final String ALREADY_ADDED_TO_BASKET = "Already added to basket";
     public static final String INVALID_CREDENTIALS = "Invalid phoneNumber or password";
-    public static final String ACCESS_DENIED = "You do not have permission to access this resource";
+    public static final String ACCESS_DENIED = "You do not have permission for this";
 
     private ErrorMessages() {
     }

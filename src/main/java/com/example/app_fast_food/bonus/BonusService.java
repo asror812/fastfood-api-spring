@@ -75,7 +75,6 @@ public class BonusService {
         return false;
     }
 
-    @Cacheable(value = "bonusById", key = "#p0")
     public BonusResponseDto findById(UUID id) {
         LocalDate now = LocalDate.now();
         return repository.findBonusDetails(id, now).map(mapper::toResponseDto)

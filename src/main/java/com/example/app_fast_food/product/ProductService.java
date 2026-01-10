@@ -1,7 +1,9 @@
 package com.example.app_fast_food.product;
 
+import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.favorite.FavoriteRepository;
 import com.example.app_fast_food.product.dto.ProductCreateDto;
+import com.example.app_fast_food.product.dto.ProductListResponseDto;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.product.entity.Product;
 import com.example.app_fast_food.user.dto.AuthDto;
@@ -22,7 +24,6 @@ import java.util.UUID;
 public class ProductService {
 
     private final ProductMapper mapper;
-
     private final FavoriteRepository favoriteRepository;
     private final ProductRepository repository;
 
@@ -54,13 +55,47 @@ public class ProductService {
     public List<ProductResponseDto> getCampaignProducts(AuthDto auth) {
         LocalDate now = LocalDate.now();
 
-        List<ProductResponseDto> base = cacheService.getCampaignProductsBase(now);
+        List<ProductResponseDto> all = cacheService.getCampaignProductsBase(now);
 
-        var favSet = favoriteRepository.findAllProductIdsByUserId(auth.getId());
+        Set<UUID> favoriteIds = favoriteRepository.findAllProductIdsByUserId(auth.getId());
 
-        return base.stream()
-                .map(p -> copyWithFavorite(p, favSet.contains(p.getId())))
+        return all.stream()
+                .map(p -> copyWithFavorite(p, favoriteIds.contains(p.getId())))
                 .toList();
+    }
+
+    public List<ProductListResponseDto> getAll(AuthDto auth) {
+        List<ProductListResponseDto> all = cacheService.getAll();
+
+        Set<UUID> favoriteIds = favoriteIdsOrEmpty(auth);
+
+        if (auth == null)
+            return all;
+
+        return all.stream()
+                .map(p -> copyListWithFavorite(p, favoriteIds.contains(p.getId())))
+                .toList();
+    }
+
+    private Set<UUID> favoriteIdsOrEmpty(AuthDto auth) {
+        return (auth == null)
+                ? Set.of()
+                : favoriteRepository.findAllProductIdsByUserId(auth.getId());
+    }
+
+    public List<ProductResponseDto> getPopularProducts(AuthDto auth) {
+        List<ProductResponseDto> all = cacheService.getPopularProducts();
+
+        Set<UUID> favoriteIds = favoriteIdsOrEmpty(auth);
+
+        return all.stream().map(p -> copyWithFavorite(p, favoriteIds.contains(p.getId()))).toList();
+    }
+
+    public ProductResponseDto getById(UUID id) {
+        Product product = repository.findProductDetailsById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product", id.toString()));
+
+        return mapper.toResponseDTO(product);
     }
 
     private ProductResponseDto copyWithFavorite(ProductResponseDto p, boolean favorite) {
@@ -73,6 +108,19 @@ public class ProductService {
         c.setImages(p.getImages());
         c.setBonuses(p.getBonuses());
         c.setDiscounts(p.getDiscounts());
+        c.setFavorite(favorite);
+
+        return c;
+    }
+
+    private ProductListResponseDto copyListWithFavorite(ProductListResponseDto p, boolean favorite) {
+        ProductListResponseDto c = new ProductListResponseDto();
+        c.setId(p.getId());
+        c.setName(p.getName());
+        c.setPrice(p.getPrice());
+        c.setCategory(p.getCategory());
+        c.setWeight(p.getWeight());
+        c.setImages(p.getImages());
         c.setFavorite(favorite);
 
         return c;

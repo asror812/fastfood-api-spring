@@ -26,7 +26,6 @@ public class DiscountService {
         return repository.findAllActiveDiscountsDetails(LocalDate.now()).stream().map(mapper::toResponseDTO).toList();
     }
 
-    @Cacheable(value = "discountById", key = "#p0")
     public DiscountResponseDto findById(UUID id) {
         LocalDate now = LocalDate.now();
         return repository.findDiscountDetails(id, now).map(mapper::toResponseDTO)

@@ -26,6 +26,7 @@ import com.example.app_fast_food.user.dto.AuthDto;
 import com.example.app_fast_food.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,7 @@ public class OrderService {
 
     private static final String USER_BASKET_NOT_FOUND = "Basket with user id `%s` not found";
 
+    @Cacheable(CacheNames.ORDERS)
     public List<OrderResponseDto> getAll() {
         return repository.findAll().stream().map(mapper::toResponseDto).toList();
 
@@ -64,7 +66,8 @@ public class OrderService {
         return mapper.toResponseDto(order);
     }
 
-    public List<OrderResponseDto> getOrderByStatus(String status) {
+    @Cacheable(value = CacheNames.ORDERS_BY_STATUS, key = "#p0")
+    public List<OrderResponseDto> getOrdersByStatus(String status) {
         try {
             OrderStatus orderStatus = OrderStatus.valueOf(status);
             List<Order> orders = repository.findByStatus(orderStatus);

@@ -27,12 +27,13 @@ public class FavoriteService {
     private final CustomerProfileRepository customerProfileRepository;
     private final ProductRepository productRepository;
     private final FavoriteRepository repository;
+
     private static final String PRODUCT_ENTITY = "Product";
     private static final String CUSTOMER_ENTITY = "Customer";
 
     private final ProductMapper mapper;
 
-    @Cacheable(value = "favoriteProducts", key = "#p0.id")
+    @Cacheable(value = CacheNames.FAVORITE_PRODUCTS, key = "#p0.id")
     public List<ProductResponseDto> getFavorites(AuthDto auth) {
         List<Favorite> favorites = repository.findAllByUserId(auth.getId());
 
@@ -43,7 +44,7 @@ public class FavoriteService {
                 }).toList();
     }
 
-    @CacheEvict(value = "favoriteProducts", key = "#p0.id")
+    @CacheEvict(value = CacheNames.FAVORITE_PRODUCTS, key = "#p0.id")
     @Transactional
     public ApiMessageResponse add(AuthDto auth, UUID productId) {
         if (repository.existsByCustomerIdAndProductId(auth.getId(), productId)) {
@@ -61,7 +62,7 @@ public class FavoriteService {
         return new ApiMessageResponse("Product added to favorites");
     }
 
-    @CacheEvict(value = "favoriteProducts", key = "#p0.id")
+    @CacheEvict(value = CacheNames.FAVORITE_PRODUCTS, key = "#p0.id")
     @Transactional
     public ApiMessageResponse remove(AuthDto auth, UUID productId) {
         repository.deleteByCustomerIdAndProductId(auth.getId(), productId);

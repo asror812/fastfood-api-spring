@@ -2,6 +2,7 @@ package com.example.app_fast_food.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -11,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.example.app_fast_food.utils.CustomAccessDeniedHandler;
+import com.example.app_fast_food.utils.CustomAuthenticationEntryPoint;
 import com.example.app_fast_food.utils.TransactionLoggerFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -24,18 +27,37 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(
                         HttpSecurity httpSecurity,
                         JwtAuthorizationFilter jwtAuthorizationFilter,
-                        TransactionLoggerFilter transactionLoggerFilter) throws Exception {
+                        TransactionLoggerFilter transactionLoggerFilter,
+                        CustomAccessDeniedHandler accessDeniedHandler,
+                        CustomAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
                 return httpSecurity
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .cors(AbstractHttpConfigurer::disable)
+                                .authorizeHttpRequests(registry -> registry
+                                                .requestMatchers(
+                                                                "/auth/**",
+                                                                "/swagger-ui/**",
+                                                                "/v3/**")
+                                                .permitAll()
+
+                                                .requestMatchers(HttpMethod.GET, "/products", "/products/popular",
+                                                                "/products/*")
+                                                .permitAll()
+
+                                                .requestMatchers(HttpMethod.GET, "/attachments/download/*")
+                                                .permitAll()
+
+                                                .requestMatchers(HttpMethod.GET, "/categories/parent",
+                                                                "/categories/menu/*")
+                                                .permitAll()
+
+                                                .anyRequest().authenticated())
+                                .exceptionHandling(ex -> ex
+                                                .authenticationEntryPoint(authenticationEntryPoint)
+                                                .accessDeniedHandler(accessDeniedHandler))
+
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                .authorizeHttpRequests(registry -> registry.requestMatchers(
-                                                "/auth/**",
-                                                "/swagger-ui/**",
-                                                "/v3/**")
-                                                .permitAll()
-                                                .anyRequest().authenticated())
                                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                                 .addFilterBefore(transactionLoggerFilter, JwtAuthorizationFilter.class)
                                 .build();

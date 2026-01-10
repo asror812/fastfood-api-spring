@@ -42,7 +42,7 @@ public class OtpService {
             if (existingOtp.isPresent()) {
                 return reTry(existingOtp.get());
             }
-            
+
             Otp otp = sendSmsInternal(phoneNumber);
             otpRepository.save(otp);
             return new ApiMessageResponse("Sms was sent successfully");

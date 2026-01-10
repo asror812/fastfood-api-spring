@@ -42,21 +42,25 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             "/swagger-ui");
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return EXCLUDED_URLS.stream().anyMatch(path::startsWith);
+    }
+
+    @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-
-        if (EXCLUDED_URLS.stream().anyMatch(path::startsWith)) {
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || authHeader.isBlank()) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -96,8 +100,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
-            filterChain.doFilter(request, response);
 
+            filterChain.doFilter(request, response);
         } catch (Exception e) {
             log.error("Authentication failed: {}", e.getMessage());
             sendError(response, ErrorMessages.AUTH_FAILED, "AUTH_FAILED");

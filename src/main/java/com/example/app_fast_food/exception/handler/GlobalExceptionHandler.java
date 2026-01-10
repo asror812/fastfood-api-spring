@@ -160,6 +160,7 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 ErrorMessages.ACCESS_DENIED,
                 "ACCESS_DENIED");
+
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
