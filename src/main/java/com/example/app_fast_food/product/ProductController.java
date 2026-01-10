@@ -47,7 +47,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getCampaignProducts(auth));
     }
 
-    @PreAuthorize("hasAuthority('PRODUCT_IMAGE_UPDATE')")
+    @PreAuthorize("hasAuthority('PRODUCT_MANAGE')")
     @PostMapping(value = "/{id}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public AttachmentResponseDto updateImage(
             @PathVariable("id") UUID productId,
