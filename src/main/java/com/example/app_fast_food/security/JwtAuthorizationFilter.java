@@ -18,6 +18,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -56,7 +57,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendError(response, ErrorMessages.TOKEN_INVALID, "TOKEN_MISSING");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (!authHeader.startsWith("Bearer ")) {
+            sendError(response, ErrorMessages.TOKEN_INVALID, "TOKEN_INVALID_FORMAT");
             return;
         }
 
@@ -66,18 +72,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             UUID userId = jwtService.extractUserId(token);
             String phoneNumber = jwtService.extractPhoneNumber(token);
 
-            if (userId == null) {
+            if (userId == null || !jwtService.isTokenValid(token, userId)) {
                 sendError(response, ErrorMessages.TOKEN_INVALID, "TOKEN_INVALID");
-                return;
-            }
-
-            if (!jwtService.isTokenValid(token, userId)) {
-                sendError(response, ErrorMessages.TOKEN_INVALID, "TOKEN_INVALID");
-                return;
-            }
-
-            if (SecurityContextHolder.getContext().getAuthentication() != null) {
-                filterChain.doFilter(request, response);
                 return;
             }
 
@@ -95,17 +91,17 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             AuthDto auth = new AuthDto(userId, phoneNumber);
 
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(auth, null,
-                    authorities);
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    auth, null, authorities);
 
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
+            filterChain.doFilter(request, response);
+
         } catch (Exception e) {
             log.error("Authentication failed: {}", e.getMessage());
             sendError(response, ErrorMessages.AUTH_FAILED, "AUTH_FAILED");
-            return;
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private void sendError(HttpServletResponse response, String message, String code) throws IOException {
