@@ -1,6 +1,7 @@
 package com.example.app_fast_food.user;
 
 import com.example.app_fast_food.exception.AlreadyExistsException;
+import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.exception.InvalidCredentialsException;
 import com.example.app_fast_food.exception.PhoneNumberNotVerifiedException;
 import com.example.app_fast_food.otp.OtpRepository;
@@ -8,6 +9,8 @@ import com.example.app_fast_food.otp.entity.Otp;
 import com.example.app_fast_food.security.JwtService;
 import com.example.app_fast_food.user.entity.CustomerProfile;
 import com.example.app_fast_food.user.entity.User;
+import com.example.app_fast_food.user.role.Role;
+import com.example.app_fast_food.user.role.RoleRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,8 @@ import com.example.app_fast_food.user.dto.SignInDto;
 import com.example.app_fast_food.user.dto.SignUpDto;
 import com.example.app_fast_food.user.dto.TokenResponseDto;
 import com.example.app_fast_food.user.dto.UserResponseDto;
+
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -33,6 +38,7 @@ public class AuthService implements UserDetailsService {
     private final UserMapper mapper;
     private final UserRepository repository;
     private final OtpRepository otpRepository;
+    private final RoleRepository roleRepository;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -55,7 +61,12 @@ public class AuthService implements UserDetailsService {
         CustomerProfile customer = new CustomerProfile();
         customer.setUser(user);
 
+        Role customerRole = roleRepository.findByName("CUSTOMER")
+                .orElseThrow(() -> new EntityNotFoundException("Role", "CUSTOMER"));
+
+        user.setRoles(Set.of(customerRole));
         user.setCustomerProfile(customer);
+
         repository.save(user);
 
         return mapper.toResponseDto(user);
