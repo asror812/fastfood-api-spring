@@ -1,5 +1,6 @@
 package com.example.app_fast_food.user.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -13,5 +14,6 @@ public class SignInDto {
     private String phoneNumber;
 
     @NotBlank
+    @Min(8)
     private String password;
 }
