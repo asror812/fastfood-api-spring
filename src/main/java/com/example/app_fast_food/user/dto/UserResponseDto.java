@@ -1,6 +1,5 @@
 package com.example.app_fast_food.user.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -19,8 +18,8 @@ public class UserResponseDto extends UserDto {
 
     private Integer accessLevel;
 
-    private Set<ProductDto> favouriteProducts = Set.of();
+    private Set<ProductDto> favouriteProducts;
 
-    private List<UserBonusDto> userBonuses = new ArrayList<>();
+    private List<UserBonusDto> userBonuses;
 
 }

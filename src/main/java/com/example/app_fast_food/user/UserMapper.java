@@ -1,6 +1,7 @@
 package com.example.app_fast_food.user;
 
 import com.example.app_fast_food.bonus.entity.Bonus;
+import com.example.app_fast_food.favorite.Favorite;
 import com.example.app_fast_food.product.dto.CategoryDto;
 import com.example.app_fast_food.product.dto.ProductDto;
 import com.example.app_fast_food.product.entity.Product;
@@ -12,6 +13,7 @@ import com.example.app_fast_food.user.entity.AdminProfile;
 import com.example.app_fast_food.user.entity.CustomerProfile;
 import com.example.app_fast_food.user.entity.User;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.mapstruct.AfterMapping;
@@ -48,13 +50,15 @@ public interface UserMapper {
 
         if (profile.getFavouriteProducts() != null) {
             dto.setFavouriteProducts(profile.getFavouriteProducts().stream()
-                    .map(this::toProductDto)
+                    .map(Favorite::getProduct)
+                    .filter(Objects::nonNull)
+                    .map(this::mapToProductDto)
                     .collect(Collectors.toSet()));
         }
 
         if (profile.getUserBonuses() != null) {
             dto.setUserBonuses(profile.getUserBonuses().stream()
-                    .map(userBonus -> mapToBonusDto(userBonus.getBonus()))
+                    .map(userBonus -> mapToUserBonusDto(userBonus.getBonus()))
                     .toList());
         }
     }
@@ -74,7 +78,7 @@ public interface UserMapper {
             dto.setAccessLevel(profile.getAccessLevel());
     }
 
-    default UserBonusDto mapToBonusDto(Bonus bonus) {
+    default UserBonusDto mapToUserBonusDto(Bonus bonus) {
         if (bonus == null)
             return null;
 
@@ -89,7 +93,7 @@ public interface UserMapper {
         return dto;
     }
 
-    default ProductDto toProductDto(Product p) {
+    default ProductDto mapToProductDto(Product p) {
         CategoryDto category = new CategoryDto(p.getCategory().getId(), p.getCategory().getName());
         return new ProductDto(p.getId(), p.getName(), p.getPrice(), category, p.getWeight());
     }

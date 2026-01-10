@@ -33,6 +33,8 @@ public interface ProductMapper {
 
     ProductListResponseDto toListResponseDto(Product product);
 
+    
+
     default Set<ProductDiscountResponseDto> toProductDiscountResponseDto(Set<ProductDiscount> pds) {
         Set<ProductDiscountResponseDto> productDiscounts = new HashSet<>();
         if (pds == null)

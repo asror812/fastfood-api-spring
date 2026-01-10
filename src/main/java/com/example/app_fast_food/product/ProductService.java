@@ -1,19 +1,20 @@
 package com.example.app_fast_food.product;
 
-import com.example.app_fast_food.exception.EntityNotFoundException;
+import com.example.app_fast_food.favorite.FavoriteRepository;
 import com.example.app_fast_food.product.dto.ProductCreateDto;
-import com.example.app_fast_food.product.dto.ProductListResponseDto;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.product.entity.Product;
+import com.example.app_fast_food.user.dto.AuthDto;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -22,9 +23,17 @@ public class ProductService {
 
     private final ProductMapper mapper;
 
+    private final FavoriteRepository favoriteRepository;
     private final ProductRepository repository;
 
-    @CacheEvict(value = { "campaignProducts", "productsByCategory" }, allEntries = true)
+    private final ProductCacheService cacheService;
+
+    @CacheEvict(value = {
+            CacheNames.CAMPAIGN_PRODUCTS,
+            CacheNames.POPULAR_PRODUCTS,
+            CacheNames.PRODUCTS,
+            CacheNames.PRODUCTS_BY_CATEGORY
+    }, allEntries = true)
     @Transactional
     public ProductResponseDto create(ProductCreateDto createDto) {
         Product product = mapper.toEntity(createDto);
@@ -33,37 +42,40 @@ public class ProductService {
         return mapper.toResponseDTO(product);
     }
 
-    @Cacheable(value = "productsByCategory", key = "#p0")
-    public List<ProductResponseDto> getAllByCategory(UUID categoryId) {
-        return getProductResponseDTOS(
-                repository.findProductsByCategoryTree(categoryId));
+    public List<ProductResponseDto> getAllByCategory(UUID categoryId, AuthDto auth) {
+        List<ProductResponseDto> products = cacheService.getAllByCategoryTree(categoryId);
+
+        Set<UUID> favoriteIds = favoriteRepository.findAllProductIdsByUserId(auth.getId());
+
+        return products.stream()
+                .map(p -> copyWithFavorite(p, favoriteIds.contains(p.getId()))).toList();
     }
 
-    @Cacheable("campaignProducts")
-    public List<ProductResponseDto> getCampaignProducts() {
+    public List<ProductResponseDto> getCampaignProducts(AuthDto auth) {
         LocalDate now = LocalDate.now();
-        return repository.getCampaignProducts(now).stream().map(mapper::toResponseDTO).toList();
+
+        List<ProductResponseDto> base = cacheService.getCampaignProductsBase(now);
+
+        var favSet = favoriteRepository.findAllProductIdsByUserId(auth.getId());
+
+        return base.stream()
+                .map(p -> copyWithFavorite(p, favSet.contains(p.getId())))
+                .toList();
     }
 
-    @Cacheable(value = "productById", key = "#p0")
-    public ProductResponseDto getById(UUID id) {
-        Product product = repository.findProductDetailsById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product", id.toString()));
+    private ProductResponseDto copyWithFavorite(ProductResponseDto p, boolean favorite) {
+        ProductResponseDto c = new ProductResponseDto();
+        c.setId(p.getId());
+        c.setName(p.getName());
+        c.setPrice(p.getPrice());
+        c.setCategory(p.getCategory());
+        c.setWeight(p.getWeight());
+        c.setImages(p.getImages());
+        c.setBonuses(p.getBonuses());
+        c.setDiscounts(p.getDiscounts());
+        c.setFavorite(favorite);
 
-        return mapper.toResponseDTO(product);
+        return c;
     }
 
-    @Cacheable("popularProducts")
-    public List<ProductResponseDto> getPopularProducts() {
-        return repository.getPopularProducts().stream().map(mapper::toResponseDTO).toList();
-    }
-
-    @Cacheable("products")
-    public List<ProductListResponseDto> getAll() {
-        return repository.findAllProductsDetails().stream().map(mapper::toListResponseDto).toList();
-    }
-
-    public List<ProductResponseDto> getProductResponseDTOS(List<Product> products) {
-        return products.stream().map(mapper::toResponseDTO).toList();
-    }
 }

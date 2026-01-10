@@ -11,18 +11,18 @@ import com.example.app_fast_food.bonus.dto.bonus_condition.BonusConditionRespons
 
 @Getter
 @Setter
-public class UserBonusDto implements Serializable{
-    private UUID id; 
-    
-    protected String name;
+public class UserBonusDto implements Serializable {
+    private UUID id;
 
-    protected LocalDate startDate;
+    private String name;
 
-    protected LocalDate endDate;
+    private LocalDate startDate;
 
-    protected BonusConditionResponseDto condition;
+    private LocalDate endDate;
 
-    protected boolean isActive;
+    private BonusConditionResponseDto condition;
 
-    protected int usageLimit;
+    private boolean isActive;
+
+    private int usageLimit;
 }

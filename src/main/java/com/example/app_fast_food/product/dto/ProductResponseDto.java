@@ -22,4 +22,6 @@ public class ProductResponseDto implements Serializable {
     private Set<ProductDiscountResponseDto> discounts = new HashSet<>();
     private Set<ProductBonusDto> bonuses = new HashSet<>();
     private Set<ProductImageResponseDto> images = new HashSet<>();
+
+    private boolean favorite;
 }

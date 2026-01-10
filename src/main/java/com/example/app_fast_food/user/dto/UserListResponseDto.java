@@ -8,9 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserListResponseDto {
-    protected String name;
+    private String name;
 
-    protected String phoneNumber;
+    private String phoneNumber;
 
-    protected LocalDate birthDate;
+    private LocalDate birthDate;
 }

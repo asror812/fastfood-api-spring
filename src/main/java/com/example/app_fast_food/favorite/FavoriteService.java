@@ -24,51 +24,46 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FavoriteService {
 
-        private final CustomerProfileRepository customerProfileRepository;
-        private final ProductRepository productRepository;
-        private final ProductMapper mapper;
+    private final CustomerProfileRepository customerProfileRepository;
+    private final ProductRepository productRepository;
+    private final FavoriteRepository repository;
+    private static final String PRODUCT_ENTITY = "Product";
+    private static final String CUSTOMER_ENTITY = "Customer";
 
-        @Cacheable(value = "favoriteProducts", key = "#p0.id")
-        public List<ProductResponseDto> getFavorites(AuthDto auth) {
-                CustomerProfile customerProfile = customerProfileRepository
-                                .findById(auth.getId())
-                                .orElseThrow(() -> new EntityNotFoundException("Customer", auth.getId().toString()));
+    private final ProductMapper mapper;
 
-                return customerProfile.getFavouriteProducts().stream().map(mapper::toResponseDTO).toList();
+    @Cacheable(value = "favoriteProducts", key = "#p0.id")
+    public List<ProductResponseDto> getFavorites(AuthDto auth) {
+        List<Favorite> favorites = repository.findAllByUserId(auth.getId());
+
+        return favorites.stream().map(f -> f.getProduct()).map(mapper::toResponseDTO)
+                .peek(dto -> dto.setFavorite(true)).toList();
+    }
+
+    @CacheEvict(value = "favoriteProducts", key = "#p0.id")
+    @Transactional
+    public ApiMessageResponse add(AuthDto auth, UUID productId) {
+        if (repository.existsByUserIdAndProductId(auth.getId(), productId)) {
+            return new ApiMessageResponse("Product already in favorites");
         }
 
-        @CacheEvict(value = "favoriteProducts", key = "#p0.id")
-        @Transactional
-        public ApiMessageResponse add(AuthDto auth, UUID productId) {
-                CustomerProfile profile = customerProfileRepository.findById(auth.getId())
-                                .orElseThrow(() -> new EntityNotFoundException("Customer", auth.getId().toString()));
+        CustomerProfile profile = customerProfileRepository.findById(auth.getId())
+                .orElseThrow(() -> new EntityNotFoundException(CUSTOMER_ENTITY, auth.getId().toString()));
 
-                boolean alreadyExists = profile.getFavouriteProducts().stream()
-                                .anyMatch(p -> p.getId().equals(profile.getId()));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException(PRODUCT_ENTITY, productId.toString()));
 
-                if (alreadyExists) {
-                        return new ApiMessageResponse("Product already in favorites");
-                }
+        Favorite favorite = new Favorite(null, product, profile);
+        repository.save(favorite);
+        return new ApiMessageResponse("Product added to favorites");
+    }
 
-                Product product = productRepository.findById(productId)
-                                .orElseThrow(() -> new EntityNotFoundException("Product", productId.toString()));
-                profile.getFavouriteProducts().add(product);
+    @CacheEvict(value = "favoriteProducts", key = "#p0.id")
+    @Transactional
+    public ApiMessageResponse remove(AuthDto auth, UUID productId) {
+        repository.deleteByUserIdAndProductId(auth.getId(), productId);
 
-                return new ApiMessageResponse("Product added to favorites");
-        }
-
-        @CacheEvict(value = "favoriteProducts", key = "#p0.id")
-        @Transactional
-        public ApiMessageResponse remove(AuthDto auth, UUID productId) {
-                CustomerProfile profile = customerProfileRepository.findById(auth.getId())
-                                .orElseThrow(() -> new EntityNotFoundException("User", auth.getId().toString()));
-
-                boolean removed = profile.getFavouriteProducts()
-                                .removeIf(p -> p.getId().equals(productId));
-
-                return removed
-                                ? new ApiMessageResponse("Product removed from favorites")
-                                : new ApiMessageResponse("Product not in favorites");
-        }
+        return new ApiMessageResponse("Product removed from favorites");
+    }
 
 }
