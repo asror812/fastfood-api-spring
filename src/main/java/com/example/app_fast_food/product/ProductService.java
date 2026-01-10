@@ -49,7 +49,8 @@ public class ProductService {
         Set<UUID> favoriteIds = favoriteRepository.findAllProductIdsByUserId(auth.getId());
 
         return products.stream()
-                .map(p -> copyWithFavorite(p, favoriteIds.contains(p.getId()))).toList();
+                .map(p -> copyWithFavorite(p, favoriteIds.contains(p.getId())))
+                .toList();
     }
 
     public List<ProductResponseDto> getCampaignProducts(AuthDto auth) {
@@ -77,18 +78,14 @@ public class ProductService {
                 .toList();
     }
 
-    private Set<UUID> favoriteIdsOrEmpty(AuthDto auth) {
-        return (auth == null)
-                ? Set.of()
-                : favoriteRepository.findAllProductIdsByUserId(auth.getId());
-    }
-
     public List<ProductResponseDto> getPopularProducts(AuthDto auth) {
         List<ProductResponseDto> all = cacheService.getPopularProducts();
 
         Set<UUID> favoriteIds = favoriteIdsOrEmpty(auth);
 
-        return all.stream().map(p -> copyWithFavorite(p, favoriteIds.contains(p.getId()))).toList();
+        return all.stream()
+                .map(p -> copyWithFavorite(p, favoriteIds.contains(p.getId())))
+                .toList();
     }
 
     public ProductResponseDto getById(UUID id) {
@@ -96,6 +93,12 @@ public class ProductService {
                 .orElseThrow(() -> new EntityNotFoundException("Product", id.toString()));
 
         return mapper.toResponseDTO(product);
+    }
+
+    private Set<UUID> favoriteIdsOrEmpty(AuthDto auth) {
+        return (auth == null)
+                ? Set.of()
+                : favoriteRepository.findAllProductIdsByUserId(auth.getId());
     }
 
     private ProductResponseDto copyWithFavorite(ProductResponseDto p, boolean favorite) {
