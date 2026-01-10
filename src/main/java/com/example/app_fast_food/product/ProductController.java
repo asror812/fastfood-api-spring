@@ -5,7 +5,6 @@ import com.example.app_fast_food.attachment.dto.AttachmentResponseDto;
 import com.example.app_fast_food.product.dto.ProductListResponseDto;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.user.dto.AuthDto;
-import com.example.app_fast_food.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +27,6 @@ public class ProductController {
     private final AttachmentService attachmentService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ProductListResponseDto>> getAll() {
         return ResponseEntity.ok(cacheService.getAll());
     }
@@ -43,13 +41,14 @@ public class ProductController {
         return ResponseEntity.ok(cacheService.getById(id));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/campaign")
     public ResponseEntity<List<ProductResponseDto>> getCampaignProducts(@AuthenticationPrincipal AuthDto auth) {
         return ResponseEntity.ok(productService.getCampaignProducts(auth));
     }
 
+    @PreAuthorize("hasAuthority('PRODUCT_IMAGE_UPDATE')")
     @PostMapping(value = "/{id}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
     public AttachmentResponseDto updateImage(
             @PathVariable("id") UUID productId,
             @RequestPart MultipartFile file,

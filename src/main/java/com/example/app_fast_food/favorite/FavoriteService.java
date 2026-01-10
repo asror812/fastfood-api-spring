@@ -37,13 +37,16 @@ public class FavoriteService {
         List<Favorite> favorites = repository.findAllByUserId(auth.getId());
 
         return favorites.stream().map(f -> f.getProduct()).map(mapper::toResponseDTO)
-                .peek(dto -> dto.setFavorite(true)).toList();
+                .map(dto -> {
+                    dto.setFavorite(true);
+                    return dto;
+                }).toList();
     }
 
     @CacheEvict(value = "favoriteProducts", key = "#p0.id")
     @Transactional
     public ApiMessageResponse add(AuthDto auth, UUID productId) {
-        if (repository.existsByUserIdAndProductId(auth.getId(), productId)) {
+        if (repository.existsByCustomerIdAndProductId(auth.getId(), productId)) {
             return new ApiMessageResponse("Product already in favorites");
         }
 
@@ -61,7 +64,7 @@ public class FavoriteService {
     @CacheEvict(value = "favoriteProducts", key = "#p0.id")
     @Transactional
     public ApiMessageResponse remove(AuthDto auth, UUID productId) {
-        repository.deleteByUserIdAndProductId(auth.getId(), productId);
+        repository.deleteByCustomerIdAndProductId(auth.getId(), productId);
 
         return new ApiMessageResponse("Product removed from favorites");
     }

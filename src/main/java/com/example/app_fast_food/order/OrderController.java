@@ -54,11 +54,13 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrderByStatus(status));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/basket")
     public ResponseEntity<OrderResponseDto> getBasket(@AuthenticationPrincipal AuthDto auth) {
         return ResponseEntity.ok(orderService.getBasket(auth));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/basket/items")
     public ResponseEntity<OrderResponseDto> addItem(
             @AuthenticationPrincipal AuthDto auth,
@@ -67,6 +69,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderService.addProduct(dto, auth));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/basket/items/{productId}")
     public ResponseEntity<OrderResponseDto> updateQuantity(
             @AuthenticationPrincipal AuthDto auth,
@@ -84,17 +87,20 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/basket")
     public ResponseEntity<Void> deleteBasket(@AuthenticationPrincipal AuthDto auth) {
         orderService.emptyBasket(auth);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/basket/bonuses")
     public ResponseEntity<List<BonusResponseDto>> getAvailableBonuses(@AuthenticationPrincipal AuthDto auth) {
         return ResponseEntity.ok(orderService.getAvailableBonuses(auth));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/basket/bonuses")
     public ResponseEntity<OrderResponseDto> chooseBonus(
             @AuthenticationPrincipal AuthDto auth,
@@ -102,6 +108,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.applyBonus(auth, dto));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/confirm")
     public ResponseEntity<Void> confirmOrder(@AuthenticationPrincipal AuthDto auth,
             @Valid @RequestBody OrderConfirmRequestDto dto) {

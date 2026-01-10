@@ -21,15 +21,14 @@ public class DiscountController {
 
     private final DiscountService discountService;
 
-    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-
+    @GetMapping
     public ResponseEntity<List<DiscountResponseDto>> getAll() {
         return ResponseEntity.ok(discountService.findAll());
     }
 
-    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
     public ResponseEntity<DiscountResponseDto> getById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(discountService.findById(id));
     }

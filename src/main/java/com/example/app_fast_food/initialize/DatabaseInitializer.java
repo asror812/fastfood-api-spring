@@ -486,18 +486,32 @@ public class DatabaseInitializer implements CommandLineRunner {
                 }
                 Set<Permission> permissions = new HashSet<>();
 
-                // USER PERMISSIONS
-                permissions.add(new Permission(null, "order:create", Collections.emptySet()));
-                permissions.add(new Permission(null, "menu:view", Collections.emptySet()));
-                permissions.add(new Permission(null, "profile:manage", Collections.emptySet()));
-                permissions.add(new Permission(null, "order_history:view", Collections.emptySet()));
+                // ORDER
+                permissions.add(new Permission("CARD_MANAGE"));
+                permissions.add(new Permission("ORDER_CREATE"));
+                permissions.add(new Permission("ORDER_READ_OWN"));
+                permissions.add(new Permission("ORDER_CANCEL_OWN"));
 
-                // STAFF / COURIER PERMISSIONS
-                permissions.add(new Permission(null, "order:update", Collections.emptySet()));
+                // MANAGE FAVORITE|PROFILE
+                permissions.add(new Permission("FAVORITE_MANAGE"));
+                permissions.add(new Permission("PROFILE_MANAGE"));
 
-                // ADMIN PERMISSIONS
-                permissions.add(new Permission(null, "user:manage", Collections.emptySet()));
-                permissions.add(new Permission(null, "permission:set", Collections.emptySet()));
+                // COURIER PERMISSIONS
+                permissions.add(new Permission("DELIVERY_READ_ASSIGNED"));
+                permissions.add(new Permission("DELIVERY_STATUS_UPDATE"));
+
+                // ADMIN ORDER PERMISSIONS
+                permissions.add(new Permission("ORDER_READ_ALL"));
+                permissions.add(new Permission("ORDER_STATUS_UPDATE"));
+
+                // ADMIN MANAGE PERMISSIONS
+                permissions.add(new Permission("PRODUCT_MANAGE"));
+                permissions.add(new Permission("CATEGORY_MANAGE"));
+                permissions.add(new Permission("DISCOUNT_MANAGE"));
+                permissions.add(new Permission("BONUS_MANAGE"));
+
+                permissions.add(new Permission("USER_MANAGE"));
+                permissions.add(new Permission("ROLE_MANAGE"));
 
                 permissionRepository.saveAll(permissions);
         }

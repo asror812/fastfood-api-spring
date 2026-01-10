@@ -21,6 +21,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
     public ResponseEntity<UserResponseDto> getMe(@AuthenticationPrincipal AuthDto auth) {
         return ResponseEntity.ok(userService.getMe(auth));

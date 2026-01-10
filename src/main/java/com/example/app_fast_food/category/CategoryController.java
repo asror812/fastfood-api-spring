@@ -26,14 +26,14 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final ProductService productService;
 
-    @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
     public ResponseEntity<CategoryResponseDto> create(@Valid @RequestBody CategoryCreateDto createDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(createDTO));
     }
 
-    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
     public ResponseEntity<List<CategoryResponseDto>> getAll() {
         return ResponseEntity.ok(categoryService.getAll());
     }
@@ -43,8 +43,8 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getParentCategories());
     }
 
-    @GetMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("{id}")
     public ResponseEntity<CategoryResponseDto> getById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(categoryService.findById(id));
     }

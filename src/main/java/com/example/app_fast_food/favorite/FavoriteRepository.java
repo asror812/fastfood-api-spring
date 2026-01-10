@@ -12,14 +12,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FavoriteRepository extends JpaRepository<Favorite, UUID> {
 
-    boolean existsByUserIdAndProductId(UUID userId, UUID productId);
+    boolean existsByCustomerIdAndProductId(UUID userId, UUID productId);
 
-    void deleteByUserIdAndProductId(UUID userId, UUID productId);
+    void deleteByCustomerIdAndProductId(@Param("userId") UUID userId, @Param("productId") UUID productId);
 
-    @Query("select f from Favorite f join fetch f.product p where f.user.id = :userId")
+    @Query("select f from Favorite f join fetch f.product p where f.customer.id = :userId")
     List<Favorite> findAllByUserId(@Param("userId") UUID userId);
 
-    @Query("select f.product.id from Favorite f where f.user.id = :userId")
+    @Query("select f.product.id from Favorite f where f.customer.id = :userId")
     Set<UUID> findAllProductIdsByUserId(@Param("userId") UUID userId);
 
 }

@@ -20,14 +20,14 @@ import lombok.RequiredArgsConstructor;
 public class BonusController {
     private final BonusService bonusService;
 
-    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
     public ResponseEntity<List<BonusResponseDto>> getAll() {
         return ResponseEntity.ok(bonusService.findAll());
     }
 
-    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
     public ResponseEntity<BonusResponseDto> getById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(bonusService.findById(id));
     }

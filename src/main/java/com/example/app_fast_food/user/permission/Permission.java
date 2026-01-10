@@ -26,4 +26,8 @@ public class Permission {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Role> roles = new HashSet<>();
+
+    public Permission(String name) {
+        this.name = name;
+    }
 }
