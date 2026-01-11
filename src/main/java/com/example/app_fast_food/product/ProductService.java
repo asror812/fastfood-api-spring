@@ -1,5 +1,6 @@
 package com.example.app_fast_food.product;
 
+import com.example.app_fast_food.category.CategoryRepository;
 import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.favorite.FavoriteRepository;
 import com.example.app_fast_food.product.dto.ProductCreateDto;
@@ -28,6 +29,7 @@ public class ProductService {
     private final ProductRepository repository;
 
     private final ProductCacheService cacheService;
+    private final CategoryRepository categoryRepository;
 
     @CacheEvict(value = {
             CacheNames.CAMPAIGN_PRODUCTS,
@@ -44,21 +46,29 @@ public class ProductService {
     }
 
     public List<ProductResponseDto> getAllByCategory(UUID categoryId, AuthDto auth) {
-        List<ProductResponseDto> products = cacheService.getAllByCategoryTree(categoryId);
+        if (!categoryRepository.existsById(categoryId))
+            throw new EntityNotFoundException("Category", categoryId.toString());
+
+        List<ProductResponseDto> all = cacheService.getAllByCategoryTree(categoryId);
+
+        if (auth == null)
+            return all;
 
         Set<UUID> favoriteIds = favoriteRepository.findAllProductIdsByUserId(auth.getId());
 
-        return products.stream()
+        return all.stream()
                 .map(p -> copyWithFavorite(p, favoriteIds.contains(p.getId())))
                 .toList();
     }
 
     public List<ProductResponseDto> getCampaignProducts(AuthDto auth) {
         LocalDate now = LocalDate.now();
-
         List<ProductResponseDto> all = cacheService.getCampaignProductsBase(now);
 
-        Set<UUID> favoriteIds = favoriteRepository.findAllProductIdsByUserId(auth.getId());
+        if (auth == null)
+            return all;
+
+        Set<UUID> favoriteIds = favoriteIdsOrEmpty(auth);
 
         return all.stream()
                 .map(p -> copyWithFavorite(p, favoriteIds.contains(p.getId())))
@@ -68,10 +78,10 @@ public class ProductService {
     public List<ProductListResponseDto> getAll(AuthDto auth) {
         List<ProductListResponseDto> all = cacheService.getAll();
 
-        Set<UUID> favoriteIds = favoriteIdsOrEmpty(auth);
-
         if (auth == null)
             return all;
+
+        Set<UUID> favoriteIds = favoriteIdsOrEmpty(auth);
 
         return all.stream()
                 .map(p -> copyListWithFavorite(p, favoriteIds.contains(p.getId())))
@@ -80,6 +90,9 @@ public class ProductService {
 
     public List<ProductResponseDto> getPopularProducts(AuthDto auth) {
         List<ProductResponseDto> all = cacheService.getPopularProducts();
+
+        if (auth == null)
+            return all;
 
         Set<UUID> favoriteIds = favoriteIdsOrEmpty(auth);
 

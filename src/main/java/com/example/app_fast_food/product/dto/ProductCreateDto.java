@@ -12,17 +12,17 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProductCreateDto {
-    @NotBlank
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @NotNull
+    @NotNull(message = "Price is required")
     private BigDecimal price;
 
     private int weight;
 
-    @NotNull
+    @NotNull(message = "Category id is required")
     private UUID categoryId;
 
-    @NotNull
+    @NotNull(message = "Images are required")
     private Set<ProductImageDto> images;
 }

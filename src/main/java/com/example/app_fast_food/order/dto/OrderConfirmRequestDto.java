@@ -9,8 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OrderConfirmRequestDto {
-    @NotNull
+    @NotNull(message = "Payment type is required")
     private PaymentType paymentType;
-    @NotNull
+
+    @NotNull(message = "Address is required")
     private AddressDto address;
 }

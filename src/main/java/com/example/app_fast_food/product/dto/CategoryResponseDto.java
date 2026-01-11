@@ -9,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CategoryResponseDto implements Serializable{
-
     private UUID id;
     private String name;
 }

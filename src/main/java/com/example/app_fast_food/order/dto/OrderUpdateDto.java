@@ -16,5 +16,5 @@ public class OrderUpdateDto {
 
     private Bonus selectedBonus;
 
-    private boolean appliedBonus = true;
+    private boolean appliedBonus;
 }

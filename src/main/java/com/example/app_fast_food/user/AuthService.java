@@ -93,7 +93,7 @@ public class AuthService implements UserDetailsService {
                         () -> new InvalidCredentialsException(signInDTO.getPhoneNumber(), signInDTO.getPassword()));
 
         if (!passwordEncoder.matches(signInDTO.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException(user.getUsername(), user.getPassword());
+            throw new InvalidCredentialsException(signInDTO.getPhoneNumber(), signInDTO.getPassword());
         }
 
         return new TokenResponseDto(jwtService.generateToken(user));

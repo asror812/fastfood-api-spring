@@ -11,14 +11,14 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class UserDto {
-    @NotBlank
+    @NotBlank(message = "Name is required")
     protected String name;
 
-    @NotBlank
+    @NotBlank(message = "Phone number is required")
     @Pattern(regexp = "^\\+\\d{9}$")
     protected String phoneNumber;
 
-    @NotNull
+    @NotNull(message = "Birth date is required")
     protected LocalDate birthDate;
 
 }
