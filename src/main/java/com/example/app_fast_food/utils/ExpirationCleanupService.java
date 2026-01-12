@@ -1,5 +1,6 @@
 package com.example.app_fast_food.utils;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
@@ -20,9 +21,11 @@ public class ExpirationCleanupService {
     private final DiscountRepository discountRepository;
     private final BonusRepository bonusRepository;
 
+    private final Clock clock;
+
     @Transactional
     public void cleanExpired() {
-        LocalDate today = LocalDate.now(ZoneId.of("Asia/Samarkand"));
+        LocalDate today = LocalDate.now(clock);
 
         int deletedDiscounts = discountRepository.deactivateAllExpired(today);
         int deletedBonuses = bonusRepository.deactivateAllExpired(today);

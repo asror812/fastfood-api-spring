@@ -31,6 +31,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -47,6 +48,7 @@ public class OrderService {
     private final BonusMapper bonusMapper;
 
     private final BonusService bonusService;
+    private final Clock clock;
 
     public static final String PRODUCT_ENTITY = "Product";
     public static final String BASKET_ENTITY = "Basket";
@@ -253,7 +255,7 @@ public class OrderService {
     }
 
     private void calculateOrderPrices(Order order) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(clock);
 
         BigDecimal total = BigDecimal.ZERO;
         BigDecimal totalDiscount = BigDecimal.ZERO;

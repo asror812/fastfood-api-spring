@@ -17,7 +17,7 @@ import java.util.Set;
 @Mapper(componentModel = "spring", uses = { CategoryMapper.class, ProductDiscountMapper.class, BonusMapper.class })
 public interface ProductMapper {
 
-    String BASE_DOWNLOAD_URL = "/attachments/";
+    String BASE_DOWNLOAD_URL = "/attachments/download/";
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", ignore = true)
@@ -64,7 +64,7 @@ public interface ProductMapper {
             }
 
             productImages.add(
-                    new ProductImageResponseDto(pi.getId(), BASE_DOWNLOAD_URL + pi.getAttachment().getStoredName(),
+                    new ProductImageResponseDto(pi.getId(), BASE_DOWNLOAD_URL + pi.getAttachment().getId(),
                             pi.getPosition()));
         }
         return productImages;
