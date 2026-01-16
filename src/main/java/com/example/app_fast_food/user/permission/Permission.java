@@ -9,10 +9,9 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "permissions")
+@Table(name = "permissions", uniqueConstraints = @UniqueConstraint(name = "uk_permissions_name", columnNames = "name"))
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class Permission {
     @Id

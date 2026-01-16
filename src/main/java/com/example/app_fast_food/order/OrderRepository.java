@@ -18,7 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     @Query("select o from Order o left join fetch o.orderItems where o.user.id = :userId and o.status = 'BASKET'")
     Optional<Order> findBasketByUserId(@Param("userId") UUID userId);
 
-    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user.phoneNumber = :phoneNumber AND o.status = 'BASKET'")
+    @Query("select o from Order o left join fetch o.orderItems where o.user.phoneNumber = :phoneNumber and o.status = 'BASKET'")
     Optional<Order> findBasketByUserPhoneNumber(@Param("phoneNumber") String phoneNumber);
 
     @EntityGraph(attributePaths = {
@@ -30,6 +30,6 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     Optional<Order> findOrderById(UUID orderId);
 
-    @Query("SELECT COUNT(o) FROM Order o WHERE o.user.id = :userId AND o.status = 'TAKEN'")
+    @Query("select count(o) from Order o where o.user.id = :userId and o.status = 'TAKEN'")
     int getPurchasesCountOfUser(@Param("userId") UUID userId);
 }

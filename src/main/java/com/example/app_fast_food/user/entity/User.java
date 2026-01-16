@@ -57,12 +57,13 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // adding permissions
         Set<SimpleGrantedAuthority> authorities = roles.stream()
                 .flatMap(role -> role.getPermissions().stream())
                 .map(p -> new SimpleGrantedAuthority(p.getName()))
                 .collect(Collectors.toSet());
 
-        // 2. ОБЯЗАТЕЛЬНО добавляем сами роли (ROLE_ADMIN)
+        // adding roles
         roles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName())));
 
         return authorities;

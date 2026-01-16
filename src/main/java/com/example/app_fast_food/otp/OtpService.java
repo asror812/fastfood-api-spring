@@ -1,10 +1,10 @@
 package com.example.app_fast_food.otp;
 
-import com.example.app_fast_food.common.notification.sms.SmsNotificationService;
 import com.example.app_fast_food.common.response.ApiMessageResponse;
 import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.exception.OtpEarlyResentException;
 import com.example.app_fast_food.exception.OtpLimitExitedException;
+import com.example.app_fast_food.notification.sms.SmsNotificationService;
 import com.example.app_fast_food.otp.dto.ValidatePhoneNumberDTO;
 import com.example.app_fast_food.otp.entity.Otp;
 

@@ -27,16 +27,11 @@ public class Bonus {
     @OneToMany(mappedBy = "bonus", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BonusProductLink> bonusProductLinks = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "condition_id", nullable = false)
     private BonusCondition condition;
 
     // 1 = one-time, 0 = unlimited
-    // For example:
-    // birhtday bonus usageLimit := 1 and user gets bonu
-    // when user changes birthdat then again tries to get this bonus we say for this
-    // year bonus already used
-    // holiday bonus usageLimit := 1 also works like this
     @Column(name = "usage_limit")
     private int usageLimit;
 

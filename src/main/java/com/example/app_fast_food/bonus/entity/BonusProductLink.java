@@ -12,7 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,20 +21,25 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class BonusProductLink {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "bonus_id", nullable = false)
     private Bonus bonus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     private int quantity = 1;
+
+    public BonusProductLink(Bonus bonus, Product product, int quantity) {
+        this.bonus = bonus;
+        this.product = product;
+        this.quantity = quantity;
+    }
 }

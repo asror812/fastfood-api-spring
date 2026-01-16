@@ -9,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DiscountUpdateDto {
-
     @NotBlank
     private String name;
 

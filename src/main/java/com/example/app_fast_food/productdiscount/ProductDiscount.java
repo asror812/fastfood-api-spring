@@ -27,17 +27,17 @@ public class ProductDiscount {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "discount_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "discount_id", nullable = false)
     private Discount discount;
 
     public ProductDiscount(Product product, Discount discount) {
         this.product = product;
         this.discount = discount;
     }
-    
+
 }

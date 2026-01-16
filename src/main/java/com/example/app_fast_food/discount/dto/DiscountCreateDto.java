@@ -12,8 +12,8 @@ public class DiscountCreateDto {
     @NotBlank
     private String name;
 
-    @Min(0)
-    @Max(100)
+    @Min(1)
+    @Max(90)
     private int percentage;
 
     @NotNull

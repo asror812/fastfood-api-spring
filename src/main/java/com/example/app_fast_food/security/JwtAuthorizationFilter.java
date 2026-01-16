@@ -42,7 +42,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             "/swagger-ui");
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getRequestURI();
         return EXCLUDED_URLS.stream().anyMatch(path::startsWith);
     }

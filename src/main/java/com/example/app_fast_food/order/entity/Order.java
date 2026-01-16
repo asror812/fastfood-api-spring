@@ -39,8 +39,8 @@ public class Order {
     @Column(name = "payment_type")
     private PaymentType paymentType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToMany(fetch = FetchType.LAZY)

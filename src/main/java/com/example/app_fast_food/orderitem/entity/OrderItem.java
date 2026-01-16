@@ -34,12 +34,12 @@ public class OrderItem {
     @Column(name = "final_price")
     private BigDecimal finalPrice;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     @Column(name = "is_bonus")

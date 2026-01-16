@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -29,10 +29,10 @@ public class Product {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(nullable = false, precision = 20, scale = 2)
     private BigDecimal price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
@@ -40,13 +40,13 @@ public class Product {
     private int weight;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ProductDiscount> discounts = new HashSet<>();
+    private List<ProductDiscount> discounts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "product")
-    private Set<BonusProductLink> bonuses = new HashSet<>();
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<BonusProductLink> bonuses = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ProductImage> images = new HashSet<>();
+    private List<ProductImage> images = new ArrayList<>();
 
     public Product(UUID id, String name, BigDecimal price, Category category, int weight) {
         this.id = id;

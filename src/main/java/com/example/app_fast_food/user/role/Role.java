@@ -13,18 +13,18 @@ import java.util.Set;
 @Table(name = "roles")
 @NoArgsConstructor
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Role {
     @Id
+    @EqualsAndHashCode.Include
     private String name;
 
-    @EqualsAndHashCode.Exclude
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_name"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
     @ToString.Exclude
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
-    private Set<Permission> permissions;
+    private Set<Permission> permissions = new HashSet<>();
 
     @ManyToMany(mappedBy = "roles")
-    @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<User> users = new HashSet<>();
 

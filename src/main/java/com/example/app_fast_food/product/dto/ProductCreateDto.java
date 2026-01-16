@@ -1,7 +1,7 @@
 package com.example.app_fast_food.product.dto;
 
 import java.math.BigDecimal;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
@@ -24,5 +24,5 @@ public class ProductCreateDto {
     private UUID categoryId;
 
     @NotNull(message = "Images are required")
-    private Set<ProductImageDto> images;
+    private List<ProductImageDto> images;
 }

@@ -1,5 +1,4 @@
-package com.example.app_fast_food.common.notification.eskiz.dto;
-
+package com.example.app_fast_food.notification.eskiz.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -12,9 +11,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SendSmsRequestDTO {
+    private static final String FROM = "4546";
 
-    @JsonProperty("monile_phone")
+    @JsonProperty("mobile_phone")
     public String phoneNumber;
+
     private String message;
-    private final String from  = "4546";
 }

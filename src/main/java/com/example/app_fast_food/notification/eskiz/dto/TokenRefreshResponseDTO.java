@@ -1,4 +1,4 @@
-package com.example.app_fast_food.common.notification.eskiz.dto;
+package com.example.app_fast_food.notification.eskiz.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -12,8 +12,9 @@ import java.util.Map;
 @Data
 public class TokenRefreshResponseDTO {
     private String message;
-    @JsonProperty("token_type")
-   private String  tokenType;
 
-   Map<String , String> data;
+    @JsonProperty("token_type")
+    private String tokenType;
+
+    Map<String, String> data;
 }

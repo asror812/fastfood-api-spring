@@ -1,14 +1,16 @@
-package com.example.app_fast_food.common.notification.sms;
-
+package com.example.app_fast_food.notification.sms;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
-@ConditionalOnProperty(value = "spring.profiles.active" , havingValue = "local")
+@Slf4j
+@ConditionalOnProperty(value = "spring.profiles.active", havingValue = "local")
 public class NoSmsNotificationServiceImpl implements SmsNotificationService {
     @Override
     public void sendNotification(String phoneNumber, String message) {
-        System.out.printf("%s: %s \n" , phoneNumber, message);
+        log.info("SMS (LOCAL) -> {}: {}", phoneNumber, message);
     }
 }

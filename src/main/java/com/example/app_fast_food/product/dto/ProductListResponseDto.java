@@ -5,8 +5,8 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -19,5 +19,5 @@ public class ProductListResponseDto implements Serializable {
     private int weight;
 
     private boolean favorite;
-    private Set<ProductImageResponseDto> images = new HashSet<>();
+    private List<ProductImageResponseDto> images = new ArrayList<>();
 }
