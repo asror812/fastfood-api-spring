@@ -79,7 +79,7 @@ public class OrderService {
                     .map(mapper::toResponseDto)
                     .toList();
 
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid order status `%s`".formatted(status));
         }
     }

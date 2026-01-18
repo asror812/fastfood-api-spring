@@ -25,8 +25,8 @@ public interface ProductDiscountReposity extends JpaRepository<ProductDiscount, 
                 select pd from ProductDiscount pd
                 join fetch pd.discount d
                 where pd.product.id in :ids
-                  and d.active = true
-                  and :today between d.startDate and d.endDate
+                and d.active = true
+                and :today between d.startDate and d.endDate
             """)
     List<ProductDiscount> findAllActiveByProductIds(
             @Param("ids") List<UUID> ids,

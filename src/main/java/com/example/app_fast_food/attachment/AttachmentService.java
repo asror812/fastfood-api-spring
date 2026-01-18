@@ -72,6 +72,7 @@ public class AttachmentService {
 
         boolean positionOccupied = product.getImages().stream()
                 .anyMatch(pi -> pi.getPosition() == position);
+
         if (positionOccupied) {
             throw new IllegalArgumentException(
                     "Image position `%s` is already occupied for product `%s`".formatted(position, productId));
@@ -107,6 +108,7 @@ public class AttachmentService {
             ProductImage productImage = new ProductImage(product, attachment, position);
             productImageRepository.save(productImage);
             product.getImages().add(productImage);
+
         } catch (RuntimeException e) {
             try {
                 Files.deleteIfExists(targetPath);

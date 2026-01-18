@@ -29,7 +29,9 @@ public class ProductCacheService {
 
     @Cacheable(CacheNames.POPULAR_PRODUCTS)
     public List<ProductResponseDto> getPopularProducts() {
-        return repository.getPopularProducts().stream().map(mapper::toResponseDTO).toList();
+        List<Product> popularProducts = repository.getPopularProducts();
+
+        return enrichWithBonusesAndDiscounts(popularProducts);
     }
 
     @Cacheable(CacheNames.PRODUCTS)
@@ -39,10 +41,9 @@ public class ProductCacheService {
 
     @Cacheable(value = CacheNames.PRODUCTS_BY_CATEGORY, key = "#p0")
     public List<ProductResponseDto> getAllByCategoryTree(UUID categoryId) {
-        return repository.findProductsByCategoryTree(categoryId)
-                .stream()
-                .map(mapper::toResponseDTO)
-                .toList();
+        List<Product> productsByCategoryTree = repository.findProductsByCategoryTree(categoryId);
+
+        return enrichWithBonusesAndDiscounts(productsByCategoryTree);
     }
 
     @Cacheable(value = CacheNames.CAMPAIGN_PRODUCTS, key = "#p0")
@@ -51,7 +52,11 @@ public class ProductCacheService {
         if (campaignProducts.isEmpty())
             return List.of();
 
-        List<UUID> productIds = campaignProducts.stream().map(Product::getId).toList();
+        return enrichWithBonusesAndDiscounts(campaignProducts);
+    }
+
+    private List<ProductResponseDto> enrichWithBonusesAndDiscounts(List<Product> products) {
+        List<UUID> productIds = products.stream().map(Product::getId).toList();
 
         Map<UUID, List<BonusProductLink>> bonusesMap = bonusProductLinkRepository
                 .findAllActiveByProductIds(productIds, LocalDate.now())
@@ -61,7 +66,7 @@ public class ProductCacheService {
                 .findAllActiveByProductIds(productIds, LocalDate.now())
                 .stream().collect(Collectors.groupingBy(d -> d.getProduct().getId()));
 
-        return campaignProducts.stream().map(p -> {
+        return products.stream().map(p -> {
             List<BonusProductLink> pBonuses = bonusesMap.getOrDefault(p.getId(), List.of());
             List<ProductDiscount> pDiscounts = discountsMap.getOrDefault(p.getId(), List.of());
 

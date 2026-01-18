@@ -32,8 +32,8 @@ public interface ProductMapper {
     Product toEntity(ProductCreateDto productCreateDto);
 
     @Mapping(target = "images", source = "images")
-    @Mapping(target = "bonuses", source = "bonuses")
-    @Mapping(target = "discounts", source = "discounts")
+    @Mapping(target = "bonuses", ignore = true)
+    @Mapping(target = "discounts", ignore = true)
     @Mapping(target = "favorite", ignore = true)
     ProductResponseDto toResponseDTO(Product product);
 
@@ -44,6 +44,7 @@ public interface ProductMapper {
             Product product,
             List<ProductDiscount> discounts,
             List<BonusProductLink> bonuses) {
+                
         if (product == null)
             return null;
 
