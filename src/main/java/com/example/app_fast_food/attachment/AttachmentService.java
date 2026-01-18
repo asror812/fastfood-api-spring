@@ -70,6 +70,13 @@ public class AttachmentService {
         if (position < 1)
             throw new IllegalArgumentException("Invalid position.");
 
+        boolean positionOccupied = product.getImages().stream()
+                .anyMatch(pi -> pi.getPosition() == position);
+        if (positionOccupied) {
+            throw new IllegalArgumentException(
+                    "Image position `%s` is already occupied for product `%s`".formatted(position, productId));
+        }
+
         UUID id = UUID.randomUUID();
 
         String originalName = safeOriginalName(file.getOriginalFilename());
@@ -96,7 +103,20 @@ public class AttachmentService {
             throw new FileSaveException("Failed to save file to disk: " + targetPath, e);
         }
 
-        productRepository.save(product);
+        try {
+            ProductImage productImage = new ProductImage(product, attachment, position);
+            productImageRepository.save(productImage);
+            product.getImages().add(productImage);
+        } catch (RuntimeException e) {
+            try {
+                Files.deleteIfExists(targetPath);
+            } catch (IOException ioe) {
+                log.warn("Failed to cleanup file after ProductImage save failure: {}", targetPath, ioe);
+            }
+            repository.deleteById(id);
+            throw e;
+        }
+
         return mapper.toResponseDTO(attachment);
     }
 
@@ -127,7 +147,7 @@ public class AttachmentService {
         ProductImage productImage = productImageRepository.findById(productImageId)
                 .orElseThrow(() -> new EntityNotFoundException("ProductImage", productImageId.toString()));
 
-        UUID attachmentId = productImage.getId();
+        UUID attachmentId = productImage.getAttachment().getId();
         String storedName = productImage.getAttachment().getStoredName();
 
         productImageRepository.delete(productImage);

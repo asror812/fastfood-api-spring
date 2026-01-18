@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -83,6 +84,7 @@ public class OrderService {
         }
     }
 
+    @Transactional
     public ApiMessageResponse emptyBasket(AuthDto auth) {
         Order basket = repository
                 .findBasketByUserId(auth.getId())
@@ -167,6 +169,7 @@ public class OrderService {
 
     }
 
+    @Transactional
     public OrderResponseDto removeProduct(AuthDto auth, UUID productId) {
         Order order = repository.findBasketByUserId(auth.getId())
                 .orElseThrow(
@@ -184,6 +187,7 @@ public class OrderService {
         return mapper.toResponseDto(order);
     }
 
+    @Transactional
     public OrderResponseDto applyBonus(AuthDto auth, ChosenOrderDto dto) {
         Order o = repository.findBasketByUserId(auth.getId())
                 .orElseThrow(() -> new UserBasketNotFoundException(
@@ -193,24 +197,28 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException(BONUS_ENTITY, dto.getBonusId().toString()));
 
         BonusProductLink bonusProductLink = bonus.getBonusProductLinks()
-                .stream().filter(bp -> bp.getId().equals(dto.getBonunProductLinkId()))
+                .stream().filter(bp -> bp.getId().equals(dto.getBonusProductLinkId()))
                 .findFirst().orElseThrow(
-                        () -> new EntityNotFoundException("Bonus Product", dto.getBonunProductLinkId().toString()));
+                        () -> new EntityNotFoundException("Bonus Product", dto.getBonusProductLinkId().toString()));
 
-        BigDecimal price = bonusProductLink.getProduct().getPrice();
+        // Remove previously applied bonus item(s) to avoid duplicates
+        o.getOrderItems().removeIf(OrderItem::isBonus);
+
+        Product bonusProduct = bonusProductLink.getProduct();
+        BigDecimal price = bonusProduct.getPrice();
         OrderItem item = new OrderItem();
 
         item.setBonus(true);
-        item.setDiscountAmount(price);
-        item.setFinalPrice(BigDecimal.ZERO);
-        item.setLineTotal(BigDecimal.ZERO);
         item.setUnitPrice(price);
+        item.setQuantity(1);
+        item.setProduct(bonusProduct);
         item.setOrder(o);
 
         o.setAppliedBonus(true);
         o.setSelectedBonus(bonus);
         o.getOrderItems().add(item);
 
+        calculateOrderPrices(o);
         repository.save(o);
         return mapper.toResponseDto(o);
     }
@@ -266,11 +274,20 @@ public class OrderService {
             BigDecimal lineTotal = oi.getProduct().getPrice()
                     .multiply(BigDecimal.valueOf(oi.getQuantity()));
 
-            BigDecimal itemDiscount = applyProductDiscounts(oi, lineTotal, today);
+            BigDecimal itemDiscount;
+            BigDecimal itemFinal;
+
+            if (oi.isBonus()) {
+                itemDiscount = lineTotal;
+                itemFinal = BigDecimal.ZERO;
+            } else {
+                itemDiscount = applyProductDiscounts(oi, lineTotal, today);
+                itemFinal = lineTotal.subtract(itemDiscount);
+            }
 
             oi.setLineTotal(lineTotal);
             oi.setDiscountAmount(itemDiscount);
-            oi.setFinalPrice(lineTotal.subtract(itemDiscount));
+            oi.setFinalPrice(itemFinal);
 
             total = total.add(lineTotal);
             totalDiscount = totalDiscount.add(itemDiscount);

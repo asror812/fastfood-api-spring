@@ -9,9 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ChosenOrderDto {
-    @NotNull(message = "Bonus id i required")
+    @NotNull(message = "Bonus id is required")
     private UUID bonusId;
 
     @NotNull(message = "Bonus Product Link is required")
-    private UUID bonunProductLinkId;
+    private UUID bonusProductLinkId;
 }

@@ -17,10 +17,10 @@ import java.util.UUID;
 public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     @Query("""
-            SELECT p
-            FROM Product p
-            JOIN FETCH p.category c
-            WHERE c.name = :name
+            select p
+            from Product p
+            join fetch p.category c
+            where c.name = :name
             """)
     List<Product> findProductsByCategoryName(@Param("name") String name);
 
@@ -42,19 +42,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     Optional<Product> findByName(String name);
 
-    @EntityGraph(attributePaths = {
-            "category", "images",
-            "images.attachment",
-            "discounts.discount",
-            "bonuses.bonus.condition"
-    })
-    @Query("""
-                select distinct p
-                from Product p
-                join p.discounts pd
-                join pd.discount d
-                where d.active = true and :today between d.startDate and d.endDate
-            """)
+    @EntityGraph(attributePaths = { "category", "images" })
+    @Query("select p from Product p")
     List<Product> getCampaignProducts(@Param("today") LocalDate today);
 
     @Query(value = """
@@ -69,20 +58,11 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             """, nativeQuery = true)
     List<Product> getPopularProducts();
 
-    @EntityGraph(attributePaths = {
-            "category",
-            "images",
-            "images.attachment"
-    })
+    @EntityGraph(attributePaths = { "category", "images" })
     @Query("select p from Product p")
-    List<Product> findAllProductsDetails();
+    List<Product> findAllProducts();
 
-    @EntityGraph(attributePaths = {
-            "category",
-            "images",
-            "images.attachment",
-            "discounts.discount",
-            "bonuses.bonus.condition"
-    })
-    Optional<Product> findProductDetailsById(@Param("id") UUID id);
+    @EntityGraph(attributePaths = { "category", "images" })
+    @Query("select p from Product p where p.id = :id")
+    Optional<Product> findProductById(@Param("id") UUID id);
 }

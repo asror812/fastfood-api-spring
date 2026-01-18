@@ -17,25 +17,31 @@ import java.util.UUID;
 @Repository
 public interface BonusRepository extends JpaRepository<Bonus, UUID> {
 
-        @EntityGraph(attributePaths = {
-                        "condition",
-                        "bonusProductLinks",
-                        "bonusProductLinks.product",
-                        "bonusProductLinks.product.category"
-        })
-        @Query("select b from Bonus b where b.active = true and :today between b.startDate and b.endDate")
-        List<Bonus> findAllActiveBonusesDetails(@Param("today") LocalDate today);
+    @EntityGraph(attributePaths = {
+            "condition",
+            "bonusProductLinks",
+            "bonusProductLinks.product",
+            "bonusProductLinks.product.category"
+    })
+    @Query("select b from Bonus b where b.active = true and :today between b.startDate and b.endDate")
+    List<Bonus> findAllActiveBonusesDetails(@Param("today") LocalDate today);
 
-        @EntityGraph(attributePaths = {
-                        "condition",
-                        "bonusProductLinks",
-                        "bonusProductLinks.product",
-                        "bonusProductLinks.product.category"
-        })
-        @Query("select b from Bonus b where b.id = :id and b.active = true and :today between b.startDate and b.endDate")
-        Optional<Bonus> findBonusDetails(@Param("id") UUID id, @Param("today") LocalDate today);
+    @EntityGraph(attributePaths = {
+            "condition",
+            "bonusProductLinks",
+            "bonusProductLinks.product",
+            "bonusProductLinks.product.category"
+    })
+    @Query("""
+                select b from Bonus b
+                where b.id=:id and b.active=true and
+                :today between b.startDate and b.endDate
+            """)
 
-        @Modifying
-        @Query("update Bonus b set b.active = false where b.endDate <= :today and b.active = true")
-        int deactivateAllExpired(@Param("today") LocalDate today);
+    Optional<Bonus> findBonusDetails(@Param("id") UUID id, @Param("today") LocalDate today);
+
+    @Modifying
+    @Query("update Bonus b set b.active = false where b.endDate <= :today and b.active = true")
+    int deactivateAllExpired(@Param("today") LocalDate today);
+
 }

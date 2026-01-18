@@ -19,7 +19,7 @@ public class Role {
     @EqualsAndHashCode.Include
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_name"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
     @ToString.Exclude
     private Set<Permission> permissions = new HashSet<>();

@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDiscountResponseDto implements Serializable {
+public class ProductDiscountDto implements Serializable {
     private UUID id;
     private String name;
     private int percentage;

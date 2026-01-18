@@ -1,16 +1,18 @@
 package com.example.app_fast_food.product.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.example.app_fast_food.bonus.dto.bonus_condition.BonusConditionResponseDto;
-
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductBonusDto implements Serializable {
     private UUID id;
 
@@ -20,7 +22,7 @@ public class ProductBonusDto implements Serializable {
 
     protected LocalDate endDate;
 
-    protected BonusConditionResponseDto condition;
+    protected BonusConditionDto condition;
 
     protected int usageLimit;
 }

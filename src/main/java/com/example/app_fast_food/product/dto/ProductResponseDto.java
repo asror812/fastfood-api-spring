@@ -19,7 +19,7 @@ public class ProductResponseDto implements Serializable {
 
     private int weight;
 
-    private List<ProductDiscountResponseDto> discounts = new ArrayList<>();
+    private List<ProductDiscountDto> discounts = new ArrayList<>();
     private List<ProductBonusDto> bonuses = new ArrayList<>();
     private List<ProductImageResponseDto> images = new ArrayList<>();
 

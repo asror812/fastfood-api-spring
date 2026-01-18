@@ -43,7 +43,7 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(name = "order_discounts", joinColumns = @JoinColumn(name = "order_id"), inverseJoinColumns = @JoinColumn(name = "discount_id"))
     private List<Discount> discounts = new ArrayList<>();
 
@@ -51,7 +51,7 @@ public class Order {
     @JoinColumn(name = "selected_bonus")
     private Bonus selectedBonus;
 
-    private boolean appliedBonus = true;
+    private boolean appliedBonus = false;
 
     private LocalDateTime createdAt;
 

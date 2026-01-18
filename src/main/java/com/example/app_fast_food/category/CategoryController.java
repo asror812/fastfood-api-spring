@@ -50,7 +50,7 @@ public class CategoryController {
     }
 
     @GetMapping("/menu/{id}")
-    public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryId(@PathVariable("id") UUID id,
+    public ResponseEntity<List<ProductResponseDto>> getProductsByCategory(@PathVariable("id") UUID id,
             @AuthenticationPrincipal AuthDto auth) {
         return ResponseEntity.ok(productService.getAllByCategory(id, auth));
     }

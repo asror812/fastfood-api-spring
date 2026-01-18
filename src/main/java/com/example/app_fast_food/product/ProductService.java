@@ -1,5 +1,7 @@
 package com.example.app_fast_food.product;
 
+import com.example.app_fast_food.bonus.BonusProductLinkRepository;
+import com.example.app_fast_food.bonus.entity.BonusProductLink;
 import com.example.app_fast_food.category.CategoryRepository;
 import com.example.app_fast_food.exception.EntityNotFoundException;
 import com.example.app_fast_food.favorite.FavoriteRepository;
@@ -7,6 +9,8 @@ import com.example.app_fast_food.product.dto.ProductCreateDto;
 import com.example.app_fast_food.product.dto.ProductListResponseDto;
 import com.example.app_fast_food.product.dto.ProductResponseDto;
 import com.example.app_fast_food.product.entity.Product;
+import com.example.app_fast_food.productdiscount.ProductDiscount;
+import com.example.app_fast_food.productdiscount.ProductDiscountReposity;
 import com.example.app_fast_food.user.dto.AuthDto;
 
 import lombok.RequiredArgsConstructor;
@@ -25,11 +29,14 @@ import java.util.UUID;
 public class ProductService {
 
     private final ProductMapper mapper;
+
     private final FavoriteRepository favoriteRepository;
     private final ProductRepository repository;
+    private final CategoryRepository categoryRepository;
+    private final BonusProductLinkRepository bonusProductLinkRepository;
+    private final ProductDiscountReposity productDiscountReposity;
 
     private final ProductCacheService cacheService;
-    private final CategoryRepository categoryRepository;
 
     @CacheEvict(value = {
             CacheNames.CAMPAIGN_PRODUCTS,
@@ -102,10 +109,13 @@ public class ProductService {
     }
 
     public ProductResponseDto getById(UUID id) {
-        Product product = repository.findProductDetailsById(id)
+        Product product = repository.findProductById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product", id.toString()));
 
-        return mapper.toResponseDTO(product);
+        List<BonusProductLink> bonuses = bonusProductLinkRepository.findActiveByProductId(id, LocalDate.now());
+        List<ProductDiscount> discounts = productDiscountReposity.findActiveByProductId(id, LocalDate.now());
+
+        return mapper.toFullResponse(product, discounts, bonuses);
     }
 
     private Set<UUID> favoriteIdsOrEmpty(AuthDto auth) {

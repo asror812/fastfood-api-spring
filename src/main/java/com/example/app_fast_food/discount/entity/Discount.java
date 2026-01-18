@@ -48,7 +48,7 @@ public class Discount {
     @Column(name = "is_active")
     private boolean active;
 
-    @OneToMany(mappedBy = "discount", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "discount")
     private List<ProductDiscount> products = new ArrayList<>();
 
     public Discount(String name, DiscountType type, int precentage, Integer requiredQuantity, BigDecimal requiredAmount,
