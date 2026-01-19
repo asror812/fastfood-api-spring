@@ -59,12 +59,12 @@ public class OrderService {
 
     @Cacheable(CacheNames.ORDERS)
     public List<OrderResponseDto> getAll() {
-        return repository.findAll().stream().map(mapper::toResponseDto).toList();
+        return repository.findAllOrders().stream().map(mapper::toResponseDto).toList();
 
     }
 
     public OrderResponseDto getById(@NonNull UUID id) {
-        Order order = repository.findById(id).orElseThrow(
+        Order order = repository.findOrderById(id).orElseThrow(
                 () -> new EntityNotFoundException("Order", id.toString()));
         return mapper.toResponseDto(order);
     }

@@ -71,7 +71,7 @@ public class OrderController {
     public ResponseEntity<OrderResponseDto> updateQuantity(
             @AuthenticationPrincipal AuthDto auth,
             @PathVariable("productId") UUID productId,
-            @RequestParam int quantity) {
+            @RequestParam("quantity") int quantity) {
         return ResponseEntity.ok(orderService.updateQuantity(auth, productId, quantity));
     }
 

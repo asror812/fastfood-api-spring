@@ -41,10 +41,10 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private LocalDate birthDate;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private CustomerProfile customerProfile;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private AdminProfile adminProfile;
 
     public User(String phoneNumber, String name,
