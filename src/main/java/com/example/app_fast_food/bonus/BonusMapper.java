@@ -10,6 +10,7 @@ import com.example.app_fast_food.product.dto.CategoryDto;
 import com.example.app_fast_food.product.dto.ProductBonusDto;
 import com.example.app_fast_food.product.dto.ProductDto;
 import com.example.app_fast_food.product.entity.Product;
+import com.example.app_fast_food.productimage.ProductImageMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = { BonusConditionMapper.class })
+@Mapper(componentModel = "spring", uses = { BonusConditionMapper.class, ProductImageMapper.class})
 public interface BonusMapper {
+
+    String BASE_DOWNLOAD_URL = "/attachments/download/";
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "condition", ignore = true)
@@ -27,7 +30,6 @@ public interface BonusMapper {
     @Mapping(target = "active", ignore = true)
     Bonus toEntity(BonusCreateDto dto);
 
-    @Mapping(target = "products", source = "bonusProductLinks")
     BonusResponseDto toResponseDto(Bonus bonus);
 
     default List<ProductDto> toResponseDto(List<BonusProductLink> bonusProductLink) {

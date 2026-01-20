@@ -19,15 +19,17 @@ public class SmsNotificationServiceImpl implements SmsNotificationService {
     @Value("${notification.eskiz.token}")
     private String token;
 
+    private static final String BEARER_HEADER = "Bearer ";
+
     private final EskizFeignClient eskizFeignClient;
 
     @Override
     public void sendNotification(String phoneNumber, String message) {
         try {
-            eskizFeignClient.sendSms("Bearer " + token, new SendSmsRequestDTO(phoneNumber, message));
+            eskizFeignClient.sendSms(BEARER_HEADER + token, new SendSmsRequestDTO(phoneNumber, message));
         } catch (FeignException.Unauthorized e) {
-            token = eskizFeignClient.refresh("Bearer " + token).getData().get(token);
-            eskizFeignClient.sendSms("Bearer " + token, new SendSmsRequestDTO(phoneNumber, message));
+            token = eskizFeignClient.refresh(BEARER_HEADER + token).getData().get(token);
+            eskizFeignClient.sendSms(BEARER_HEADER + token, new SendSmsRequestDTO(phoneNumber, message));
         } catch (Exception e) {
             log.error("Exception occurred while sending notification.phoneNumber {}  message  {}  ", phoneNumber,
                     message, e);

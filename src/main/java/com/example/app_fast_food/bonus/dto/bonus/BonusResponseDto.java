@@ -10,13 +10,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import com.example.app_fast_food.bonus.dto.bonus_condition.BonusConditionResponseDto;
-import com.example.app_fast_food.product.dto.ProductDto;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class BonusResponseDto implements Serializable {
-
     protected UUID id;
 
     protected String name;
@@ -29,5 +27,5 @@ public class BonusResponseDto implements Serializable {
 
     private BonusConditionResponseDto condition;
 
-    private List<ProductDto> products;
+    private List<BonusProductLinkDto> bonusProductLinks;
 }

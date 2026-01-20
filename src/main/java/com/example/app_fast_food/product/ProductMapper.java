@@ -1,6 +1,5 @@
 package com.example.app_fast_food.product;
 
-import com.example.app_fast_food.bonus.BonusMapper;
 import com.example.app_fast_food.bonus.entity.Bonus;
 import com.example.app_fast_food.bonus.entity.BonusCondition;
 import com.example.app_fast_food.bonus.entity.BonusProductLink;
@@ -9,8 +8,7 @@ import com.example.app_fast_food.discount.entity.Discount;
 import com.example.app_fast_food.product.dto.*;
 import com.example.app_fast_food.product.entity.Product;
 import com.example.app_fast_food.productdiscount.ProductDiscount;
-import com.example.app_fast_food.productdiscount.ProductDiscountMapper;
-import com.example.app_fast_food.productimage.ProductImage;
+import com.example.app_fast_food.productimage.ProductImageMapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = { CategoryMapper.class, ProductDiscountMapper.class, BonusMapper.class })
+@Mapper(componentModel = "spring", uses = { CategoryMapper.class, ProductImageMapper.class })
 public interface ProductMapper {
 
     String BASE_DOWNLOAD_URL = "/attachments/download/";
@@ -44,7 +42,7 @@ public interface ProductMapper {
             Product product,
             List<ProductDiscount> discounts,
             List<BonusProductLink> bonuses) {
-                
+
         if (product == null)
             return null;
 
@@ -102,24 +100,6 @@ public interface ProductMapper {
         }
 
         return productDiscounts;
-    }
-
-    default List<ProductImageResponseDto> toProductImageResponseDto(List<ProductImage> pis) {
-        if (pis == null || pis.isEmpty())
-            return Collections.emptyList();
-
-        List<ProductImageResponseDto> productImages = new ArrayList<>();
-
-        for (ProductImage pi : pis) {
-            if (pi == null || pi.getAttachment() == null) {
-                continue;
-            }
-
-            productImages.add(
-                    new ProductImageResponseDto(pi.getId(), BASE_DOWNLOAD_URL + pi.getAttachment().getId(),
-                            pi.getPosition()));
-        }
-        return productImages;
     }
 
 }

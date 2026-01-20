@@ -232,8 +232,9 @@ public class OrderService {
         User user = userRepository.findById(auth.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User", auth.getId().toString()));
 
-        return bonusService.getAvailableOrderBonuses(
-                user, order).stream().map(bonusMapper::toResponseDto).toList();
+        return bonusService.getAvailableOrderBonuses(user, order)
+                .stream().map(bonusMapper::toResponseDto)
+                .toList();
     }
 
     public OrderResponseDto getBasket(AuthDto auth) {
